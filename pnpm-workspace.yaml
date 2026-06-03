@@ -1,0 +1,5 @@
+# pnpm 默认不信任第三方包的安装脚本，会就「被忽略的构建脚本」报错。
+# sharp 是 Next.js 图片优化用的，本项目是静态导出 + images.unoptimized，用不到它，
+# 所以这里显式声明「忽略 sharp 的构建脚本」（值 false = 确认不构建并消除报错）。
+allowBuilds:
+  sharp: false

@@ -1,13 +1,13 @@
 # 个人简历网站
 
 终端 / 科技风的双语单页简历，深浅色 + 三种风格切换。
-技术栈：**Next.js 15 + React 19 + TypeScript**。
+技术栈：**Next.js 15 + React 19 + TypeScript**，包管理用 **pnpm**。
 
 ## 运行
 
 ```bash
-npm install      # 首次：安装依赖
-npm run dev      # 开发模式，访问 http://localhost:3000
+pnpm install     # 首次：安装依赖
+pnpm dev         # 开发模式，访问 http://localhost:3000
 ```
 
 改代码后浏览器会自动刷新（热更新）。
@@ -15,7 +15,7 @@ npm run dev      # 开发模式，访问 http://localhost:3000
 ## 构建 / 部署
 
 ```bash
-npm run build    # 生成纯静态站点到 out/ 目录
+pnpm build       # 生成纯静态站点到 out/ 目录
 ```
 
 `out/` 里是纯 HTML/CSS/JS，可上传到任意静态托管（GitHub Pages / Vercel / Netlify / 自己的服务器）。
