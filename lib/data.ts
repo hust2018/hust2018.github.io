@@ -1,7 +1,8 @@
-/* global window */
-// Bilingual resume content. Edit freely.
+// 所有简历内容都在这里。改简历主要就改这个文件。
+// `: Resume` 表示这个对象必须符合 Resume 类型，漏写/写错字段会立刻报错。
+import type { Resume, Localized } from "./types";
 
-const RESUME = {
+export const RESUME: Resume = {
   meta: {
     handle: "your-handle",
     user: "you",
@@ -179,7 +180,8 @@ const RESUME = {
   },
 };
 
-const STRINGS = {
+// 界面上的固定文案（区块标题、按钮文字等）的双语对照。
+export const STRINGS: Record<string, Localized> = {
   about: { zh: "关于", en: "About" },
   skills: { zh: "技能栈", en: "Skills" },
   experience: { zh: "工作经历", en: "Experience" },
@@ -195,6 +197,3 @@ const STRINGS = {
   available: { zh: "状态", en: "Status" },
   whoami: { zh: "whoami", en: "whoami" },
 };
-
-window.RESUME = RESUME;
-window.STRINGS = STRINGS;
