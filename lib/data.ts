@@ -1,7 +1,19 @@
 // 所有简历内容都在这里。改简历主要就改这个文件。
 // `: Resume` 表示这个对象必须符合 Resume 类型，漏写/写错字段会立刻报错。
+//
+// 这个文件和 types.ts 的关系：types.ts 定义「形状」（每个字段该是什么类型），
+// 这里填「内容」（具体的名字、经历、文案）。把数据和它的结构定义分开放，
+// 是很常见的组织方式——以后想改简历内容，基本只动这一个文件。
+//
+// 从 "./types" 引入两个类型：Resume 给下面的 RESUME 用，Localized 给最下面的 STRINGS 用。
+// 同样是 `import type`，纯类型引入，不会出现在编译后的 JS 里。
 import type { Resume, Localized } from "./types";
 
+// 概念：`const` 声明一个常量（声明后不可重新赋值）。
+// 变量名用全大写 RESUME 是一种约定俗成的写法，表示「这是一份固定不变的配置数据」。
+// `: Resume` 是类型标注：约束这个对象必须严格符合 Resume 接口——
+// 这样写数据时若漏了某个字段、或把双语对象写成了纯字符串，编辑器会马上标红，
+// 这正是用 TypeScript 写数据的最大好处：错误在编码时就被拦住，而不是等到页面跑崩。
 export const RESUME: Resume = {
   meta: {
     handle: "your-handle",
@@ -9,6 +21,7 @@ export const RESUME: Resume = {
     host: "portfolio",
     cwd: "~/resume",
   },
+  // hero：顶部主视觉。每个像 { zh: ..., en: ... } 的对象就是一个 Localized 双语文本。
   hero: {
     name: { zh: "你的名字", en: "Your Name" },
     role: { zh: "高级软件工程师", en: "Senior Software Engineer" },
@@ -32,6 +45,9 @@ export const RESUME: Resume = {
       "Outside work I tinker with Linux, mechanical keyboards, and Neovim configs — and build small useless tools for fun.",
     ],
   },
+  // skills：用 [ ] 包起来是一个「数组」，里面每个 { } 是一组技能（对应 SkillGroup）。
+  // 注意 items 里 "TypeScript" 这种纯字符串和 { zh, en } 双语对象是混着放的——
+  // 这正是 types.ts 里 MaybeLocalized 这个联合类型允许的。
   skills: [
     {
       cat: { zh: "语言", en: "Languages" },
@@ -59,6 +75,8 @@ export const RESUME: Resume = {
       ],
     },
   ],
+  // experience：工作经历数组，每项对应一个 ExperienceItem。
+  // bullets 是 LocalizedList——zh 和 en 各是一个字符串数组，所以下面用 [ ] 装多条要点。
   experience: [
     {
       role: { zh: "高级软件工程师", en: "Senior Software Engineer" },
@@ -117,6 +135,7 @@ export const RESUME: Resume = {
       stack: ["Vue", "Python", "Django"],
     },
   ],
+  // projects：项目数组，每项对应一个 Project。
   projects: [
     {
       name: "term-lib",
@@ -163,6 +182,7 @@ export const RESUME: Resume = {
       lang: "Go",
     },
   ],
+  // education：教育经历数组，每项对应一个 EducationItem。
   education: [
     {
       date: "2013 — 2017",
@@ -171,6 +191,7 @@ export const RESUME: Resume = {
       extra: { zh: "GPA 3.8 / 4.0 · ACM 校队", en: "GPA 3.8 / 4.0 · ACM team" },
     },
   ],
+  // contact：联系方式，对应 Contact，字段都是固定文本。
   contact: {
     email: "you@example.com",
     github: "github.com/your-handle",
@@ -181,6 +202,13 @@ export const RESUME: Resume = {
 };
 
 // 界面上的固定文案（区块标题、按钮文字等）的双语对照。
+//
+// 概念：`Record<string, Localized>` 是 TypeScript 内置的「工具类型」。
+// 它的尖括号 < > 里是「泛型参数」——给类型传参，像给函数传参数一样。
+// Record<K, V> 表示「一个对象，键(key)是 K 类型、值(value)是 V 类型」。
+// 这里 K=string、V=Localized，即：一个键是字符串、每个值都是双语对象的字典。
+// 这样既能随意增删条目（不像 interface 要固定字段），又保证每个值都是合法的双语对象。
+// 用法上：界面组件拿到一个 key（如 "about"），就能查到对应的 { zh, en } 去显示。
 export const STRINGS: Record<string, Localized> = {
   about: { zh: "关于", en: "About" },
   skills: { zh: "技能栈", en: "Skills" },
