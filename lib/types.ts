@@ -74,31 +74,20 @@ export interface ExperienceItem {
   stack: string[];
 }
 
-// Project：一个项目展示卡片。
-// name/year/stars/lang 都是固定文本用 string，只有描述 desc 需要双语。
-export interface Project {
-  name: string;
-  year: string;
-  desc: Localized;
-  stack: string[];
-  stars: string;
-  lang: string;
-}
-
 // EducationItem：一段教育经历。
+// extra 后面加了 `?`，表示「这个字段可有可无」（如 GPA、社团等补充信息）。
+// 不写时 data.ts 里可以直接省略；渲染时 pickLang 收到 undefined 会安全地返回空串。
 export interface EducationItem {
   date: string;
   school: Localized;
   degree: Localized;
-  extra: Localized;
+  extra?: Localized;
 }
 
 // Contact：联系方式，全是固定文本，所以字段都是 string。
 export interface Contact {
   email: string;
-  github: string;
   linkedin: string;
-  blog: string;
   phone: string;
 }
 
@@ -111,7 +100,6 @@ export interface Resume {
   about: LocalizedList;
   skills: SkillGroup[];
   experience: ExperienceItem[];
-  projects: Project[];
   education: EducationItem[];
   contact: Contact;
 }

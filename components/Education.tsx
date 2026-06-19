@@ -6,7 +6,7 @@ import { pickLang } from "@/lib/i18n";
 import { FadeUp, SectionHead } from "./effects";
 import type { Lang } from "@/lib/types";
 
-// 「教育」区块：和 Projects 结构几乎一样的纯展示组件。
+// 「教育」区块：纯展示组件——遍历教育经历数组，每条渲染成一行。
 export function Education({ lang }: { lang: Lang }) {
   // 取出教育经历数组。
   const items = RESUME.education;

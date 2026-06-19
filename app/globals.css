@@ -473,47 +473,6 @@ html[data-theme="light"] .hero-name { text-shadow: none; }
   vertical-align: 1px;
 }
 
-/* Stats row */
-.hero-stats {
-  margin-top: 32px;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  max-width: 560px;
-}
-.stat {
-  padding: 12px 14px;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  position: relative;
-  clip-path: var(--clip-notch);
-}
-.stat::after {
-  content: "";
-  position: absolute;
-  top: 0; right: 0;
-  width: 14px; height: 1px;
-  background: var(--accent);
-  transform-origin: 100% 0%;
-  transform: rotate(-45deg) translateY(8.5px) translateX(0.5px);
-}
-.stat .v {
-  font-family: var(--font-display);
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--fg);
-  letter-spacing: -0.02em;
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-}
-.stat .v .plus { color: var(--accent); font-size: 14px; vertical-align: 6px; }
-.stat .k {
-  font-size: 10px;
-  color: var(--fg-mute);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  margin-top: 6px;
-}
 
 /* Hero photo */
 .hero-photo {
@@ -734,73 +693,6 @@ html[data-variant="terminal"][data-theme="dark"] .hero-photo::after { opacity: 1
   gap: 5px;
 }
 .exp-inner .stack .chip { font-size: 10px; padding: 2px 9px; clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%); }
-
-/* ============ Projects ============ */
-.projects {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 14px;
-}
-.project {
-  border: 1px solid var(--border);
-  background: var(--bg-card);
-  padding: 18px;
-  transition: all 0.2s;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  position: relative;
-  clip-path: var(--clip-notch);
-}
-.project::before {
-  content: "[ PRJ ]";
-  position: absolute;
-  top: 6px; right: 14px;
-  font-size: 9px;
-  color: var(--fg-mute);
-  letter-spacing: 0.12em;
-}
-.project:hover {
-  border-color: var(--accent);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 32px -12px var(--accent), inset 0 0 0 1px var(--accent-soft);
-}
-.project-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 10px;
-  padding-right: 50px;
-}
-.project-name {
-  color: var(--fg);
-  font-weight: 600;
-  font-size: 15px;
-  font-family: var(--font-display);
-  letter-spacing: -0.01em;
-}
-.project-name::before { content: "▸ "; color: var(--accent); font-family: var(--font-mono); }
-.project-year { color: var(--fg-mute); font-size: 11px; font-variant-numeric: tabular-nums; }
-.project-desc { color: var(--fg-dim); font-size: 12px; flex: 1; text-wrap: pretty; line-height: 1.7; }
-.project-stack { display: flex; flex-wrap: wrap; gap: 4px; }
-.project-stack .tag {
-  font-size: 10px;
-  color: var(--accent);
-  padding: 1px 7px;
-  background: var(--accent-soft);
-  border: 1px solid var(--accent-soft);
-  letter-spacing: 0.04em;
-}
-.project-meta {
-  display: flex;
-  gap: 16px;
-  font-size: 11px;
-  color: var(--fg-mute);
-  padding-top: 8px;
-  border-top: 1px dashed var(--border);
-  font-variant-numeric: tabular-nums;
-}
-.project-meta b { color: var(--accent); font-weight: 600; }
 
 /* ============ Education ============ */
 .edu-list {
@@ -1037,6 +929,65 @@ html[data-theme="light"] .glitch::after { animation: none; opacity: 0; }
 }
 
 /* ============ Print ============ */
+/* ============ Interactive terminal (section 04) ============ */
+.terminal {
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  clip-path: var(--clip-notch);
+  font-family: var(--font-mono);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  cursor: text;
+}
+.term-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  background: var(--bg-soft);
+  border-bottom: 1px solid var(--border);
+}
+.term-dot { width: 11px; height: 11px; border-radius: 50%; background: var(--fg-mute); opacity: 0.55; }
+.term-ttl { margin-left: 6px; color: var(--fg-mute); font-size: 11px; letter-spacing: 0.04em; }
+.term-body {
+  padding: 14px 16px 6px;
+  max-height: 360px;
+  overflow-y: auto;
+  font-size: 13px;
+  line-height: 1.75;
+  color: var(--fg-dim);
+}
+.term-entry { margin-bottom: 9px; }
+.term-cmdline { color: var(--fg); }
+.term-out { white-space: pre-wrap; word-break: break-word; }
+.term-note { color: var(--fg-mute); margin-bottom: 9px; }
+.term-err { color: var(--red); }
+.term-pmt { color: var(--accent); white-space: nowrap; }
+.term-you { color: var(--green); }
+.term-k, .term-cmd { color: var(--accent); }
+.term-grid { display: grid; grid-template-columns: auto 1fr; gap: 2px 18px; }
+.term-inputrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px 14px;
+  border-top: 1px dashed var(--border);
+}
+.term-input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  color: var(--fg);
+  font: inherit;
+  caret-color: var(--accent);
+}
+.term-input::placeholder { color: var(--fg-mute); opacity: 0.7; }
+/* 输入框聚焦时，给整个终端窗口描一圈 accent 边框 + 柔光，作为清晰的「焦点指示」（键盘可达性）。
+   :focus-within 表示「内部任意元素获得焦点时」就生效——这里即输入框被聚焦时。 */
+.terminal:focus-within { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-soft), var(--shadow); }
+
 @media print {
   :root, html, html[data-variant], html[data-theme] {
     --bg: #ffffff;
@@ -1053,10 +1004,13 @@ html[data-theme="light"] .glitch::after { animation: none; opacity: 0; }
     --accent-soft: transparent;
     --accent-glow: none;
     --blue: #2c5a7e;
+    /* 终端用到的两个语义色也要中和成深色，否则霓虹绿/红会印在白纸上（提示符、报错文字） */
+    --red: #8a2f2f;
+    --green: #2f6b3a;
     --clip-notch: none;
   }
   body::before, body::after { display: none !important; }
-  .topbar, .tweaks-panel, .rail, .scan-sweep, .boot { display: none !important; }
+  .topbar, .rail, .scan-sweep, .boot { display: none !important; }
   .app { padding: 20px 0; max-width: 100%; }
   .hero { padding: 0 0 20px; }
   .section { padding: 18px 0 8px; page-break-inside: avoid; }
@@ -1066,10 +1020,15 @@ html[data-theme="light"] .glitch::after { animation: none; opacity: 0; }
   .hero-photo::after { display: none; }
   a { color: #000; text-decoration: underline; }
   .fade-up { opacity: 1 !important; transform: none !important; }
-  .stat, .exp, .project, .edu, .contact-block, .hero-photo, .chip { clip-path: none !important; }
+  .exp, .edu, .contact-block, .hero-photo, .chip { clip-path: none !important; }
   .hero-name { text-shadow: none; }
   .hero-role { text-shadow: none; }
   .section-head h2 { color: #000; }
+  /* 终端：打印时隐藏输入行、展开回滚区（去掉滚动条/限高），让内容完整打印成黑白 */
+  .term-inputrow { display: none !important; }
+  .term-body { max-height: none !important; overflow: visible !important; }
+  .term-dot { display: none; }
+  .terminal { clip-path: none !important; box-shadow: none; }
 }
 
 /* ============ Responsive ============ */
@@ -1082,7 +1041,6 @@ html[data-theme="light"] .glitch::after { animation: none; opacity: 0; }
   .topbar-title { display: none; }
   .hero { grid-template-columns: 1fr; padding-top: 40px; gap: 28px; align-items: start; }
   .hero-photo { width: 140px; height: 170px; }
-  .hero-stats { grid-template-columns: repeat(2, 1fr); }
   .skills-grid { grid-template-columns: 1fr; gap: 4px; }
   .skill-cat { padding-top: 14px; }
   .edu { grid-template-columns: 1fr; gap: 4px; }

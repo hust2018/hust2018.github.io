@@ -16,9 +16,7 @@ export function Contact({ lang }: { lang: Lang }) {
   // 第三项可以是字符串或 null（电话没有链接，所以是 null）。
   const rows: [string, string, string | null][] = [
     ["email", c.email, `mailto:${c.email}`],
-    ["github", c.github, `https://${c.github}`],
     ["linkedin", c.linkedin, `https://${c.linkedin}`],
-    ["blog", c.blog, `https://${c.blog}`],
     ["phone", c.phone, null],
   ];
   return (

@@ -14,7 +14,7 @@ export function SideRail({ lang }: { lang: Lang }) {
     { id: "about", label: { zh: "关于", en: "About" } },
     { id: "skills", label: { zh: "技能", en: "Skills" } },
     { id: "experience", label: { zh: "经历", en: "Exp" } },
-    { id: "projects", label: { zh: "项目", en: "Projects" } },
+    { id: "shell", label: { zh: "终端", en: "Shell" } },
     { id: "education", label: { zh: "教育", en: "Edu" } },
     { id: "contact", label: { zh: "联系", en: "Contact" } },
   ];

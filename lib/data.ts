@@ -16,31 +16,31 @@ import type { Resume, Localized } from "./types";
 // 这正是用 TypeScript 写数据的最大好处：错误在编码时就被拦住，而不是等到页面跑崩。
 export const RESUME: Resume = {
   meta: {
-    handle: "your-handle",
-    user: "you",
-    host: "portfolio",
+    handle: "jianglei.li resume",
+    user: "jianglei.li",
+    host: "tamaredge.ai",
     cwd: "~/resume",
   },
   // hero：顶部主视觉。每个像 { zh: ..., en: ... } 的对象就是一个 Localized 双语文本。
   hero: {
-    name: { zh: "你的名字", en: "Your Name" },
-    role: { zh: "高级软件工程师", en: "Senior Software Engineer" },
+    name: { zh: "李姜磊", en: "Jianglei Li" },
+    role: { zh: "AI Agent开发工程师", en: "Senior Software Engineer" },
     tagline: {
-      zh: "构建高性能的工具与系统。专注前端架构、开发者体验与分布式服务。开源爱好者，热爱键盘与编辑器配置。",
-      en: "Building performant tools and systems. Focused on frontend architecture, developer experience, and distributed services. Open-source enthusiast, keyboard-and-config nerd.",
+      zh: "构建高性能的Agent工具与系统。专注高性能架构、分布式服务与Agent前沿技术。开源爱好者，热爱AI与挑战。",
+      en: "Building high-performance agent tools and systems.Building high-performance agent tools and systems. Focused on high-performance architecture, developer experience, and distributed services. Open-source enthusiast, passionate about AI and challenges.",
     },
-    location: { zh: "上海，中国", en: "Shanghai, China" },
-    status: { zh: "开放新机会", en: "Open to opportunities" },
-    yearsExp: "8",
+    location: { zh: "深圳，中国", en: "Shenzhen, China" },
+    status: { zh: "（暂不考虑机会）为梦想窒息", en: "Open to opportunities" },
+    yearsExp: "4",
   },
   about: {
     zh: [
-      "我是一名 **软件工程师**，过去 **8 年** 我都在写代码、读代码、删代码。",
+      "我是一名 **Agent开发工程师**，过去 **4 年** 我都在写代码、读代码、删代码。",
       "我相信好的工程师是 **工具的工匠**：让复杂的系统变得简单，让简单的事情自动化。",
       "工作之外我会折腾 Linux、机械键盘和 Neovim 配置，也会写一些没什么用的小工具自娱自乐。",
     ],
     en: [
-      "I'm a **software engineer**. For the past **8 years** I've been writing code, reading code, and deleting code.",
+      "I'm a **software engineer**. For the past **4 years** I've been writing code, reading code, and deleting code.",
       "I believe great engineers are **craftspeople of tools**: making complex systems simple and simple things automated.",
       "Outside work I tinker with Linux, mechanical keyboards, and Neovim configs — and build small useless tools for fun.",
     ],
@@ -51,7 +51,7 @@ export const RESUME: Resume = {
   skills: [
     {
       cat: { zh: "语言", en: "Languages" },
-      items: ["TypeScript", "Go", "Python", "Rust", "Lua", "Bash"],
+      items: ["Go", "Python", "C", "Bash"],
     },
     {
       cat: { zh: "前端", en: "Frontend" },
@@ -63,7 +63,7 @@ export const RESUME: Resume = {
     },
     {
       cat: { zh: "工具", en: "Tooling" },
-      items: ["Neovim", "tmux", "Git", "Docker", "Bazel", "Nix"],
+      items: ["tmux", "Git", "Docker", "Bazel", "Nix"],
     },
     {
       cat: { zh: "兴趣方向", en: "Interests" },
@@ -135,68 +135,25 @@ export const RESUME: Resume = {
       stack: ["Vue", "Python", "Django"],
     },
   ],
-  // projects：项目数组，每项对应一个 Project。
-  projects: [
-    {
-      name: "term-lib",
-      year: "2025",
-      desc: {
-        zh: "一个零依赖的终端 UI 库，支持复杂布局与动画。",
-        en: "Zero-dependency terminal UI library with layouts and animations.",
-      },
-      stack: ["Rust", "TUI"],
-      stars: "3.2k",
-      lang: "Rust",
-    },
-    {
-      name: "dotfiles",
-      year: "ongoing",
-      desc: {
-        zh: "我的 Neovim、tmux、zsh 配置，包含自定义 Lua 插件。",
-        en: "My Neovim, tmux, and zsh configs — with custom Lua plugins.",
-      },
-      stack: ["Lua", "Bash"],
-      stars: "480",
-      lang: "Lua",
-    },
-    {
-      name: "tinywasm",
-      year: "2024",
-      desc: {
-        zh: "用 TypeScript 实现的 WebAssembly 解释器，纯学习项目。",
-        en: "A WebAssembly interpreter written in TypeScript. Pure learning exercise.",
-      },
-      stack: ["TypeScript", "WASM"],
-      stars: "1.1k",
-      lang: "TS",
-    },
-    {
-      name: "k8s-debug-cli",
-      year: "2023",
-      desc: {
-        zh: "Kubernetes 故障排查命令行工具，整合 kubectl + 常用诊断。",
-        en: "Kubernetes troubleshooting CLI; bundles kubectl with common diagnostics.",
-      },
-      stack: ["Go", "K8s"],
-      stars: "820",
-      lang: "Go",
-    },
-  ],
   // education：教育经历数组，每项对应一个 EducationItem。
   education: [
     {
-      date: "2013 — 2017",
-      school: { zh: "某某大学", en: "University of Somewhere" },
-      degree: { zh: "计算机科学 学士", en: "B.S. Computer Science" },
-      extra: { zh: "GPA 3.8 / 4.0 · ACM 校队", en: "GPA 3.8 / 4.0 · ACM team" },
+      date: "2015 — 2019",
+      school: { zh: "华中科技大学", en: "University of Somewhere" },
+      degree: { zh: "信息安全 学士", en: "B.S. Computer Science" },
+      // extra: { zh: "GPA 3.8 / 4.0 · ACM 校队", en: "GPA 3.8 / 4.0 · ACM team" },
+    },
+    {
+      date: "2015 — 2019",
+      school: { zh: "华中科技大学", en: "University of Somewhere" },
+      degree: { zh: "网络安全 硕士", en: "B.S. Computer Science" },
+      // extra: { zh: "GPA 3.8 / 4.0 · ACM 校队", en: "GPA 3.8 / 4.0 · ACM team" },
     },
   ],
   // contact：联系方式，对应 Contact，字段都是固定文本。
   contact: {
     email: "you@example.com",
-    github: "github.com/your-handle",
     linkedin: "linkedin.com/in/your-handle",
-    blog: "your-blog.dev",
     phone: "+86 138 0000 0000",
   },
 };
@@ -213,7 +170,7 @@ export const STRINGS: Record<string, Localized> = {
   about: { zh: "关于", en: "About" },
   skills: { zh: "技能栈", en: "Skills" },
   experience: { zh: "工作经历", en: "Experience" },
-  projects: { zh: "项目", en: "Projects" },
+  shell: { zh: "终端", en: "Shell" },
   education: { zh: "教育", en: "Education" },
   contact: { zh: "联系方式", en: "Contact" },
   download: { zh: "下载 PDF", en: "Download PDF" },
