@@ -22,7 +22,7 @@ export function Skills({ lang }: { lang: Lang }) {
     // 区块容器，className 配合全局 CSS 控制样式，id="skills" 用作锚点方便跳转。
     <section className="section" id="skills">
       {/* 标题栏：编号 02，标题取当前语言的「技能」文案，右侧小注释 // ls ~/skills */}
-      <SectionHead num="02" title={pickLang(STRINGS.skills, lang)} meta="// ls ~/skills" />
+      <SectionHead num="03" title={pickLang(STRINGS.skills, lang)} meta="// ls ~/skills" />
       <FadeUp>
         <div className="skills-grid">
           {/* 外层 .map：遍历每个技能分类 s（下标 i），为每个分类渲染「分类名 + 该分类下的技能标签组」。 */}

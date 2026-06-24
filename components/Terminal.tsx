@@ -214,7 +214,7 @@ export function Terminal({ lang }: { lang: Lang }) {
   return (
     <section className="section" id="shell">
       {/* 区块标题：编号沿用原「项目」区的 04；meta 提示这是个可运行的脚本 */}
-      <SectionHead num="04" title={pickLang(STRINGS.shell, lang)} meta="// ./resume.sh" />
+      <SectionHead num="02" title={pickLang(STRINGS.shell, lang)} meta="// ./resume.sh" />
       <FadeUp>
         {/* 点终端窗口任意处都让输入框获得焦点，体验更接近真终端 */}
         <div className="terminal" onClick={() => inputRef.current?.focus()}>

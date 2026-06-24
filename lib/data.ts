@@ -26,7 +26,7 @@ export const RESUME: Resume = {
     },
     location: { zh: "深圳，中国", en: "Shenzhen, China" },
     status: { zh: "在职 · 暂不看机会", en: "Currently employed" },
-    yearsExp: "3",
+    yearsExp: "4",
   },
   // about：「关于我」的几段话。每段里的 **加粗** 会被 FormattedBold 渲染成高亮。
   about: {

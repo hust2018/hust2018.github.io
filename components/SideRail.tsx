@@ -12,9 +12,9 @@ export function SideRail({ lang }: { lang: Lang }) {
   // label 是这一项的双语显示文字。
   const sections: { id: string; label: Localized }[] = [
     { id: "about", label: { zh: "关于", en: "About" } },
+    { id: "shell", label: { zh: "终端", en: "Shell" } },
     { id: "skills", label: { zh: "技能", en: "Skills" } },
     { id: "experience", label: { zh: "经历", en: "Exp" } },
-    { id: "shell", label: { zh: "终端", en: "Shell" } },
     { id: "highlights", label: { zh: "亮点", en: "More" } },
     { id: "education", label: { zh: "教育", en: "Edu" } },
     { id: "contact", label: { zh: "联系", en: "Contact" } },

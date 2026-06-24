@@ -93,9 +93,9 @@ export default function App() {
             Hero 还额外需要知道开机动画是否结束（booted）以决定何时开始打字等。 */}
         <Hero lang={lang} booted={booted} />
         <About lang={lang} />
+        <Terminal lang={lang} />
         <Skills lang={lang} />
         <Experience lang={lang} />
-        <Terminal lang={lang} />
         <Highlights lang={lang} />
         <Education lang={lang} />
         <Contact lang={lang} />

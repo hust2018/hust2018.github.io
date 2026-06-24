@@ -92,7 +92,7 @@ export function Experience({ lang }: { lang: Lang }) {
           meta 这个 prop 接收的是一段 JSX（按钮），会显示在标题旁边。 */}
       {/* meta 传入的这个按钮点一下就把 allOpen 取反，让所有经历同时展开或收起 */}
       <SectionHead
-        num="03"
+        num="04"
         title={pickLang(STRINGS.experience, lang)}
         meta={
           <button
