@@ -17,3 +17,7 @@
 *.pdf
 # 但生成的简历 PDF（只含邮箱、由 pnpm pdf 生成）要入库并随站点部署
 !public/resume.pdf
+
+# 加密页构建产物（部署到单独的公开仓库，不在本仓库跟踪）
+/encrypted/
+/.enc-tmp/
