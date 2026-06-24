@@ -12,3 +12,6 @@
 # TypeScript
 /next-env.d.ts
 *.tsbuildinfo
+
+# 源简历 PDF（含手机号等隐私，不入公开仓库）
+*.pdf

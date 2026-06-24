@@ -87,8 +87,17 @@ export interface EducationItem {
 // Contact：联系方式，全是固定文本，所以字段都是 string。
 export interface Contact {
   email: string;
-  linkedin: string;
-  phone: string;
+}
+
+// Highlight：一条「亮点 / 活动」经历（黑客马拉松、开源研读等）。
+// badge/link/stack 后面带 `?`，表示可选——不同活动按需填，不填就不显示。
+export interface Highlight {
+  date: string; // 时间范围，纯文本（如 "2025.8 — 2025.9"）
+  title: Localized; // 标题（双语）
+  desc: Localized; // 一句话描述（双语）
+  badge?: Localized; // 可选小徽章，如「第五名 / 5th place」
+  link?: string; // 可选外链（如开源仓库地址）
+  stack?: string[]; // 可选技术标签（固定英文 token，不翻译）
 }
 
 // 整份简历的总类型：把上面各块组合起来。
@@ -100,6 +109,7 @@ export interface Resume {
   about: LocalizedList;
   skills: SkillGroup[];
   experience: ExperienceItem[];
+  highlights: Highlight[];
   education: EducationItem[];
   contact: Contact;
 }

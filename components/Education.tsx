@@ -13,7 +13,7 @@ export function Education({ lang }: { lang: Lang }) {
   return (
     <section className="section" id="education">
       {/* 这个区块没有右侧 meta，所以只传 num 和 title 两个 prop */}
-      <SectionHead num="05" title={pickLang(STRINGS.education, lang)} />
+      <SectionHead num="06" title={pickLang(STRINGS.education, lang)} />
       <FadeUp>
         <div className="edu-list">
           {/* 遍历每条教育经历渲染一行 */}

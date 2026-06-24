@@ -16,12 +16,10 @@ export function Contact({ lang }: { lang: Lang }) {
   // 第三项可以是字符串或 null（电话没有链接，所以是 null）。
   const rows: [string, string, string | null][] = [
     ["email", c.email, `mailto:${c.email}`],
-    ["linkedin", c.linkedin, `https://${c.linkedin}`],
-    ["phone", c.phone, null],
   ];
   return (
     <section className="section" id="contact">
-      <SectionHead num="06" title={pickLang(STRINGS.contact, lang)} meta="// curl --get" />
+      <SectionHead num="07" title={pickLang(STRINGS.contact, lang)} meta="// curl --get" />
       <FadeUp>
         <div className="contact-block">
           {/* 遍历 rows。.map 的参数 ([k, v, href]) 直接把每个元组解构成三个变量。

@@ -16,23 +16,20 @@ import { useClock } from "./effects";
 import type { Lang } from "@/lib/types";
 
 // TopBar 是一个「函数组件」：一个返回 JSX（界面）的普通函数。
-// 大括号里的 { lang, setLang, ... } 是「解构 props」：父组件传进来的参数。
+// 大括号里的 { lang, setLang, onPrint } 是「解构 props」：父组件传进来的参数。
 // 这里体现了 React 的父子通信：
-//   - lang/theme 是父组件持有的「状态」，作为只读数据传下来给子组件显示；
-//   - setLang/setTheme/onPrint 是父组件传下来的「回调函数」，子组件点击按钮时
-//     调用它们，就能反过来通知父组件「我要切换语言/主题/打印了」。
+//   - lang 是父组件持有的「状态」，作为只读数据传下来给子组件显示；
+//   - setLang/onPrint 是父组件传下来的「回调函数」，子组件点击按钮时
+//     调用它们，就能反过来通知父组件「我要切换语言/打印了」。
+// （主题固定为深色，不再提供深/浅切换，所以这里没有 theme/setTheme。）
 export function TopBar({
   lang,
   setLang,
-  theme,
-  setTheme,
   onPrint,
 }: {
   // 下面是对每个 prop 的类型说明（: 后面是类型）。
   lang: Lang; // 当前语言
   setLang: (l: Lang) => void; // 切换语言的回调：接收一个 Lang，无返回值(void)
-  theme: string; // 当前主题（"dark" / "light"）
-  setTheme: (t: string) => void; // 切换主题的回调
   onPrint: () => void; // 点击打印按钮时调用
 }) {
   // 从 RESUME 里解构出 meta（站点元信息：用户名、主机名、当前路径等）。
@@ -74,7 +71,7 @@ export function TopBar({
             <span className="label">TIME:</span> <span className="val accent">{time}</span>
           </span>
         </div>
-        {/* 右侧三个操作按钮：切语言、切主题、打印 */}
+        {/* 右侧两个操作按钮：切语言、打印 */}
         <div className="topbar-actions">
           {/* onClick 绑定点击事件。这里传一个箭头函数 () => ...，点击时才执行。
               点击时调用父组件传下来的 setLang，把语言切到「另一个」：
@@ -89,15 +86,6 @@ export function TopBar({
             <span style={{ opacity: lang === "zh" ? 1 : 0.4 }}>ZH</span>
             <span style={{ color: "var(--fg-mute)" }}>/</span>
             <span style={{ opacity: lang === "en" ? 1 : 0.4 }}>EN</span>
-          </button>
-          {/* 同理：点击在 dark / light 之间来回切主题 */}
-          <button
-            className="icon-btn"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            title="Toggle theme"
-          >
-            {/* 「条件渲染」：根据 theme 显示不同文字/图标 */}
-            {theme === "dark" ? "◐ DARK" : "◑ LIGHT"}
           </button>
           {/* 打印按钮：直接把父组件的 onPrint 作为点击处理函数。
               pickLang(STRINGS.print, lang) 按当前语言取「打印 / Print」文案。 */}

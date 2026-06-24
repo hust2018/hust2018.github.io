@@ -7,8 +7,8 @@
 import { useEffect, useState } from "react";
 import { RESUME, STRINGS } from "@/lib/data";
 import { pickLang } from "@/lib/i18n";
-// FadeUp（滚动淡入容器）和 SectionHead（区块标题）是从 effects.tsx 复用的组件。
-import { FadeUp, SectionHead } from "./effects";
+// FadeUp（滚动淡入容器）、FormattedBold（把 **加粗** 渲染成高亮）、SectionHead（区块标题），均来自 effects.tsx。
+import { FadeUp, FormattedBold, SectionHead } from "./effects";
 // ExperienceItem 是「一条工作经历」的类型，Lang 是语言类型。
 import type { ExperienceItem, Lang } from "@/lib/types";
 
@@ -54,7 +54,10 @@ function ExpItem({
                 React 渲染列表时要求每项有唯一的 key，方便它高效更新；
                 这里没有更合适的唯一值，就用下标 i（数组不会重排，所以可接受）。 */}
             {bullets.map((b, i) => (
-              <li key={i}>{b}</li>
+              <li key={i}>
+                {/* 用 FormattedBold 渲染，让要点里的 **关键指标** 高亮显示 */}
+                <FormattedBold text={b} />
+              </li>
             ))}
           </ul>
           {/* 条件渲染：item.stack && (...) 表示「有 stack 才渲染后面这块」。

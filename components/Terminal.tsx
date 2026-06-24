@@ -104,8 +104,6 @@ function outputFor(raw: string, lang: Lang): ReactNode {
       // 整理成 [字段名, 值] 的数组，用 grid 两列对齐渲染。
       const rows: [string, string][] = [
         ["email", c.email],
-        ["linkedin", c.linkedin],
-        ["phone", c.phone],
       ];
       return (
         <div className="term-grid">
