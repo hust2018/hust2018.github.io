@@ -10,8 +10,8 @@ import "./globals.css";
 // 这是 Next.js 的约定：在 layout 或 page 文件里 export 一个名为 metadata 的对象，
 // Next 就会据此生成 <title>、<meta name="description"> 等标签，无需自己手写。
 export const metadata: Metadata = {
-  title: "~/resume — your-handle",          // 显示在浏览器标签页上的标题
-  description: "终端 / 科技风的双语个人简历", // 搜索引擎/分享预览用的描述
+  title: "李姜磊 · Jianglei Li — résumé",      // 显示在浏览器标签页上的标题
+  description: "李姜磊 (Jianglei Li) 的个人简历 — AI Agent 开发工程师，前字节跳动安全研发。", // 搜索引擎/分享预览用的描述
 };
 
 // app/layout.tsx 也是 Next.js 的约定文件：它是「根布局」，包裹所有页面，

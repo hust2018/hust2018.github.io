@@ -903,46 +903,36 @@ html[data-variant="terminal"][data-theme="dark"] .hero-photo::after { opacity: 1
 .terminal:focus-within { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-soft), var(--shadow); }
 
 @media print {
-  :root, html, html[data-variant], html[data-theme] {
-    --bg: #ffffff;
-    --bg-elev: #ffffff;
-    --bg-soft: #f6f6f6;
-    --bg-card: #ffffff;
-    --border: #cccccc;
-    --border-strong: #999999;
-    --grid: transparent;
-    --fg: #000000;
-    --fg-dim: #333333;
-    --fg-mute: #666666;
-    --accent: #006d8a;
-    --accent-soft: transparent;
-    --accent-glow: none;
-    --blue: #2c5a7e;
-    /* 终端用到的两个语义色也要中和成深色，否则霓虹绿/红会印在白纸上（提示符、报错文字） */
-    --red: #8a2f2f;
-    --green: #2f6b3a;
-    --clip-notch: none;
+  /* 「所见即所得」深色 PDF：保留站点的深色主题，不再转白底黑字。
+     关键：浏览器打印默认会丢掉背景色，必须用 print-color-adjust: exact 强制保留，
+     否则就会印成「白底」（这正是之前打印发白的根因）。print-color-adjust 可继承，
+     设在 html/body 上即可向下传递。 */
+  html, body {
+    background: var(--bg) !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
+  /* 纸张页边距 */
+  @page { margin: 12mm; }
+
+  /* 隐藏：顶栏、侧栏、扫描光带、开机动画、装饰光晕、光标、名字的故障重影 */
+  .topbar, .rail, .scan-sweep, .boot, .cursor { display: none !important; }
   body::before, body::after { display: none !important; }
-  .topbar, .rail, .scan-sweep, .boot { display: none !important; }
-  .app { padding: 20px 0; max-width: 100%; }
-  .hero { padding: 0 0 20px; }
-  .section { padding: 18px 0 8px; page-break-inside: avoid; }
+  .glitch::before, .glitch::after { display: none !important; }
+
+  /* 打印里不应出现「可交互终端」，整段隐藏（第 02 区 #shell） */
+  #shell { display: none !important; }
+
+  /* 布局：去掉进场动画、展开折叠的经历、尽量避免区块被分页切断 */
+  .app { padding: 0; max-width: 100%; }
+  .hero { padding: 0 0 14px; }
+  .section { padding: 12px 0 6px; page-break-inside: avoid; break-inside: avoid; }
+  .exp { page-break-inside: avoid; break-inside: avoid; }
   .exp .exp-body { max-height: none !important; }
-  .exp-inner { padding-top: 10px; }
-  .cursor { display: none; }
-  .hero-photo::after { display: none; }
-  a { color: #000; text-decoration: underline; }
+  .exp-inner { padding-top: 8px; }
   .fade-up { opacity: 1 !important; transform: none !important; }
-  .exp, .edu, .contact-block, .hero-photo, .chip { clip-path: none !important; }
   .hero-name { text-shadow: none; }
-  .hero-role { text-shadow: none; }
-  .section-head h2 { color: #000; }
-  /* 终端：打印时隐藏输入行、展开回滚区（去掉滚动条/限高），让内容完整打印成黑白 */
-  .term-inputrow { display: none !important; }
-  .term-body { max-height: none !important; overflow: visible !important; }
-  .term-dot { display: none; }
-  .terminal { clip-path: none !important; box-shadow: none; }
+  a { text-decoration: none; }
 }
 
 /* ============ Responsive ============ */

@@ -80,12 +80,7 @@ export default function App() {
       )}
       {/* 顶部栏。把语言的「当前值」和「修改函数」传下去，
           子组件就能读取并通过 setter 反过来修改父组件的状态（这叫状态提升 + 受控）。 */}
-      <TopBar
-        lang={lang}
-        setLang={setLang}
-        // onPrint：点击打印按钮时调用。window.print() 是浏览器 API，会弹出系统打印对话框。
-        onPrint={() => window.print()}
-      />
+      <TopBar lang={lang} setLang={setLang} />
       <div className="app">
         {/* 装饰用的扫描光带特效 */}
         <div className="scan-sweep"></div>

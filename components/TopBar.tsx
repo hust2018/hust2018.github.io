@@ -19,18 +19,16 @@ import type { Lang } from "@/lib/types";
 // 大括号里的 { lang, setLang, onPrint } 是「解构 props」：父组件传进来的参数。
 // 这里体现了 React 的父子通信：
 //   - lang 是父组件持有的「状态」，作为只读数据传下来给子组件显示；
-//   - setLang/onPrint 是父组件传下来的「回调函数」，子组件点击按钮时
-//     调用它们，就能反过来通知父组件「我要切换语言/打印了」。
-// （主题固定为深色，不再提供深/浅切换，所以这里没有 theme/setTheme。）
+//   - setLang 是父组件传下来的「回调函数」，子组件点击按钮时
+//     调用它，就能反过来通知父组件「我要切换语言了」。
+// （主题固定为深色，不再提供深/浅切换；PDF 改为下载预生成的 /resume.pdf，所以也没有打印回调。）
 export function TopBar({
   lang,
   setLang,
-  onPrint,
 }: {
   // 下面是对每个 prop 的类型说明（: 后面是类型）。
   lang: Lang; // 当前语言
   setLang: (l: Lang) => void; // 切换语言的回调：接收一个 Lang，无返回值(void)
-  onPrint: () => void; // 点击打印按钮时调用
 }) {
   // 从 RESUME 里解构出 meta（站点元信息：用户名、主机名、当前路径等）。
   const { meta } = RESUME;
@@ -71,7 +69,7 @@ export function TopBar({
             <span className="label">TIME:</span> <span className="val accent">{time}</span>
           </span>
         </div>
-        {/* 右侧两个操作按钮：切语言、打印 */}
+        {/* 右侧两个操作：切语言、下载 PDF */}
         <div className="topbar-actions">
           {/* onClick 绑定点击事件。这里传一个箭头函数 () => ...，点击时才执行。
               点击时调用父组件传下来的 setLang，把语言切到「另一个」：
@@ -87,11 +85,11 @@ export function TopBar({
             <span style={{ color: "var(--fg-mute)" }}>/</span>
             <span style={{ opacity: lang === "en" ? 1 : 0.4 }}>EN</span>
           </button>
-          {/* 打印按钮：直接把父组件的 onPrint 作为点击处理函数。
-              pickLang(STRINGS.print, lang) 按当前语言取「打印 / Print」文案。 */}
-          <button className="icon-btn" onClick={onPrint} title="Print / PDF">
-            ⎙ {pickLang(STRINGS.print, lang)}
-          </button>
+          {/* 下载 PDF：链到 /resume.pdf——这是 scripts/build-pdf.mjs 从简历数据生成的「干净文档版」PDF，
+              和网站的终端风完全分开。download 属性让浏览器直接下载并指定保存文件名。 */}
+          <a className="icon-btn" href="/resume.pdf" download="李姜磊-简历.pdf" title="Download résumé PDF">
+            ⤓ {pickLang(STRINGS.download, lang)}
+          </a>
         </div>
       </div>
     </header>
