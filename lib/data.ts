@@ -185,7 +185,7 @@ export const RESUME: Resume = {
   ],
   // contact：联系方式（只公开邮箱；手机号不放到公开网站上）。
   contact: {
-    email: "1596420919@qq.com",
+    email: "1158471109@qq.com",
   },
 };
 

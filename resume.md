@@ -1,6 +1,6 @@
 # 李姜磊　Jianglei Li
 <div class="subtitle">AI Agent 开发工程师 · 前安全研发</div>
-<div class="meta">深圳，中国　·　1596420919@qq.com</div>
+<div class="meta">深圳，中国　·　1158471109@qq.com</div>
 <div class="tagline">专注 AI Agent 与多智能体系统，把它们从 0 到 1 做成生产级产品。带着字节安全研发打下的高并发、分布式底子，痴迷把复杂系统做简单。</div>
 
 ## 关于
