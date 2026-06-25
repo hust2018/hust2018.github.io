@@ -76,7 +76,7 @@ export function Hero({ lang, booted }: { lang: Lang; booted: boolean }) {
       <div className="hero-photo">
         {/* 头像位。placeholder 是没有图片时显示的占位文字，这里用三元表达式按语言给不同提示： */}
         {/* 条件 ? 真时的值 : 假时的值 —— lang 是 "zh" 就给中文提示，否则给英文提示。 */}
-        <ImageSlot src="/ljl.jpg" placeholder={lang === "zh" ? "把头像放到 public/avatar.jpg" : "drop photo in public/"} />
+        <ImageSlot src="/ljl-new.png" placeholder={lang === "zh" ? "把头像放到 public/" : "drop photo in public/"} />
         <div className="hero-photo-label">ID_0001</div>
       </div>
     </section>
