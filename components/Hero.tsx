@@ -61,6 +61,17 @@ export function Hero({ lang, booted }: { lang: Lang; booted: boolean }) {
             {pickLang(hero.status, lang)}
           </span>
         </div>
+        {/* 醒目发光徽章（游戏成就等）。hero.badges 可能没有，用 && 短路：有才渲染。 */}
+        {hero.badges && hero.badges.length > 0 && (
+          <div className="hero-badges">
+            {hero.badges.map((b, i) => (
+              <span key={i} className="hero-badge">
+                <span className="ico">{b.icon}</span>
+                {pickLang(b.label, lang)}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
       <div className="hero-photo">
         {/* 头像位。placeholder 是没有图片时显示的占位文字，这里用三元表达式按语言给不同提示： */}

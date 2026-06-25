@@ -53,6 +53,8 @@ export interface Hero {
   location: Localized;
   status: Localized;
   yearsExp: string;
+  // 首屏的「醒目徽章」：每个含一个图标(emoji)和一段双语文字。`?` 表示可选。
+  badges?: { icon: string; label: Localized }[];
 }
 
 // SkillGroup：一组技能，比如「语言」「前端」。
