@@ -34,11 +34,13 @@ export const RESUME: Resume = {
       "我是 **李姜磊**，**AI Agent 开发工程师**（前 **字节跳动** 安全研发），**华中科技大学** 网络空间安全硕士。",
       "在 **字节跳动** 安全与风控做了约 **3 年** 网络安全研发——NTA 入侵检测、DDoS 防护、WAF、容器微隔离 HFW，多个系统从 0 到 1 落地，全球多机房部署历经多次大版本升级 **0 事故**。",
       "如今我专注 **AI Agent** 方向：以 Agent 开发加入 **tapnow**，目前负责模型生成相关的服务支持，并希望在多智能体方向持续深耕。Always day 1。",
+      "工作之外是个老玩家——**英雄联盟前钻石**、**炉石传说上过月榜**，一样痴迷策略与操作。",
     ],
     en: [
       "I'm **Jianglei Li**, an **AI agent engineer** (formerly **ByteDance** security R&D) with a master's in Cyberspace Security from **HUST**.",
       "Spent ~**3 years** on network-security R&D at **ByteDance** — NTA intrusion detection, DDoS protection, WAF, and container micro-segmentation (HFW) — shipping multiple 0-to-1 systems and running global multi-data-center rollouts through repeated major upgrades with **zero incidents**.",
       "Now I'm focused on **AI agents**: I joined **tapnow** as an agent developer and currently work on service support for model generation, while going deeper into multi-agent systems. Always day 1.",
+      "Off the clock, a longtime gamer — **former Diamond in League of Legends** and a **monthly-leaderboard Hearthstone** player; same love of strategy and sharp execution.",
     ],
   },
   // skills：技能分类数组。items 里纯字符串（如 "Python"）和双语对象（如 {zh,en}）可混放——
