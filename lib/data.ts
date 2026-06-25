@@ -31,6 +31,8 @@ export const RESUME: Resume = {
     badges: [
       { icon: "🎮", label: { zh: "英雄联盟 · 前钻石", en: "LoL · ex-Diamond" } },
       { icon: "🃏", label: { zh: "炉石传说 · 月榜", en: "Hearthstone · Leaderboard" } },
+      { icon: "👾", label: { zh: "星际争霸 · 手残玩家", en: "StarCraft · low APM" } },
+      { icon: "🐉", label: { zh: "原神 · 半途而废", en: "Genshin · quit halfway" } },
     ],
   },
   // about：「关于我」的几段话。每段里的 **加粗** 会被 FormattedBold 渲染成高亮。
