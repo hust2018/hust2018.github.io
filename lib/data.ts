@@ -33,6 +33,7 @@ export const RESUME: Resume = {
       { icon: "🃏", label: { zh: "炉石传说 · 月榜", en: "Hearthstone · Leaderboard" } },
       { icon: "👾", label: { zh: "星际争霸 · 手残玩家", en: "StarCraft · low APM" } },
       { icon: "🐉", label: { zh: "原神 · 半途而废", en: "Genshin · quit halfway" } },
+      { icon: "👑", label: { zh: "皇室战争 · 普通玩家", en: "Clash Royale · casual" } },
     ],
   },
   // about：「关于我」的几段话。每段里的 **加粗** 会被 FormattedBold 渲染成高亮。
