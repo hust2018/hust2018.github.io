@@ -435,6 +435,29 @@ html[data-variant="terminal"][data-theme="dark"] .hero-photo::after { opacity: 1
 }
 .hero-photo-label::before { content: "// "; color: var(--accent); }
 
+/* 右栏容器：把照片框和它下面的标语「上下叠放并水平居中」。
+   照片框（.hero-photo）有 clip-path 会裁掉超出方框的内容，所以标语必须放在框外面、
+   也就是这个容器里，才不会被裁掉。 */
+.hero-photo-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+/* 照片下方的个人标语：和整体终端风格一致的小字，居中、宽度对齐照片。
+   margin-top 留出一点空隙，顺便避开照片右下角那个绝对定位的 ID_0001 标签。 */
+.hero-motto {
+  margin-top: 28px;
+  max-width: 230px;
+  text-align: center;
+  font-size: 12.5px;
+  line-height: 1.6;
+  letter-spacing: 0.03em;
+  color: var(--accent);
+  text-shadow: 0 0 10px var(--accent-soft);   /* 青色辉光，呼应整体终端霓虹感 */
+}
+/* 标语开头的提示符箭头：用品红强调色（--accent-2），和上方「职位」行的 ▸ 一致。 */
+.hero-motto-arrow { color: var(--accent-2); margin-right: 6px; }
+
 /* ============ About ============ */
 .about p {
   color: var(--fg-dim);
