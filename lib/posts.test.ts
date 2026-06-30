@@ -14,6 +14,10 @@ describe("post parsing", () => {
   it("marks drafts", () => {
     expect(__readForTest("_fixture-draft.md").draft).toBe(true);
   });
+  it("normalizes dates to ISO YYYY-MM-DD (not a verbose JS Date string)", () => {
+    // _fixture-a.md has `date: 2026-01-02` (unquoted → YAML parses to a Date object).
+    expect(__readForTest("_fixture-a.md").meta.date).toBe("2026-01-02");
+  });
   it("throws on missing required field", () => {
     // a file missing 'description' would throw; covered by validation branch
     expect(() => tagSlug("Rust")).not.toThrow();

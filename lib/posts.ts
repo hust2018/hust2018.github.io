@@ -28,6 +28,20 @@ export function tagSlug(name: string): string {
   return ascii || encodeURIComponent(name.trim().toLowerCase());
 }
 
+// 把 frontmatter 里的日期统一规范成 ISO 的 YYYY-MM-DD。
+// 为什么需要：YAML 会把不带引号的 `date: 2026-06-30` 直接解析成 JS Date 对象，
+// 此时 String(date) 会变成 "Mon Jun 29 2026 20:00:00 GMT-0400 (...)" 这种本地时区的长串——
+// 既不是合法的结构化数据/sitemap 日期，又会按「星期几」字母序乱排，还可能因时区偏移差一天。
+// 用 toISOString() 取 UTC 的前 10 位（YAML 的纯日期就是 UTC 零点），既正确又能让字符串排序 = 时间排序。
+function toISODate(v: unknown): string {
+  if (v instanceof Date) return v.toISOString().slice(0, 10);
+  const s = String(v);
+  // 已经是 YYYY-MM-DD 开头就原样取前 10 位；否则尽力解析。
+  if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
+  const d = new Date(s);
+  return Number.isNaN(d.getTime()) ? s : d.toISOString().slice(0, 10);
+}
+
 type RawPost = { meta: PostMeta; raw: string; draft: boolean };
 
 // 读单个 md 文件 → 校验必填字段 → 返回结构化数据。字段缺失就抛错，绝不让没 SEO 元信息的文章上线。
@@ -49,8 +63,8 @@ function readPost(file: string): RawPost {
       slug,
       title: String(data.title),
       description: String(data.description),
-      date: String(data.date),
-      updated: data.updated ? String(data.updated) : undefined,
+      date: toISODate(data.date),
+      updated: data.updated ? toISODate(data.updated) : undefined,
       lang: data.lang,
       tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
       cover: data.cover ? String(data.cover) : undefined,
