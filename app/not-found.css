@@ -1,0 +1,111 @@
+/* ============================================================================
+   404 页样式（仅由 app/not-found.tsx 引入）
+
+   作用域说明：404 页不在 /blog/** 下，所以拿不到 app/blog/blog.css；
+   但根布局（app/layout.tsx）已经全局引入 globals.css，因此这里可以直接：
+     - 复用 :root 里的设计变量（--bg / --fg / --accent / --clip-notch …）；
+     - 复用 .frame（角标边框）、.glitch（色散抖动）、.icon-btn（按钮）、.prompt（提示符）等已有类。
+   本文件只补「整页居中 + 终端窗口」这点 404 专属排版，不重复声明任何颜色变量。
+   ============================================================================ */
+
+/* 整页垂直 + 水平居中。
+   position:relative + z-index:1 是关键：globals.css 用 body::before 画了一层固定的网格背景（z-index:0），
+   正文必须浮在它之上，否则文字会被网格层压住、显得发灰。 */
+.notfound {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+}
+
+/* 终端「窗口」：复用 .frame 的角标描边，自己只负责尺寸、底色与切角。 */
+.notfound-window {
+  width: 100%;
+  max-width: 560px;
+  background: var(--bg-card);
+  clip-path: var(--clip-notch);   /* 与主页卡片一致的切角，呼应整体审美 */
+}
+
+/* 窗口标题栏：左侧三个「红 / 黄 / 绿」交通灯点 + 标签，模仿桌面终端 app 的顶栏。 */
+.notfound-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--fg-mute);
+}
+.notfound-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+/* 三个点各自的颜色，直接取用全局调色板里的语义色。 */
+.notfound-dot.r { background: var(--red); }
+.notfound-dot.y { background: var(--warn); }
+.notfound-dot.g { background: var(--green); }
+.notfound-titlebar .label { margin-left: 6px; }
+
+/* 窗口正文区。左对齐让命令行更像真实终端输出。 */
+.notfound-body {
+  padding: 30px 28px 36px;
+  text-align: left;
+}
+
+/* 模拟在终端里敲下的命令行：等宽字体 + 主色 $ 提示符。 */
+.notfound-cmd {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--fg-dim);
+  margin-bottom: 4px;
+}
+.notfound-cmd .prompt { margin-right: 8px; }
+/* shell 回的「找不到」报错行，用语义红强调。 */
+.notfound-err {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--red);
+  margin-bottom: 22px;
+}
+
+/* 巨大的 404：用 display 字体 + clamp() 做响应式字号（窄屏自动变小），
+   外层套 .glitch（globals.css）实现 RGB 色散抖动。 */
+.notfound-code {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(64px, 18vw, 116px);
+  line-height: 1;
+  letter-spacing: 0.04em;
+  color: var(--fg);
+  margin: 0 0 18px;
+}
+
+/* 双语标题 + 说明文案。 */
+.notfound-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--fg);
+  margin-bottom: 10px;
+}
+.notfound-msg {
+  color: var(--fg-dim);
+  font-size: 13px;
+  line-height: 1.7;
+  margin-bottom: 26px;
+}
+
+/* 返回链接行：直接复用 globals.css 的 .icon-btn 外观（描边小按钮 + hover 发光）。 */
+.notfound-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
