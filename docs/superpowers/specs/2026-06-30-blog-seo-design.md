@@ -159,7 +159,7 @@ Ship a static `public/og-default.png` (1200×630). Use `cover ?? og-default` for
 ## 11. Internal linking (SEO-critical)
 The résumé homepage is the only high-authority page. Plan:
 - **TopBar link** `BLOG`/`文章` (→ `/blog/`). *(One small edit to `components/TopBar.tsx`.)*
-- **Homepage "最新文章 / Latest" block** linking the latest ~3 posts directly (depth-1). *Recommended by review; flagged for your approval in §17.*
+- **Homepage "最新文章 / Latest" block** linking the latest ~3 posts directly (depth-1). *Included in v1 (serves the SEO goal).*
 - **Breadcrumb** on articles (+ BreadcrumbList JSON-LD).
 - **Prev/next (or related) links** between articles — cheap, reduces crawl depth.
 
@@ -215,8 +215,9 @@ No `transpilePackages`/`serverExternalPackages` needed (export has no server run
 - Tag pages `noindex,follow` + out of sitemap (thin content). → §10.6
 - **RSS reconsider:** review flags Atom/RSS as the highest-value dropped "nice to have," trivial to emit from the same post list. Currently out of scope per user; easy to add if desired.
 
-## 17. Open questions for review
-1. **Homepage "Latest posts" block** (§11) — include in v1 (recommended for SEO) or skip for now?
-2. **RSS feed** (§16) — keep out, or add it (it's nearly free)?
-3. **Tag URL language** — OK to require ASCII tag tokens (e.g. `rust`, `llm`) for clean URLs, or must Chinese tags appear in URLs (percent-encoded)?
-4. Anything to change in the frontmatter schema (§3) or the `/blog` base path?
+## 17. Resolved decisions
+Spec approved 2026-06-30. Resolutions to the prior open questions:
+1. **Homepage "Latest posts" block** — **included in v1** (§11).
+2. **RSS feed** — **out of scope for v1** (per the earlier explicit choice); a near-free later add from the same post list if wanted (§16).
+3. **Tag URLs** — **ASCII slug tokens** (lowercased `[a-z0-9-]`); non-ASCII tags percent-encoded as fallback; build asserts no slug collisions (§7.3).
+4. **Frontmatter schema (§3) and `/blog` base path** — **unchanged**.
