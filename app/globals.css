@@ -700,6 +700,33 @@ html[data-variant="terminal"][data-theme="dark"] .hero-photo::after { opacity: 1
   margin: 0 16px;
 }
 
+/* ============ Latest posts (section 08) ============ */
+/* 首页底部「最新文章 / Latest」小区块（组件见 components/blog/LatestPosts.tsx）：
+   一个紧凑的内部链接列表。样式放在 globals.css（而非 blog.css）里，
+   因为这个区块渲染在首页「/」上，而 blog.css 只在 /blog/** 路由加载。 */
+.latest-posts { margin-top: 8px; }
+.latest-posts .latest-item {
+  display: flex;                       /* 一行两列：左标题撑开、右日期靠右 */
+  align-items: baseline;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--border);
+  font-size: 13px;
+}
+.latest-posts .latest-item time {     /* 日期用等宽字、弱化颜色，nowrap 防止换行 */
+  color: var(--fg-mute);
+  font-size: 11px;
+  font-family: var(--font-mono);
+  white-space: nowrap;
+  margin-left: auto;                   /* 把日期推到行尾，与标题分列两端 */
+}
+.latest-posts .latest-all {           /* 「查看全部 →」入口，等宽字呼应终端风 */
+  display: inline-block;
+  margin-top: 12px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
 /* ============ Scroll animation ============ */
 .fade-up {
   opacity: 0;

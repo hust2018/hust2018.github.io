@@ -9,6 +9,8 @@
 import { RESUME, STRINGS } from "@/lib/data";
 // pickLang(双语对象, lang)：按当前语言从 { zh, en } 里取出对应那条文本。
 import { pickLang } from "@/lib/i18n";
+// urlFor：把站内路径变成「绝对 + 结尾带斜杠」的规范 URL；博客链接走它，和全站 URL 形态保持一致。
+import { urlFor } from "@/lib/site";
 // useClock 是本项目自定义的 Hook（在 effects.tsx 里），返回每秒更新的当前时间。
 import { useClock } from "./effects";
 // 只导入类型用 `import type`，编译成 JS 时这行会被完全擦除，不影响运行。
@@ -69,8 +71,14 @@ export function TopBar({
             <span className="label">TIME:</span> <span className="val accent">{time}</span>
           </span>
         </div>
-        {/* 右侧两个操作：切语言、下载 PDF */}
+        {/* 右侧操作区：博客入口、切语言、下载 PDF */}
         <div className="topbar-actions">
+          {/* 博客入口。href 用 urlFor("/blog") 得到带结尾斜杠的绝对地址（与 trailingSlash:true 一致）。
+              label 按当前界面语言切换：中文显示「文章」，英文显示「BLOG」。
+              复用既有的 icon-btn 样式，和下面的语言切换 / 下载按钮长得一致。 */}
+          <a className="icon-btn" href={urlFor("/blog")} title="Blog">
+            {lang === "zh" ? "文章" : "BLOG"}
+          </a>
           {/* onClick 绑定点击事件。这里传一个箭头函数 () => ...，点击时才执行。
               点击时调用父组件传下来的 setLang，把语言切到「另一个」：
               当前是 zh 就传 en，否则传 zh。父组件收到后更新状态，整个页面随之换语言。 */}

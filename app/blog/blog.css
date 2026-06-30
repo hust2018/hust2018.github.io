@@ -353,18 +353,9 @@
 .article-header .post-meta { margin-bottom: 12px; }
 .article-header time { font-variant-numeric: tabular-nums; }
 
-/* 主页「最新文章 / Latest」小区块（LatestPosts）：紧凑的内部链接列表。 */
-.latest-posts { margin-top: 8px; }
-.latest-posts .latest-item {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  padding: 8px 0;
-  border-bottom: 1px dashed var(--border);
-  font-size: 13px;
-}
-.latest-posts .latest-item time { color: var(--fg-mute); font-size: 11px; font-family: var(--font-mono); white-space: nowrap; }
-.latest-posts .latest-all { display: inline-block; margin-top: 12px; font-family: var(--font-mono); font-size: 12px; }
+/* 注：首页「最新文章 / Latest」区块（.latest-posts）的样式不在这里——
+   blog.css 只在 /blog/** 路由加载（见 app/blog/layout.tsx），而那个区块渲染在首页「/」上，
+   首页只加载 globals.css。所以它的样式放在 app/globals.css 里才会生效。 */
 
 /* ---------------------------------------------------------------------------
    窄屏适配：手机上把阅读列内边距收一点，标题再小一档。
