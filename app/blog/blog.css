@@ -1,0 +1,377 @@
+/* ============================================================================
+   博客作用域样式（只在 /blog/** 下生效，由 app/blog/layout.tsx 引入）
+
+   设计原则：
+   - 复用 app/globals.css :root 里已定义的设计变量（--bg / --fg / --accent …），
+     这样博客和简历视觉同源；这里不重新声明颜色变量，只“取用”。
+   - 简历主页是宽栏 HUD，博客文章是「窄栏长文阅读」：所以这里把正文收进
+     ~720px 的阅读列，行高放宽，专注可读性。
+   - 代码高亮在构建期由 rehype-pretty-code 产出内联 span（见 lib/markdown.ts），
+     但我们设了 keepBackground:false，所以代码块的背景色必须在这里补上。
+   ============================================================================ */
+
+/* ---------------------------------------------------------------------------
+   阅读容器：博客页面没有套用主页的 .app，所以自己负责「居中 + 内边距 + 浮于背景之上」。
+   body::before / ::after 是 z-index:0 的固定网格与光晕，正文必须 position:relative + z-index:1
+   才能盖在它们上面（否则文字会被网格层挡住或显得发灰）。
+   --------------------------------------------------------------------------- */
+.blog-shell {
+  position: relative;
+  z-index: 1;
+  max-width: 720px;            /* 窄栏：长文最佳阅读宽度，约 70–80 个字符/行 */
+  margin: 0 auto;
+  padding: 40px 24px 120px;
+  line-height: 1.8;            /* 比全局 1.6 更宽松，长文更好读 */
+  color: var(--fg);
+}
+
+/* ---------------------------------------------------------------------------
+   终端风「面包屑 / 顶栏」：呼应主页的 HUD 语言，用等宽字体 + 暗色描边。
+   面包屑组件（Task 6 的 Breadcrumb）渲染 `▸ ~ / blog / …` 这样的导航行。
+   分隔符 `/` 用 ::after 由 CSS 注入，组件本身只输出每个 label/链接。
+   --------------------------------------------------------------------------- */
+.blog-topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--fg-mute);
+}
+
+.blog-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--fg-mute);
+  margin-bottom: 28px;
+}
+/* 每个层级之间用 “/” 分隔——用伪元素生成，组件不必手写分隔符。
+   :last-child 不加分隔符，避免末尾出现多余的斜杠。 */
+.blog-breadcrumb > * + *::before {
+  content: "/";
+  margin-right: 8px;
+  color: var(--fg-mute);
+}
+.blog-breadcrumb a { color: var(--fg-dim); }
+.blog-breadcrumb a:hover { color: var(--accent); }
+/* 当前所在页（无链接的最后一项）高亮成主色，提示“你在这里”。 */
+.blog-breadcrumb .crumb-current { color: var(--accent); }
+
+/* ---------------------------------------------------------------------------
+   博客大标题（列表页 / 标签页用）：沿用主页 section-head 的「提示符 + display 字体」气质。
+   .prompt-char 是开头那个发光的 `$`/`#`，与全局 .section-head 的写法保持一致。
+   --------------------------------------------------------------------------- */
+.blog-title {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+  margin-bottom: 8px;
+}
+.blog-title .prompt-char {
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-weight: 400;
+  margin-right: 6px;
+}
+.blog-subtitle {
+  color: var(--fg-dim);
+  font-size: 13px;
+  margin-bottom: 32px;
+}
+
+/* ===========================================================================
+   正文排版（Prose）
+
+   文章正文由构建期 Markdown 流水线生成，注入到 <article class="prose">（见 components/blog/Prose.tsx）。
+   下面所有规则都「作用域到 .prose 内部」，确保只影响文章正文，不污染列表页/标签页的卡片等结构。
+   =========================================================================== */
+.prose {
+  color: var(--fg);
+  font-size: 15px;
+  line-height: 1.85;
+}
+
+/* 标题：用 display 字体拉开与正文（等宽）的层次；上方留白比下方多，形成「分段感」。 */
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4 {
+  font-family: var(--font-display);
+  color: var(--fg);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  scroll-margin-top: 24px;     /* 锚点跳转时，标题不要被顶到屏幕最边缘 */
+}
+.prose h1 { font-size: 26px; margin: 0 0 20px; }
+.prose h2 { font-size: 21px; margin: 40px 0 16px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+.prose h3 { font-size: 17px; margin: 32px 0 12px; }
+.prose h4 { font-size: 15px; margin: 24px 0 10px; color: var(--fg-dim); }
+
+.prose p { margin: 0 0 18px; }
+
+/* 列表：留出缩进，标记点用主色，呼应终端审美。 */
+.prose ul,
+.prose ol { margin: 0 0 18px; padding-left: 1.5em; }
+.prose li { margin: 6px 0; }
+.prose li::marker { color: var(--accent); }
+/* GFM 任务清单（- [ ] / - [x]）：去掉默认圆点，让复选框自己说话。 */
+.prose li:has(> input[type="checkbox"]) { list-style: none; margin-left: -1.2em; }
+.prose input[type="checkbox"] { margin-right: 8px; accent-color: var(--accent); }
+
+/* 引用块：左侧主色竖条 + 柔光背景，是终端里「高亮一段」的常见手法。 */
+.prose blockquote {
+  margin: 20px 0;
+  padding: 4px 18px;
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+  color: var(--fg-dim);
+}
+.prose blockquote p:last-child { margin-bottom: 0; }
+
+/* 表格：紧凑的描边网格，表头用稍亮的底色区分。 */
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 13px;
+}
+.prose th,
+.prose td {
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  text-align: left;
+}
+.prose th { background: var(--bg-soft); color: var(--fg); font-weight: 600; }
+
+/* 正文链接：主色 + 下划线偏移，hover 时发光（与全局 a 一致，这里只是显式重申到 .prose 作用域）。 */
+.prose a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+.prose a:hover { text-shadow: var(--accent-glow); }
+
+.prose img { max-width: 100%; height: auto; display: block; margin: 20px auto; }
+.prose hr { border: 0; border-top: 1px dashed var(--border); margin: 32px 0; }
+
+/* ---------------------------------------------------------------------------
+   标题锚点（rehype-autolink-headings 追加在每个标题末尾的 `#` 链接）。
+   平时隐藏（opacity:0），鼠标悬停到标题上才浮现——这样阅读时不被干扰，需要复制链接时又能点到。
+   --------------------------------------------------------------------------- */
+.prose .heading-anchor {
+  margin-left: 8px;
+  color: var(--fg-mute);
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  font-weight: 400;
+}
+.prose h1:hover .heading-anchor,
+.prose h2:hover .heading-anchor,
+.prose h3:hover .heading-anchor,
+.prose h4:hover .heading-anchor,
+.prose .heading-anchor:focus {
+  opacity: 1;
+}
+.prose .heading-anchor:hover { color: var(--accent); }
+
+/* ---------------------------------------------------------------------------
+   行内代码（如 `const x`）：与代码块区分——小号、暗底、主色文字、轻描边。
+   注意要排除「代码块里的 code」，那些归下面的代码块规则管。
+   --------------------------------------------------------------------------- */
+.prose :not(pre) > code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  padding: 2px 6px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  color: var(--accent);
+  word-break: break-word;
+}
+
+/* ===========================================================================
+   代码块（rehype-pretty-code + shiki 产出）
+
+   流水线里设了 keepBackground:false，所以 shiki 自带的主题背景被丢弃——
+   背景色必须由我们在这里补上，否则代码块和正文同色、糊成一片。
+   shiki 会给每个 token 输出内联 style（颜色），我们不去覆盖它，只管容器外观。
+   =========================================================================== */
+
+/* <figure data-rehype-pretty-code-figure> 是带标题/语言时的最外层包裹。 */
+.prose figure[data-rehype-pretty-code-figure] {
+  margin: 22px 0;
+}
+
+/* 代码块标题（```ts title="foo.ts" 里的 title）：像编辑器标签页一样贴在代码块上方。 */
+.prose [data-rehype-pretty-code-title] {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--fg-dim);
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-bottom: 0;
+  padding: 6px 14px;
+  letter-spacing: 0.03em;
+}
+
+.prose pre {
+  background: var(--bg-elev);    /* keepBackground:false → 在这里补背景 */
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 14px 0;               /* 左右留白交给 [data-line]，方便整行高亮铺满 */
+  overflow-x: auto;              /* 长行横向滚动，不撑破阅读列 */
+  font-size: 13px;
+  line-height: 1.6;
+}
+/* 有标题时，标题与代码块视觉上连成一体（去掉中间的圆角/重边）。 */
+.prose [data-rehype-pretty-code-title] + pre { border-top-left-radius: 0; border-top-right-radius: 0; }
+
+.prose pre code {
+  font-family: var(--font-mono);
+  display: grid;                 /* 每行一个 [data-line]，grid 让行高亮能整行铺满 */
+  background: transparent;       /* code 不要再叠一层背景 */
+  padding: 0;
+  border: 0;
+  counter-reset: line;
+}
+
+/* 每一行：左右内边距在这里给，整行才能被背景色铺满（行高亮需要）。 */
+.prose [data-line] {
+  padding: 0 16px;
+  border-left: 2px solid transparent;
+}
+/* 被 // [!code highlight] 等标注的高亮行：左侧主色竖条 + 柔光底。 */
+.prose [data-highlighted-line] {
+  background: var(--accent-soft);
+  border-left-color: var(--accent);
+}
+
+/* ---------------------------------------------------------------------------
+   Mermaid 图表占位：lib/markdown.ts 把 ```mermaid 围栏「捞」成 <pre class="mermaid">，
+   客户端 components/blog/Mermaid.tsx 才在浏览器里把它渲染成 SVG。
+   渲染前给个最小高度，避免图表出现时把下文「顶下去」造成布局抖动（CLS）。
+   --------------------------------------------------------------------------- */
+.prose .mermaid,
+.mermaid {
+  min-height: 120px;
+  margin: 22px 0;
+  text-align: center;
+  /* 未渲染时这里是纯文本源码；渲染后会被替换成 SVG。隐藏溢出，避免源码闪现太丑。 */
+  overflow-x: auto;
+}
+
+/* ===========================================================================
+   列表页/文章页的结构件（PostCard / TagChip / ArticleHeader / LatestPosts）
+   —— 由 Task 6 的展示组件使用；样式放这里，让博客整体视觉统一。
+   =========================================================================== */
+
+/* 文章卡片：列表页里每篇文章一张卡，沿用主页卡片的描边 + 切角审美。 */
+.post-card {
+  display: block;
+  padding: 18px 20px;
+  margin-bottom: 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  clip-path: var(--clip-notch);   /* 与主页卡片一致的切角 */
+  transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+}
+.post-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: var(--accent-glow);
+}
+.post-card-title {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--fg);
+  margin-bottom: 6px;
+}
+.post-card:hover .post-card-title { color: var(--accent); }
+.post-card-desc { color: var(--fg-dim); font-size: 13px; margin-bottom: 10px; }
+/* 元信息行：日期 / 阅读时长 / 语言徽章 / 标签——等宽小字，弱化处理。 */
+.post-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--fg-mute);
+  letter-spacing: 0.04em;
+}
+
+/* 语言徽章（ZH / EN）：一眼区分中英文文章。 */
+.lang-badge {
+  border: 1px solid var(--border-strong);
+  color: var(--fg-dim);
+  padding: 1px 6px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+
+/* 标签 chip：链接到 /blog/tag/<slug>/，沿用主页 .chip 的切角 hover。 */
+.tag-chip {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 3px 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-soft);
+  color: var(--fg-dim);
+  letter-spacing: 0.03em;
+  clip-path: polygon(7px 0, 100% 0, calc(100% - 7px) 100%, 0 100%);
+  transition: all 0.15s;
+}
+.tag-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+  text-decoration: none;
+}
+.tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px; }
+
+/* 文章头部（ArticleHeader）：大标题 + 发布/更新时间 + 阅读时长 + 标签。 */
+.article-header { margin-bottom: 32px; padding-bottom: 20px; border-bottom: 1px solid var(--border); }
+.article-header h1 {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+  margin-bottom: 14px;
+}
+.article-header .post-meta { margin-bottom: 12px; }
+.article-header time { font-variant-numeric: tabular-nums; }
+
+/* 主页「最新文章 / Latest」小区块（LatestPosts）：紧凑的内部链接列表。 */
+.latest-posts { margin-top: 8px; }
+.latest-posts .latest-item {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--border);
+  font-size: 13px;
+}
+.latest-posts .latest-item time { color: var(--fg-mute); font-size: 11px; font-family: var(--font-mono); white-space: nowrap; }
+.latest-posts .latest-all { display: inline-block; margin-top: 12px; font-family: var(--font-mono); font-size: 12px; }
+
+/* ---------------------------------------------------------------------------
+   窄屏适配：手机上把阅读列内边距收一点，标题再小一档。
+   --------------------------------------------------------------------------- */
+@media (max-width: 600px) {
+  .blog-shell { padding: 28px 16px 80px; }
+  .article-header h1 { font-size: 23px; }
+  .prose h1 { font-size: 22px; }
+  .prose h2 { font-size: 19px; }
+}
