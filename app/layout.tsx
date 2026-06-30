@@ -10,6 +10,9 @@ import "./globals.css";
 // 这是 Next.js 的约定：在 layout 或 page 文件里 export 一个名为 metadata 的对象，
 // Next 就会据此生成 <title>、<meta name="description"> 等标签，无需自己手写。
 export const metadata: Metadata = {
+  // 绝对 URL 的基准：canonical / Open Graph 的相对地址都按它解析。
+  // 不设的话静态导出里会变成 http://localhost:3000，SEO 链接全废。
+  metadataBase: new URL("https://www.lijianglei.com"),
   title: "李姜磊 · Jianglei Li — résumé",      // 显示在浏览器标签页上的标题
   description: "李姜磊 (Jianglei Li) 的个人简历 — AI Agent 开发工程师，前字节跳动安全研发。", // 搜索引擎/分享预览用的描述
 };
