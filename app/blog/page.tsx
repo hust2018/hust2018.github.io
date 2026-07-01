@@ -17,13 +17,13 @@ const canonical = urlFor("/blog");
 // 页面级 metadata：Next 会据此在 <head> 里生成 <title> / <meta> / canonical / Open Graph。
 // 这是个静态导出页，metadata 是常量（不像文章页要按 slug 动态算），所以直接 export const 即可。
 export const metadata: Metadata = {
-  title: `文章 / Blog — ${SITE_NAME}`,
+  title: `博客 / Blog — ${SITE_NAME}`,
   description: "技术笔记与文章：AI Agent、前端、安全研发等主题。",
   // canonical 告诉搜索引擎「这页的唯一权威地址」，杜绝带参数/不带斜杠的重复收录。
   alternates: { canonical },
   openGraph: {
     type: "website",
-    title: `文章 / Blog — ${SITE_NAME}`,
+    title: `博客 / Blog — ${SITE_NAME}`,
     description: "技术笔记与文章：AI Agent、前端、安全研发等主题。",
     url: canonical,
     // 列表页没有专属封面，用站点兜底社交图（1200×630）。
@@ -47,7 +47,7 @@ export default function BlogIndexPage() {
         <span className="prompt-char" aria-hidden="true">
           $
         </span>
-        文章 / Blog
+        博客 / Blog
       </h1>
       <p className="blog-subtitle">技术笔记与文章 · technical notes &amp; writing</p>
 

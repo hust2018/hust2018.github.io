@@ -74,10 +74,10 @@ export function TopBar({
         {/* 右侧操作区：博客入口、切语言、下载 PDF */}
         <div className="topbar-actions">
           {/* 博客入口。href 用 urlFor("/blog") 得到带结尾斜杠的绝对地址（与 trailingSlash:true 一致）。
-              label 按当前界面语言切换：中文显示「文章」，英文显示「BLOG」。
+              label 按当前界面语言切换：中文显示「博客」，英文显示「BLOG」。
               复用既有的 icon-btn 样式，和下面的语言切换 / 下载按钮长得一致。 */}
           <a className="icon-btn" href={urlFor("/blog")} title="Blog">
-            {lang === "zh" ? "文章" : "BLOG"}
+            {lang === "zh" ? "博客" : "BLOG"}
           </a>
           {/* onClick 绑定点击事件。这里传一个箭头函数 () => ...，点击时才执行。
               点击时调用父组件传下来的 setLang，把语言切到「另一个」：

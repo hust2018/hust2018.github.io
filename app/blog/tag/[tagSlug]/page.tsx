@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: { params: Promise<{ tagSlug: 
   const tag = getAllTags().find((t) => t.slug === tagSlug);
   if (!tag) return {};
   return {
-    title: `#${tag.name} · 文章 / Blog`,
+    title: `#${tag.name} · 博客 / Blog`,
     // canonical 仍然指向本页的规范地址（带结尾斜杠），即使 noindex 也给出，避免参数变体被当成不同页。
     alternates: { canonical: urlFor(`/blog/tag/${tagSlug}`) },
     // 关键：不收录这个稀薄聚合页，但允许爬虫顺着链接去抓真正的文章。

@@ -27,7 +27,7 @@ export function LatestPosts({ posts }: { posts: PostMeta[] }) {
     <section className="section" id="latest">
       {/* 复用 SectionHead，让这块和简历其它区块（01~07）保持同一套编号 + 终端提示符样式。
           编号顺着 Contact(07) 排到 08；meta 用一句模拟命令 `ls -t`（按时间倒序列文件）呼应「最新」。 */}
-      <SectionHead num="08" title="最新文章 / Latest" meta="// ls -t ~/blog" />
+      <SectionHead num="08" title="最新博客 / Latest" meta="// ls -t ~/blog" />
       <FadeUp>
         <div className="latest-posts">
           {/* 遍历最新文章，每篇渲染成一行：左标题（链接）+ 右日期。

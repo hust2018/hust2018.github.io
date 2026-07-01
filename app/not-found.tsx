@@ -66,7 +66,7 @@ export default function NotFound() {
               ← 返回首页 / Home
             </Link>
             <Link className="icon-btn" href={urlFor("/blog")}>
-              浏览文章 / Blog →
+              浏览博客 / Blog →
             </Link>
           </div>
         </div>
