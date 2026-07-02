@@ -6,9 +6,9 @@ lang: zh
 tags: [ai, agent, tech, business]
 ---
 
-**日期**：2026 年 7 月 2 日（星期四）
-**覆盖窗口**：约 2026-07-01 00:00 至 2026-07-02 01:20（美东时间），优先近 24 小时
-**信息源**：V2EX、linux.do、TechCrunch、OpenAI News、GitHub Blog、Microsoft Dev Blogs、arXiv（cs.AI / cs.SE / cs.CR / stat.ML）、FTC Press Releases
+- **日期**：2026 年 7 月 2 日（星期四）
+- **覆盖窗口**：约 2026-07-01 00:00 至 2026-07-02 01:20（美东时间），优先近 24 小时
+- **信息源**：V2EX、linux.do、TechCrunch、OpenAI News、GitHub Blog、Microsoft Dev Blogs、arXiv（cs.AI / cs.SE / cs.CR / stat.ML）、FTC Press Releases
 
 > 说明：以下条目已对同一事件的多源报道去重合并；来源可信度较弱者标注「⚠️ 待核实」，请以一手公告为准。
 
