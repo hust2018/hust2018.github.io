@@ -29,6 +29,9 @@
   --radius: 0px;
   --radius-lg: 2px;
   --shadow: 0 2px 0 rgba(0,0,0,0.4), 0 12px 32px -8px rgba(0,0,0,0.6);
+  /* 全站空间卡片共用的两级阴影：默认只提供层次，悬停/聚焦时才提高青色辉光。 */
+  --depth-shadow: 0 20px 50px -32px rgba(0,0,0,.9), 0 0 24px rgba(90,216,255,.05);
+  --depth-shadow-active: 0 28px 60px -32px rgba(0,0,0,.95), 0 0 28px rgba(90,216,255,.13);
 
   --max-w: 1060px;
 
@@ -238,6 +241,20 @@ button { font-family: inherit; cursor: pointer; }
   bottom: 0;
   height: 1px;
   background: linear-gradient(90deg, var(--accent) 0%, var(--accent) 80px, var(--border) 80px, var(--border) 100%);
+}
+/* 线尾的两个深度节点把首屏「面板连线」语言延伸到每个区块，但不改变标题布局。 */
+.section-head::before {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -2px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent-2);
+  box-shadow:
+    -18px 0 0 color-mix(in oklch, var(--accent) 62%, transparent),
+    0 0 12px var(--accent-2);
 }
 .section-head .num {
   color: var(--accent);
@@ -1098,6 +1115,85 @@ button { font-family: inherit; cursor: pointer; }
    :focus-within 表示「内部任意元素获得焦点时」就生效——这里即输入框被聚焦时。 */
 .terminal:focus-within { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-soft), var(--shadow); }
 
+/* ============ 全站空间卡片语言 ============ */
+/* 首屏以下不再注册任何指针监听；所有卡片只用 CSS 做 3px 以内的抬升和极轻的透视，
+   既保持统一，又不会让长简历在滚动时持续消耗脚本。 */
+.terminal,
+.exp,
+.edu,
+.contact-block,
+.hl,
+.latest-posts .latest-item {
+  transform: translateZ(0);
+  transform-origin: 50% 50%;
+  box-shadow: var(--depth-shadow);
+  transition:
+    transform .22s ease,
+    border-color .22s ease,
+    box-shadow .22s ease,
+    background-color .22s ease;
+}
+.terminal { box-shadow: var(--shadow), var(--depth-shadow); }
+
+/* 亮点和最新文章原本只有一条底边；补一个透明外框后，hover 时的边缘高光才有完整轮廓。 */
+.hl,
+.latest-posts .latest-item {
+  position: relative;
+  padding-left: 12px;
+  padding-right: 12px;
+  margin-left: -12px;
+  margin-right: -12px;
+  border: 1px solid transparent;
+  border-bottom-color: var(--border);
+  background: color-mix(in oklch, var(--bg-card) 34%, transparent);
+}
+.hl:last-child { border-bottom-color: transparent; }
+
+/* 技能本身就是独立小面板，给 chip 增加短阴影即可，不把整行包成厚重卡片。 */
+.chip {
+  box-shadow: 0 8px 22px -18px rgba(0,0,0,.95);
+  transform: translateZ(0);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .terminal:hover,
+  .exp:hover,
+  .edu:hover,
+  .contact-block:hover,
+  .hl:hover,
+  .latest-posts .latest-item:hover {
+    transform: translate3d(0, -3px, 0) rotateX(.35deg);
+    border-color: color-mix(in oklch, var(--accent) 48%, var(--border));
+    box-shadow: var(--depth-shadow-active);
+  }
+  .terminal:hover { box-shadow: var(--shadow), var(--depth-shadow-active); }
+}
+
+/* 只有真正可交互、能获得键盘焦点的容器才使用 focus-within；
+   教育等纯展示内容不添加 tabIndex，避免制造无意义的 Tab 停靠点。 */
+.exp:focus-within,
+.terminal:focus-within,
+.contact-block:focus-within,
+.hl:focus-within,
+.latest-posts .latest-item:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent-soft), var(--depth-shadow-active);
+}
+.terminal:focus-within { box-shadow: 0 0 0 1px var(--accent-soft), var(--shadow), var(--depth-shadow-active); }
+
+@media (prefers-reduced-motion: reduce) {
+  .terminal,
+  .exp,
+  .edu,
+  .contact-block,
+  .hl,
+  .latest-posts .latest-item,
+  .chip {
+    transition: none;
+    transform: none !important;
+  }
+}
+
 @media print {
   /* 「所见即所得」深色 PDF：保留站点的深色主题，不再转白底黑字。
      关键：浏览器打印默认会丢掉背景色，必须用 print-color-adjust: exact 强制保留，
@@ -1132,6 +1228,10 @@ button { font-family: inherit; cursor: pointer; }
   .hero-deck { transform: none !important; animation: none !important; }
   .deck-grid, .deck-panel-system, .deck-panel-telemetry, .deck-laser, .deck-node { display: none !important; }
   .deck-panel-id { transform: none !important; }
+  .terminal, .exp, .edu, .contact-block, .hl, .latest-posts .latest-item, .chip {
+    box-shadow: none !important;
+    transform: none !important;
+  }
   a { text-decoration: none; }
 }
 
