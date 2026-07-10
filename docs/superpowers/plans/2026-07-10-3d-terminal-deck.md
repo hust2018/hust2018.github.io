@@ -381,7 +381,7 @@ Expected: all tests pass, static export succeeds, and `git diff --check` prints 
 
 Run: `git diff --name-only 29d57b9..HEAD`
 
-Expected changed product files only: `lib/tilt.ts`, `lib/tilt.test.ts`, `components/effects.tsx`, `components/HeroDeck.tsx`, `components/ImageSlot.tsx`, `components/Hero.tsx`, and `app/globals.css`, plus the already-approved design and plan documents.
+Expected changed product files only: `lib/tilt.ts`, `lib/tilt.test.ts`, `lib/hero-deck.test.ts`, `lib/hero.test.ts`, `components/effects.tsx`, `components/HeroDeck.tsx`, `components/ImageSlot.tsx`, `components/Hero.tsx`, `app/globals.css`, and `vitest.config.ts`, plus the already-approved design and plan documents.
 
 - [ ] **Step 6: Commit the full-page polish**
 
