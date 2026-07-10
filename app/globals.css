@@ -541,28 +541,29 @@ button { font-family: inherit; cursor: pointer; }
 .deck-bars i:nth-child(2) { height: 82%; background: var(--accent-2); }
 .deck-bars i:nth-child(3) { height: 61%; background: var(--green); }
 
-/* 激光线和两个节点把分离的面板视觉上连成同一套系统。 */
+/* 激光线和两个节点把分离的面板视觉上连成同一套系统。
+   它们的 Z 深度必须低于身份卡的 92px，线才会从头像后方穿过，而不会压到人物身上。 */
 .deck-laser {
   position: absolute;
   left: 8px;
   right: -4px;
   top: 176px;
-  z-index: 5;
+  z-index: 3;
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--accent), var(--accent-2), transparent);
   box-shadow: 0 0 12px var(--accent);
-  transform: translateZ(112px);
+  transform: translateZ(70px);
   opacity: .72;
 }
 .deck-node {
   position: absolute;
-  z-index: 6;
+  z-index: 3;
   width: 6px;
   height: 6px;
   border-radius: 50%;
   background: var(--accent);
   box-shadow: 0 0 12px var(--accent);
-  transform: translateZ(118px);
+  transform: translateZ(72px);
 }
 .deck-node-a { left: 22px; top: 172px; }
 .deck-node-b { right: 8px; top: 173px; background: var(--accent-2); box-shadow: 0 0 12px var(--accent-2); }
