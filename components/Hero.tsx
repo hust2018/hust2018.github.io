@@ -9,8 +9,8 @@ import { pickLang } from "@/lib/i18n";
 //   - GlitchText：把文字渲染成带「故障/抖动」特效。
 //   - Typewriter：把文字以「打字机」逐字出现的方式显示。
 import { GlitchText, Typewriter } from "./effects";
-// 头像位组件（有图显示图，无图显示占位文字）。
-import { ImageSlot } from "./ImageSlot";
+// 首屏右侧的立体终端甲板：内部复用头像位，并负责轻量指针视差。
+import { HeroDeck } from "./HeroDeck";
 // 只导入类型 Lang（语言类型，如 "zh" | "en"），仅用于类型检查。
 import type { Lang } from "@/lib/types";
 
@@ -73,32 +73,9 @@ export function Hero({ lang, booted }: { lang: Lang; booted: boolean }) {
           </div>
         )}
       </div>
-      {/* 右栏：照片框 + 照片下方的标语，用一个纵向排列（flex column）的容器装起来。
-          为什么要多套这层容器？因为 .hero-photo 本身有固定高度 + clip-path（裁剪成带缺口的形状），
-          任何超出这个方框的内容都会被「剪掉」看不见。如果把标语直接放进 .hero-photo，
-          它会落在照片下方、方框的外面，于是被 clip-path 整段裁掉（DOM 里有，但画面上不显示）。
-          把标语放到照片框「外面」（即这个容器里、与 .hero-photo 平级）就不会再被裁掉。 */}
-      <div className="hero-photo-col">
-        <div className="hero-photo">
-          {/* 头像位。placeholder 是没有图片时显示的占位文字，这里用三元表达式按语言给不同提示： */}
-          {/* 条件 ? 真时的值 : 假时的值 —— lang 是 "zh" 就给中文提示，否则给英文提示。 */}
-          <ImageSlot
-            src="/ljl-new.png"
-            placeholder={lang === "zh" ? "把头像放到 public/" : "drop photo in public/"}
-            alt={lang === "zh" ? "李姜磊的头像" : "Portrait of Jianglei Li"}
-          />
-          <div className="hero-photo-label">ID_0001</div>
-        </div>
-        {/* 照片下方的一句个人标语：做成「终端回显」的样子，更有个性——
-            开头一个品红提示符箭头 ▸（呼应上方职位行的 ▸），中间是标语本身，
-            结尾接一个会闪烁的光标方块（直接复用全局 .cursor 样式，省得重写动画）。
-            整行的青色辉光由 .hero-motto 的 text-shadow 提供。 */}
-        <p className="hero-motto">
-          <span className="hero-motto-arrow">▸</span>
-          尽管提需求，我来想办法实现
-          <span className="cursor"></span>
-        </p>
-      </div>
+      {/* 右栏交给独立的 HeroDeck：头像是前景身份卡，后方终端面板只负责空间层次。
+          Hero 本身继续专注简历文案，不直接处理指针事件或 3D 细节。 */}
+      <HeroDeck lang={lang} />
     </section>
   );
 }

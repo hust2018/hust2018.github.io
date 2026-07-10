@@ -374,80 +374,186 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 
-/* Hero photo */
-.hero-photo {
+/* ---------- Hero 立体终端甲板 ---------- */
+/* 右栏外壳只负责纵向摆放「甲板 + 标语」。真正的 3D 层都在 .hero-deck 内部，
+   这样标语不会被面板的 clip-path 或空间变换裁掉。 */
+.hero-deck-col {
+  width: 332px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-self: end;
+  isolation: isolate;
+}
+
+/* usePointerTilt 会实时改这两个 CSS 变量；没有指针、尚未水合或减少动态效果时都是 0deg，
+   因此服务器首屏和浏览器首次渲染完全一致，不会出现 hydration 跳变。 */
+.hero-deck {
+  --tilt-x: 0deg;
+  --tilt-y: 0deg;
+  width: 320px;
+  height: 310px;
+  position: relative;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+  transform-origin: 50% 50%;
+  transition: transform 180ms ease-out;
+  will-change: transform;
+}
+
+/* 地面网格向后倾斜，给三张终端面板一个「站在空间里」的参照面。 */
+.deck-grid {
+  position: absolute;
+  left: 18px;
+  right: 0;
+  bottom: 4px;
+  height: 180px;
+  background-image:
+    linear-gradient(color-mix(in oklch, var(--accent) 16%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklch, var(--accent) 16%, transparent) 1px, transparent 1px);
+  background-size: 22px 22px;
+  mask-image: linear-gradient(to top, rgba(0,0,0,.9), transparent 88%);
+  -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,.9), transparent 88%);
+  transform: translateZ(-34px) rotateX(67deg);
+  transform-origin: bottom center;
+  opacity: .7;
+}
+
+/* 三张面板共享同一材质：半透明深色底、细描边、切角和内侧柔光。 */
+.deck-panel {
+  position: absolute;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  background: linear-gradient(145deg, color-mix(in oklch, var(--bg-soft) 90%, transparent), rgba(5,7,13,.82));
+  border: 1px solid color-mix(in oklch, var(--accent) 38%, var(--border));
+  clip-path: var(--clip-notch);
+  box-shadow:
+    inset 0 0 24px color-mix(in oklch, var(--accent) 7%, transparent),
+    0 24px 54px -28px rgba(0,0,0,.95),
+    0 0 24px color-mix(in oklch, var(--accent) 10%, transparent);
+  backface-visibility: hidden;
+}
+.deck-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, transparent 0 3px, rgba(90,216,255,.045) 4px);
+  mix-blend-mode: screen;
+}
+
+/* 前景身份面板：它离观察者最近，也是甲板中唯一承载真实内容（头像）的层。 */
+.deck-panel-id {
+  top: 18px;
+  right: 22px;
   width: 180px;
   height: 220px;
-  background: var(--bg-soft);
-  background-image:
-    linear-gradient(135deg, transparent 49%, var(--border) 49%, var(--border) 51%, transparent 51%),
-    linear-gradient(45deg, transparent 49%, var(--border) 49%, var(--border) 51%, transparent 51%);
-  background-size: 24px 24px;
-  background-position: 0 0;
-  position: relative;
-  flex-shrink: 0;
-  clip-path: var(--clip-notch);
-  border: 1px solid var(--border-strong);
+  z-index: 4;
+  transform: translate3d(16px, 0, 92px);
+  border-color: color-mix(in oklch, var(--accent) 68%, var(--border));
   box-shadow:
     inset 0 0 0 1px var(--bg),
-    0 0 0 1px var(--accent-soft),
-    0 20px 60px -20px var(--accent);
+    0 28px 64px -24px rgba(0,0,0,.95),
+    0 0 32px color-mix(in oklch, var(--accent) 22%, transparent);
 }
-.hero-photo image-slot,
-.hero-photo .image-slot-img {
+.deck-panel-id .image-slot-img {
   width: 100%;
   height: 100%;
   display: block;
   object-fit: cover;
+  filter: saturate(.94) contrast(1.03);
 }
-.hero-photo .image-slot-empty {
+.deck-panel-id .image-slot-empty {
   width: 100%;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 12px;
   text-align: center;
-  padding: 10px;
-  font-size: 11px;
-  letter-spacing: 0.08em;
   color: var(--fg-mute);
+  font-size: 10px;
+  letter-spacing: .08em;
 }
-.hero-photo::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(0deg, rgba(0,0,0,0) 0, rgba(0,0,0,0) 2px, rgba(0,0,0,0.06) 3px, rgba(0,0,0,0) 4px);
-  pointer-events: none;
-  mix-blend-mode: overlay;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-html[data-variant="terminal"][data-theme="dark"] .hero-photo::after { opacity: 1; }
-
 .hero-photo-label {
   position: absolute;
-  bottom: -22px;
-  right: 0;
-  font-size: 10px;
-  color: var(--fg-mute);
-  letter-spacing: 0.1em;
+  right: 9px;
+  bottom: 7px;
+  z-index: 2;
+  padding: 2px 6px;
+  color: var(--fg);
+  background: rgba(5,7,13,.78);
+  border-left: 1px solid var(--accent);
+  font-size: 9px;
+  letter-spacing: .12em;
   text-transform: uppercase;
 }
 .hero-photo-label::before { content: "// "; color: var(--accent); }
 
-/* 右栏容器：把照片框和它下面的标语「上下叠放并水平居中」。
-   照片框（.hero-photo）有 clip-path 会裁掉超出方框的内容，所以标语必须放在框外面、
-   也就是这个容器里，才不会被裁掉。 */
-.hero-photo-col {
+/* 中层系统面板露在头像左后方；文字仅是装饰遥测，所以尺寸刻意较小。 */
+.deck-panel-system {
+  top: 48px;
+  left: 4px;
+  width: 176px;
+  height: 116px;
+  padding: 15px 14px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  gap: 4px;
+  color: var(--fg-dim);
+  transform: translate3d(-18px, 0, 24px) rotateY(8deg);
 }
-/* 照片下方的个人标语：和整体终端风格一致的小字，居中、宽度对齐照片。
-   margin-top 留出一点空隙，顺便避开照片右下角那个绝对定位的 ID_0001 标签。 */
+.deck-panel-system span,
+.deck-panel-telemetry > span { color: var(--fg-mute); font-size: 8px; letter-spacing: .14em; }
+.deck-panel-system strong { color: var(--green); font-size: 18px; letter-spacing: .08em; text-shadow: 0 0 14px color-mix(in oklch, var(--green) 45%, transparent); }
+.deck-panel-system small,
+.deck-panel-telemetry small { color: var(--fg-mute); font-size: 7px; letter-spacing: .08em; }
+
+/* 下层遥测面板横跨头像底部，形成第二条空间轴线。 */
+.deck-panel-telemetry {
+  left: 46px;
+  bottom: 25px;
+  width: 238px;
+  height: 102px;
+  padding: 13px 15px;
+  transform: translate3d(0, 0, 54px) rotateY(-5deg);
+}
+.deck-bars { height: 28px; margin: 9px 0 7px; display: flex; align-items: flex-end; gap: 5px; }
+.deck-bars i { display: block; width: 34px; height: 42%; background: var(--accent); box-shadow: 0 0 9px color-mix(in oklch, var(--accent) 55%, transparent); }
+.deck-bars i:nth-child(2) { height: 82%; background: var(--accent-2); }
+.deck-bars i:nth-child(3) { height: 61%; background: var(--green); }
+
+/* 激光线和两个节点把分离的面板视觉上连成同一套系统。 */
+.deck-laser {
+  position: absolute;
+  left: 8px;
+  right: -4px;
+  top: 176px;
+  z-index: 5;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), var(--accent-2), transparent);
+  box-shadow: 0 0 12px var(--accent);
+  transform: translateZ(112px);
+  opacity: .72;
+}
+.deck-node {
+  position: absolute;
+  z-index: 6;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 12px var(--accent);
+  transform: translateZ(118px);
+}
+.deck-node-a { left: 22px; top: 172px; }
+.deck-node-b { right: 8px; top: 173px; background: var(--accent-2); box-shadow: 0 0 12px var(--accent-2); }
+
+/* 照片下方的个人标语：和整体终端风格一致的小字，宽度与甲板保持一致。 */
 .hero-motto {
-  margin-top: 28px;
-  max-width: 230px;
+  margin-top: 8px;
+  max-width: 310px;
   text-align: center;
   font-size: 12.5px;
   line-height: 1.6;
@@ -457,6 +563,24 @@ html[data-variant="terminal"][data-theme="dark"] .hero-photo::after { opacity: 1
 }
 /* 标语开头的提示符箭头：用品红强调色（--accent-2），和上方「职位」行的 ▸ 一致。 */
 .hero-motto-arrow { color: var(--accent-2); margin-right: 6px; }
+
+/* 触屏没有稳定的 hover 坐标，改用幅度很小、周期较长的自动漂浮。 */
+@keyframes deckDrift {
+  0%, 100% { transform: rotateX(0deg) rotateY(0deg) translateY(0); }
+  50% { transform: rotateX(2deg) rotateY(-3deg) translateY(-5px); }
+}
+@media (pointer: coarse) and (prefers-reduced-motion: no-preference) {
+  .hero-deck { animation: deckDrift 8s ease-in-out infinite; }
+}
+/* 尊重系统的减少动态效果设置：甲板保持静态层级，指针 Hook 同时也不会注册监听。 */
+@media (prefers-reduced-motion: reduce) {
+  .hero-deck {
+    transform: none !important;
+    animation: none !important;
+    transition: none;
+    will-change: auto;
+  }
+}
 
 /* ============ About ============ */
 .about p {
@@ -1004,6 +1128,10 @@ html[data-variant="terminal"][data-theme="dark"] .hero-photo::after { opacity: 1
   .exp-inner { padding-top: 8px; }
   .fade-up { opacity: 1 !important; transform: none !important; }
   .hero-name { text-shadow: none; }
+  /* 打印时保留头像身份卡，但拿掉纯装饰的背景面板和空间变换，避免浏览器分页时出现偏移。 */
+  .hero-deck { transform: none !important; animation: none !important; }
+  .deck-grid, .deck-panel-system, .deck-panel-telemetry, .deck-laser, .deck-node { display: none !important; }
+  .deck-panel-id { transform: none !important; }
   a { text-decoration: none; }
 }
 
@@ -1016,7 +1144,8 @@ html[data-variant="terminal"][data-theme="dark"] .hero-photo::after { opacity: 1
   .topbar-inner { padding: 10px 18px; }
   .topbar-title { display: none; }
   .hero { grid-template-columns: 1fr; padding-top: 40px; gap: 28px; align-items: start; }
-  .hero-photo { width: 140px; height: 170px; }
+  .hero-deck-col { width: 100%; justify-self: center; }
+  .hero-deck { width: min(300px, 92vw); height: 295px; transform-origin: top center; }
   .skills-grid { grid-template-columns: 1fr; gap: 4px; }
   .skill-cat { padding-top: 14px; }
   .edu { grid-template-columns: 1fr; gap: 4px; }
