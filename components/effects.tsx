@@ -6,16 +6,18 @@
 // 本文件里的特效都依赖 useState/useEffect/IntersectionObserver 等，所以必须声明为客户端组件。
 "use client";
 
-// 从 react 里导入三个最常用的「Hook」。Hook 是 React 提供的特殊函数，名字都以 use 开头，
+// 从 react 里导入几个常用的「Hook」。Hook 是 React 提供的特殊函数，名字都以 use 开头，
 // 只能在组件函数（或自定义 Hook）内部调用，用来给函数组件「加上记忆和副作用能力」：
 //   - useState：让组件拥有「状态」（会变化、变化后自动重新渲染的数据）。
 //   - useEffect：在组件渲染后执行「副作用」（定时器、订阅、操作 DOM 等与渲染本身无关的事）。
 //   - useRef：拿到一个「引用容器」，常用来引用某个真实 DOM 元素，或存一个不触发重渲染的值。
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 // 这里只导入「类型」（import type 只在编译期用，打包后会被删掉，不产生运行时代码）：
 //   - ReactNode：能被 React 渲染的任意内容的类型（字符串、数字、JSX、它们的数组等），常用于 children。
 //   - RefObject：useRef 返回值的类型。
 import type { ReactNode, RefObject } from "react";
+// 3D 甲板的角度计算保持为纯函数；这个文件只负责把浏览器事件接到它上面。
+import { calculateTilt } from "../lib/tilt";
 
 // ---------- 故障风文字 ----------
 // 视觉特效靠 CSS 实现，这里只把文字同时塞进 data-text 属性供 CSS 用。
@@ -177,6 +179,68 @@ export function useInView(ref: RefObject<HTMLElement | null>): boolean {
   }, [ref]);
   // 把「是否已进入视口」这个结果返回给调用方使用。
   return inView;
+}
+
+// ---------- 指针驱动的 3D 倾斜 ----------
+// 返回一个 ref，调用方把它挂到需要产生视差的 DOM 元素上即可。
+// 高频的 pointermove 不写 React state，而是经 requestAnimationFrame 合并后直接更新 CSS 变量：
+// 这样只重绘甲板自身，不会让整份简历跟着每一帧重新渲染。
+export function usePointerTilt<T extends HTMLElement>(maxAngle = 6): RefObject<T | null> {
+  const ref = useRef<T | null>(null);
+  // 把尚未执行的动画帧 id 存进 ref；改它不会触发组件重渲染。
+  const frameRef = useRef<number | null>(null);
+
+  // useCallback 保证函数引用稳定，避免下面的 effect 因每次渲染拿到新函数而反复拆装监听器。
+  const writeTilt = useCallback((rotateX: number, rotateY: number) => {
+    const element = ref.current;
+    if (!element) return;
+    element.style.setProperty("--tilt-x", `${rotateX}deg`);
+    element.style.setProperty("--tilt-y", `${rotateY}deg`);
+  }, []);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+
+    // 只有带精确指针的桌面设备才启用鼠标跟随；触屏交给 CSS 的慢速漂浮。
+    // 用户系统若要求减少动态效果，这里也完全不注册高频事件。
+    const finePointer = window.matchMedia("(pointer: fine)").matches;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!finePointer || reduceMotion) return;
+
+    const onMove = (event: PointerEvent) => {
+      // 同一绘制帧内只保留最后一次指针位置，避免高刷新率鼠标堆积大量 DOM 写入。
+      if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
+      frameRef.current = requestAnimationFrame(() => {
+        const result = calculateTilt({
+          pointerX: event.clientX,
+          pointerY: event.clientY,
+          bounds: element.getBoundingClientRect(),
+          maxAngle,
+        });
+        writeTilt(result.rotateX, result.rotateY);
+        frameRef.current = null;
+      });
+    };
+
+    const onLeave = () => {
+      if (frameRef.current !== null) {
+        cancelAnimationFrame(frameRef.current);
+        frameRef.current = null;
+      }
+      writeTilt(0, 0);
+    };
+
+    element.addEventListener("pointermove", onMove, { passive: true });
+    element.addEventListener("pointerleave", onLeave);
+    return () => {
+      element.removeEventListener("pointermove", onMove);
+      element.removeEventListener("pointerleave", onLeave);
+      if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
+    };
+  }, [maxAngle, writeTilt]);
+
+  return ref;
 }
 
 // ---------- 滚动淡入容器 ----------

@@ -82,7 +82,11 @@ export function Hero({ lang, booted }: { lang: Lang; booted: boolean }) {
         <div className="hero-photo">
           {/* 头像位。placeholder 是没有图片时显示的占位文字，这里用三元表达式按语言给不同提示： */}
           {/* 条件 ? 真时的值 : 假时的值 —— lang 是 "zh" 就给中文提示，否则给英文提示。 */}
-          <ImageSlot src="/ljl-new.png" placeholder={lang === "zh" ? "把头像放到 public/" : "drop photo in public/"} />
+          <ImageSlot
+            src="/ljl-new.png"
+            placeholder={lang === "zh" ? "把头像放到 public/" : "drop photo in public/"}
+            alt={lang === "zh" ? "李姜磊的头像" : "Portrait of Jianglei Li"}
+          />
           <div className="hero-photo-label">ID_0001</div>
         </div>
         {/* 照片下方的一句个人标语：做成「终端回显」的样子，更有个性——

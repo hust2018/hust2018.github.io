@@ -14,11 +14,20 @@ import { useState } from "react";
 //
 // 下面是一个「函数组件」：本质就是一个返回 JSX（界面描述）的普通函数，函数名首字母大写。
 // 括号里的 { src, placeholder } 是「解构」写法：父组件调用时会传进来一个 props 对象（属性集合），
-// 这里直接把对象里的 src 和 placeholder 两个属性取出来当变量用，省得每次写 props.src。
-// 冒号后面的 { src?: string; placeholder: string } 是 TypeScript 的类型标注，说明这两个属性各是什么类型：
+// 这里直接把对象里的 src、placeholder、alt 三个属性取出来当变量用，省得每次写 props.src。
+// 冒号后面的对象是 TypeScript 类型标注，说明这些属性各是什么类型：
 //   - src?: string  —— 问号表示「可选」，可以不传；传的话必须是字符串。
 //   - placeholder: string —— 没有问号，表示「必传」的字符串。
-export function ImageSlot({ src, placeholder }: { src?: string; placeholder: string }) {
+//   - alt: string —— 图片的替代文字，必须由调用方按当前语言提供，不能写死成泛泛的 avatar。
+export function ImageSlot({
+  src,
+  placeholder,
+  alt,
+}: {
+  src?: string;
+  placeholder: string;
+  alt: string;
+}) {
   // 声明一个状态 error，初始值是 false（表示「图片暂时没加载失败」）。
   // useState 返回一个数组，这里用解构同时拿到两样东西：
   //   - error：当前的值；
@@ -35,9 +44,9 @@ export function ImageSlot({ src, placeholder }: { src?: string; placeholder: str
   return (
     // 有 src 且没出错时，渲染真正的图片。
     //   - src={src}：把传进来的图片地址赋给 img 的 src 属性。
-    //   - alt="avatar"：图片的替代文字（图片显示不出来时给用户/读屏软件看的说明）。
+    //   - alt={alt}：使用父组件传来的本地化替代文字，告诉读屏软件照片里是谁。
     //   - onError={() => setError(true)}：图片加载失败时，浏览器会触发 onError 事件，
     //     这里就调用 setError(true) 把状态改成「出错」，于是组件重新渲染、走到上面的占位分支。
-    <img className="image-slot-img" src={src} alt="avatar" onError={() => setError(true)} />
+    <img className="image-slot-img" src={src} alt={alt} onError={() => setError(true)} />
   );
 }
