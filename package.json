@@ -13,6 +13,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@next/third-parties": "^15.5.20",
     "gray-matter": "^4.0.3",
     "katex": "^0.17.0",
     "mermaid": "^11.16.0",

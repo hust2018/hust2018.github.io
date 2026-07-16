@@ -5,6 +5,9 @@
 import type { Metadata } from "next";
 // 导入全局样式表。在组件里直接 import css 文件是 Next 的用法，会把样式应用到整个站点。
 import "./globals.css";
+// Google Analytics 4：Next 官方第三方组件。它负责在页面注入 gtag.js 统计脚本，
+// 并自动上报页面浏览（page_view）——包括本站在客户端做的路由切换（普通 gtag 需要手写才能追踪这类切换）。
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 // 页面元信息：浏览器标签标题、SEO 描述等。Next 会自动注入到 <head>。
 // 这是 Next.js 的约定：在 layout 或 page 文件里 export 一个名为 metadata 的对象，
@@ -45,6 +48,10 @@ export default function RootLayout({
       <body>
         {/* 把页面内容渲染进这个 #root 容器里。{children} 即当前路由对应页面的 JSX。 */}
         <div id="root">{children}</div>
+        {/* Google Analytics：只在生产构建（pnpm build）时注入，本地 pnpm dev 不上报，
+            避免自己开发时的访问污染统计数据。gaId 是 GA 后台给的「衡量 ID」——
+            它不是机密，最终会出现在页面源码里，任何访客都能看到，所以直接写在这里没问题。 */}
+        {process.env.NODE_ENV === "production" && <GoogleAnalytics gaId="G-E3PKHCXYBD" />}
       </body>
     </html>
   );
