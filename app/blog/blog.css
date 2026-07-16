@@ -18,7 +18,7 @@
 .blog-shell {
   position: relative;
   z-index: 1;
-  max-width: 720px;            /* 窄栏：长文最佳阅读宽度，约 70–80 个字符/行 */
+  max-width: 920px;            /* 阅读宽度：中文长文，约 55–60 字/行，宽屏下不至于太空 */
   margin: 0 auto;
   padding: 40px 24px 120px;
   line-height: 1.8;            /* 比全局 1.6 更宽松，长文更好读 */
