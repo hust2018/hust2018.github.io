@@ -1,0 +1,127 @@
+1:"$Sreact.fragment"
+2:I[4827,[],""]
+3:I[1063,[],""]
+4:I[18898,["8898","static/chunks/8898-6bd3ae2036150b59.js","5953","static/chunks/app/blog/%5Bslug%5D/page-29c0a9abb3667bfa.js"],""]
+5:I[93481,["7177","static/chunks/app/layout-a667fbbdcd28d100.js"],"GoogleAnalytics"]
+7:I[96050,[],"OutletBoundary"]
+9:I[29479,[],"AsyncMetadataOutlet"]
+b:I[96050,[],"ViewportBoundary"]
+d:I[96050,[],"MetadataBoundary"]
+e:"$Sreact.suspense"
+10:I[66177,[],""]
+:HL["/_next/static/css/63719a8cc333d957.css","style"]
+:HL["/_next/static/css/39284753f3f7ffbc.css","style"]
+0:{"P":null,"b":"WzSLKYsVIlDSw6VySHWWO","p":"","c":["","blog","daily-brief-2026-07-02",""],"i":false,"f":[[["",{"children":["blog",{"children":[["slug","daily-brief-2026-07-02","d"],{"children":["__PAGE__",{}]}]}]},"$undefined","$undefined",true],["",["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/_next/static/css/63719a8cc333d957.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]],["$","html",null,{"lang":"zh-CN","data-variant":"terminal","data-theme":"dark","data-blink":"on","data-crt":"off","children":[["$","head",null,{"children":[["$","link",null,{"rel":"preconnect","href":"https://fonts.googleapis.com"}],["$","link",null,{"rel":"preconnect","href":"https://fonts.gstatic.com","crossOrigin":"anonymous"}],["$","link",null,{"href":"https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap","rel":"stylesheet"}]]}],["$","body",null,{"children":[["$","div",null,{"id":"root","children":["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[["$","main",null,{"className":"notfound","children":["$","div",null,{"className":"notfound-window frame","children":[["$","div",null,{"className":"notfound-titlebar","children":[["$","span",null,{"className":"notfound-dot r","aria-hidden":"true"}],["$","span",null,{"className":"notfound-dot y","aria-hidden":"true"}],["$","span",null,{"className":"notfound-dot g","aria-hidden":"true"}],["$","span",null,{"className":"label","children":"~/404 — zsh"}]]}],["$","div",null,{"className":"notfound-body","children":[["$","p",null,{"className":"notfound-cmd","children":[["$","span",null,{"className":"prompt","aria-hidden":"true","children":"$$"}],"cd ./requested-page"]}],["$","p",null,{"className":"notfound-err","children":"cd: no such file or directory: 404"}],["$","div",null,{"className":"notfound-code","children":["$","span",null,{"className":"glitch","data-text":"404","children":"404"}]}],["$","h1",null,{"className":"notfound-title","children":"页面未找到 · Page not found"}],["$","p",null,{"className":"notfound-msg","children":["你访问的页面不存在、已被移动，或从未存在过。",["$","br",null,{}],"The page you’re looking for doesn’t exist or has moved."]}],["$","div",null,{"className":"notfound-links","children":[["$","$L4",null,{"className":"icon-btn","href":"https://www.lijianglei.com/","children":"← 返回首页 / Home"}],["$","$L4",null,{"className":"icon-btn","href":"https://www.lijianglei.com/blog/","children":"浏览博客 / Blog →"}]]}]]}]]}]}],[["$","link","0",{"rel":"stylesheet","href":"/_next/static/css/d913a549f8ee329b.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]]],"forbidden":"$undefined","unauthorized":"$undefined"}]}],["$","$L5",null,{"gaId":"G-E3PKHCXYBD"}]]}]]}]]}],{"children":["blog",["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/_next/static/css/39284753f3f7ffbc.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]],[["$","header",null,{"className":"topbar","children":["$","div",null,{"className":"topbar-inner","children":[["$","div",null,{"className":"dots","children":[["$","span",null,{"className":"dot live"}],["$","span",null,{"className":"dot"}],["$","span",null,{"className":"dot"}]]}],["$","div",null,{"className":"topbar-title","children":[["$","span",null,{"children":[["$","span",null,{"className":"label","children":"SESSION:"}]," ",["$","span",null,{"className":"val","children":["jianglei.li","@","hust2018"]}]]}],["$","span",null,{"className":"sep","children":"│"}],["$","span",null,{"children":[["$","span",null,{"className":"label","children":"PATH:"}]," ",["$","span",null,{"className":"val","children":"~/blog"}]]}]]}],["$","div",null,{"className":"topbar-actions","children":["$","$L4",null,{"className":"icon-btn","href":"https://www.lijianglei.com/","children":"← 首页 / Home"}]}]]}]}],["$","div",null,{"className":"blog-shell","children":["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]}]]]}],{"children":[["slug","daily-brief-2026-07-02","d"],["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}],{"children":["__PAGE__",["$","$1","c",{"children":["$L6",null,["$","$L7",null,{"children":["$L8",["$","$L9",null,{"promise":"$@a"}]]}]]}],{},null,false]},null,false]},null,false]},null,false],["$","$1","h",{"children":[null,[["$","$Lb",null,{"children":"$Lc"}],null],["$","$Ld",null,{"children":["$","div",null,{"hidden":true,"children":["$","$e",null,{"fallback":null,"children":"$Lf"}]}]}]]}],false]],"m":"$undefined","G":["$10",[]],"s":false,"S":true}
+c:[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
+8:null
+11:I[91319,[],"IconMark"]
+a:{"metadata":[["$","title","0",{"children":"每日商业与科技简报 · 2026-07-02 — 李姜磊 · Jianglei Li"}],["$","meta","1",{"name":"description","content":"2026 年 7 月 2 日商业与科技要闻：Together AI 融资 8 亿美元、半导体获利了结、Claude Sonnet 5 与企业级 AI 部署、GitHub 与微软全面 Agent 化，以及近期安全事件与 SE 智能体研究前沿。"}],["$","link","2",{"rel":"canonical","href":"https://www.lijianglei.com/blog/daily-brief-2026-07-02/"}],["$","meta","3",{"property":"og:title","content":"每日商业与科技简报 · 2026-07-02"}],["$","meta","4",{"property":"og:description","content":"2026 年 7 月 2 日商业与科技要闻：Together AI 融资 8 亿美元、半导体获利了结、Claude Sonnet 5 与企业级 AI 部署、GitHub 与微软全面 Agent 化，以及近期安全事件与 SE 智能体研究前沿。"}],["$","meta","5",{"property":"og:url","content":"https://www.lijianglei.com/blog/daily-brief-2026-07-02/"}],["$","meta","6",{"property":"og:locale","content":"zh_CN"}],["$","meta","7",{"property":"og:image","content":"https://www.lijianglei.com/og-default.png"}],["$","meta","8",{"property":"og:type","content":"article"}],["$","meta","9",{"property":"article:published_time","content":"2026-07-02"}],["$","meta","10",{"property":"article:modified_time","content":"2026-07-02"}],["$","meta","11",{"name":"twitter:card","content":"summary_large_image"}],["$","meta","12",{"name":"twitter:title","content":"每日商业与科技简报 · 2026-07-02"}],["$","meta","13",{"name":"twitter:description","content":"2026 年 7 月 2 日商业与科技要闻：Together AI 融资 8 亿美元、半导体获利了结、Claude Sonnet 5 与企业级 AI 部署、GitHub 与微软全面 Agent 化，以及近期安全事件与 SE 智能体研究前沿。"}],["$","meta","14",{"name":"twitter:image","content":"https://www.lijianglei.com/og-default.png"}],["$","link","15",{"rel":"icon","href":"/icon.svg?913075afb1bec69f","type":"image/svg+xml","sizes":"any"}],["$","$L11","16",{}]],"error":null,"digest":"$undefined"}
+f:"$a:metadata"
+12:T4d3,{"@context":"https://schema.org","@graph":[{"@type":"BlogPosting","headline":"每日商业与科技简报 · 2026-07-02","description":"2026 年 7 月 2 日商业与科技要闻：Together AI 融资 8 亿美元、半导体获利了结、Claude Sonnet 5 与企业级 AI 部署、GitHub 与微软全面 Agent 化，以及近期安全事件与 SE 智能体研究前沿。","datePublished":"2026-07-02","dateModified":"2026-07-02","inLanguage":"zh","author":{"@type":"Person","name":"李姜磊 / Jianglei Li","url":"https://www.lijianglei.com"},"publisher":{"@type":"Person","name":"李姜磊 / Jianglei Li","url":"https://www.lijianglei.com"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://www.lijianglei.com/blog/daily-brief-2026-07-02/"},"image":["https://www.lijianglei.com/og-default.png"],"url":"https://www.lijianglei.com/blog/daily-brief-2026-07-02/"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.lijianglei.com/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://www.lijianglei.com/blog/"},{"@type":"ListItem","position":3,"name":"每日商业与科技简报 · 2026-07-02","item":"https://www.lijianglei.com/blog/daily-brief-2026-07-02/"}]}]}13:T50e2,<ul>
+<li><strong>日期</strong>：2026 年 7 月 2 日（星期四）</li>
+<li><strong>覆盖窗口</strong>：约 2026-07-01 00:00 至 2026-07-02 01:20（美东时间），优先近 24 小时</li>
+<li><strong>信息源</strong>：V2EX、linux.do、TechCrunch、OpenAI News、GitHub Blog、Microsoft Dev Blogs、arXiv（cs.AI / cs.SE / cs.CR / stat.ML）、FTC Press Releases</li>
+</ul>
+<blockquote>
+<p>说明：以下条目已对同一事件的多源报道去重合并；来源可信度较弱者标注「⚠️ 待核实」，请以一手公告为准。</p>
+</blockquote>
+<hr>
+<h2 id="一商业简报business">一、商业简报（Business）<a class="heading-anchor" aria-label="Link to section" href="#一商业简报business">#</a></h2>
+<h3 id="1-together-ai-融资-8-亿美元估值跃升至-83-亿美元">1. Together AI 融资 8 亿美元，估值跃升至 83 亿美元<a class="heading-anchor" aria-label="Link to section" href="#1-together-ai-融资-8-亿美元估值跃升至-83-亿美元">#</a></h3>
+<ul>
+<li><strong>核心摘要</strong>：AI "neocloud"（对外出租 Nvidia GPU 集群等 AI 专用算力）厂商 Together AI 完成 8 亿美元 C 轮，估值达 83 亿美元，由 Aramco Ventures 领投，Vista、General Catalyst、Nvidia、SentinelOne 旗下 S Ventures 等跟投。约 16 个月前其 B 轮估值仅 33 亿美元；公司称上季度年度签约额已超 11.5 亿美元。</li>
+<li><strong>为什么重要</strong>：AI 算力租赁赛道在 2026 下半年开局依旧火热，估值 16 个月翻约 2.5 倍，显示资本对"GPU 中间商 / 算力云"模式的持续下注。</li>
+<li><strong>商业信号</strong>：企业侧对灵活、非超大厂算力的采购需求强劲；主权基金（Aramco）加码 AI 基础设施。</li>
+<li><strong>来源与时间</strong>：<a href="https://techcrunch.com/2026/07/01/neocloud-together-ai-raises-800m-leaps-to-8-3b-valuation/">TechCrunch</a> · 2026-07-01</li>
+</ul>
+<h3 id="2-下半年开局市场谨慎芯片股获利了结">2. 下半年开局市场谨慎：芯片股获利了结<a class="heading-anchor" aria-label="Link to section" href="#2-下半年开局市场谨慎芯片股获利了结">#</a></h3>
+<ul>
+<li><strong>核心摘要</strong>：H2 首个交易日纳指小幅走低，标普 500 跌约 0.4%、道指跌约 184 点。半导体在上半年大涨后遭获利了结——VanEck 半导体 ETF 上半年涨约 82%（历史最佳）；Micron 单日跌约 7%（年内仍涨约 300%），SanDisk 跌近 9%（上半年一度涨超 850%）。Micron 上一财季营收 414.6 亿美元、同比大增，市值突破 1 万亿美元。</li>
+<li><strong>为什么重要</strong>：AI 需求推动的半导体超级周期出现首次明显"退潮"信号，是判断下半年科技股情绪的重要风向标。</li>
+<li><strong>商业信号</strong>：资金在日历转换点兑现浮盈；富国银行仍看多"7 月初季节性反弹"，但提示 9 月中期选举前的不确定性。</li>
+<li><strong>来源与时间</strong>：<a href="https://247wallst.com/investing/2026/07/01/live-nasdaq-composite-markets-kick-off-h2-2026-on-cautious-note-on-chip-stock-profit-taking/">24/7 Wall St.</a> · 2026-07-01；<a href="https://www.cnbc.com/2026/06/24/micron-mu-earnings-report-q3-2026.html">CNBC（Micron Q3）</a> · 2026-06-24</li>
+</ul>
+<h3 id="3-企业级-ai落地--部署成为新战场openai-成立部署公司anthropic-深化合作网络">3. 企业级 AI"落地 / 部署"成为新战场：OpenAI 成立部署公司，Anthropic 深化合作网络<a class="heading-anchor" aria-label="Link to section" href="#3-企业级-ai落地--部署成为新战场openai-成立部署公司anthropic-深化合作网络">#</a></h3>
+<ul>
+<li><strong>核心摘要</strong>：OpenAI 宣布成立 <strong>OpenAI Deployment Company</strong>，以逾 40 亿美元初始投资帮助企业构建并部署可日常依赖的 AI 系统，并将用于收购能加速落地的公司。与此同时，Anthropic 通过 Claude Partner Network（初始投入 1 亿美元）+ PwC 等大型咨询机构扩大企业铺开（PwC 计划培训认证 3 万名美国专业人员）。</li>
+<li><strong>为什么重要</strong>：竞争焦点正从"发布更强模型"转向"帮客户真正用起来"——部署、集成、服务与合规成为收入抓手。</li>
+<li><strong>商业信号</strong>：企业采用进入"规模化落地"阶段，催生咨询、集成、Agent 运维等配套服务市场。</li>
+<li><strong>来源与时间</strong>：<a href="https://openai.com/index/openai-launches-the-deployment-company/">OpenAI</a>；<a href="https://www.anthropic.com/news/claude-partner-network">Anthropic – Partner Network</a>；<a href="https://www.anthropic.com/news/pwc-expanded-partnership">Anthropic – PwC</a> · 近期（窗口内具体日期待核实）</li>
+</ul>
+<h3 id="4-ftc-就ai-系统行为操纵征求公众意见">4. FTC 就"AI 系统行为操纵"征求公众意见<a class="heading-anchor" aria-label="Link to section" href="#4-ftc-就ai-系统行为操纵征求公众意见">#</a></h3>
+<ul>
+<li><strong>核心摘要</strong>：美国联邦贸易委员会（FTC）就一份拟议政策声明公开征求意见，聚焦 AI 公司是否可能以不符合合理惯例的方式操纵其 AI 系统的行为。</li>
+<li><strong>为什么重要</strong>：这是监管对"AI 产品行为设计（如诱导、暗黑模式、输出操纵）"的正式表态起点，可能影响产品与商业化边界。</li>
+<li><strong>商业信号</strong>：合规风险前移，AI 产品团队需关注"行为透明度 / 可解释"要求。</li>
+<li><strong>来源与时间</strong>：<a href="https://www.ftc.gov/news-events/news/press-releases">FTC Press Releases</a> · 2026-07-01</li>
+</ul>
+<h3 id="5-ftc-执法amazon-因-fcra-违规和解-225-万美元广告业合谋案再下一城">5. FTC 执法：Amazon 因 FCRA 违规和解 225 万美元；广告业合谋案再下一城<a class="heading-anchor" aria-label="Link to section" href="#5-ftc-执法amazon-因-fcra-违规和解-225-万美元广告业合谋案再下一城">#</a></h3>
+<ul>
+<li><strong>核心摘要</strong>：FTC 就 Amazon 明知故犯违反《公平信用报告法》(FCRA) 达成 225 万美元民事罚款和解（6-30）；同日联合多州在广告业"合谋"案（涉 Havas Media）取得进展；此前 6-22 敲定对 Rollins 的同意令，禁止其对员工施加竞业限制。</li>
+<li><strong>为什么重要</strong>：FTC 在数据合规、广告市场竞争与竞业限制三条线同时施压，延续对大平台与集中度的强监管姿态。</li>
+<li><strong>商业信号</strong>：数据处理与用工条款的合规成本上升；广告采购生态可能重塑。</li>
+<li><strong>来源与时间</strong>：<a href="https://www.ftc.gov/news-events/news/press-releases">FTC Press Releases</a> · 2026-06-30</li>
+</ul>
+<h3 id="6-️-待核实英国国家电网-175-亿美元入股-joulent押注-ai-数据中心电力">6. ⚠️ 待核实：英国国家电网 17.5 亿美元入股 Joulent，押注 AI 数据中心电力<a class="heading-anchor" aria-label="Link to section" href="#6-️-待核实英国国家电网-175-亿美元入股-joulent押注-ai-数据中心电力">#</a></h3>
+<ul>
+<li><strong>核心摘要</strong>：据科技资讯汇总，英国 National Grid 拟以 17.5 亿美元购入美国能源平台 Joulent 约 35% 股权，首个大项目为德州西部 2.67GW 燃气电厂 Kilby，配套一处微软运营的数据中心。</li>
+<li><strong>为什么重要</strong>：若属实，代表电网巨头直接下场为 AI 算力"供电"，凸显能源已成 AI 扩张的核心瓶颈与投资主线。</li>
+<li><strong>商业信号</strong>：AI × 能源 × 基础设施的跨界资本运作升温。</li>
+<li><strong>来源与时间</strong>：科技资讯聚合（<a href="https://techstartups.com/2026/07/01/top-tech-news-today-july-1-2026/">techstartups.com</a> 类）· 2026-07-01 · 来源可信度中等，建议以一手公告核实</li>
+</ul>
+<hr>
+<h2 id="二科技简报technology">二、科技简报（Technology）<a class="heading-anchor" aria-label="Link to section" href="#二科技简报technology">#</a></h2>
+<h3 id="1-anthropic-发布-claude-sonnet-5更便宜的跑-agent中端模型多源合并">1. Anthropic 发布 Claude Sonnet 5：更便宜的"跑 Agent"中端模型【多源合并】<a class="heading-anchor" aria-label="Link to section" href="#1-anthropic-发布-claude-sonnet-5更便宜的跑-agent中端模型多源合并">#</a></h3>
+<ul>
+<li><strong>核心摘要</strong>：Anthropic 推出 Claude Sonnet 5，主打更强的智能体（Agent）能力——可规划、调用浏览器 / 终端并自主运行，达到"几个月前需更大更贵模型才能做到"的水平。引入定价 <strong><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mi mathvariant="normal">/</mi><mtext>百万输入</mtext><mi>t</mi><mi>o</mi><mi>k</mi><mi>e</mi><mi>n</mi><mtext>、</mtext></mrow><annotation encoding="application/x-tex">2 / 百万输入 token、</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">2/</span><span class="mord cjk_fallback">百万输入</span><span class="mord mathnormal">t</span><span class="mord mathnormal">o</span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mord mathnormal">e</span><span class="mord mathnormal">n</span><span class="mord cjk_fallback">、</span></span></span></span>10 / 百万输出 token</strong>（截至 2026-08-31 的引导价，之后为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>3</mn><mi mathvariant="normal">/</mi></mrow><annotation encoding="application/x-tex">3 / </annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">3/</span></span></span></span>15）；成为 Free / Pro 默认模型。多方报道其定价约为 Opus 4.8 的 1/2.5、Sonnet 4.6 的 1/1.5。</li>
+<li><strong>为什么重要</strong>：把"可跑自主 Agent"的成本进一步压低，是推动 Agent 从演示走向规模化生产的关键一步。</li>
+<li><strong>技术 / 采用信号</strong>：中文开发者社区（linux.do）当天已密集讨论并对比成本，显示价格敏感与迁移意愿。</li>
+<li><strong>来源与时间</strong>：<a href="https://www.anthropic.com/news/claude-sonnet-5">Anthropic 官方</a>；<a href="https://techcrunch.com/2026/06/30/anthropic-launches-claude-sonnet-5-as-a-cheaper-way-to-run-agents/">TechCrunch</a>；<a href="https://linux.do/t/topic/2504900">linux.do 讨论</a> · 2026-06-30 至 07-01（各源日期略有出入，取 6-30 / 7-1）</li>
+</ul>
+<h3 id="2-openai-产品线走向垂直专用模型gpt-56-sol-预览gpt-rosalindchatgpt-新记忆系统">2. OpenAI 产品线走向"垂直专用模型"：GPT-5.6 Sol 预览、GPT-Rosalind、ChatGPT 新记忆系统<a class="heading-anchor" aria-label="Link to section" href="#2-openai-产品线走向垂直专用模型gpt-56-sol-预览gpt-rosalindchatgpt-新记忆系统">#</a></h3>
+<ul>
+<li><strong>核心摘要</strong>：OpenAI 预览 <strong>GPT-5.6 Sol</strong>（强化编码、科学、网络安全，并配更强安全栈）；推出面向生命科学的 <strong>GPT-Rosalind</strong>（生物推理、药物化学、基因组学）；ChatGPT 升级记忆系统以跨会话保持上下文。linux.do 的 6 月行业汇总亦提到"OpenAI 搁置独立 GPT-5、转向专用垂直模型"的说法（⚠️ 该说法为社区综述，待核实）。</li>
+<li><strong>为什么重要</strong>：通用大模型之外，"领域专用 + 强安全"成为新的产品化路径，直接对应科研、医药、安全等高价值垂直场景。</li>
+<li><strong>技术信号</strong>：垂直模型 + 记忆 / 个性化，是提升留存与付费的产品抓手。</li>
+<li><strong>来源与时间</strong>：<a href="https://openai.com/news/">OpenAI News</a>；<a href="https://linux.do/t/topic/2421324">linux.do 6 月 AI 汇总</a> · 近期（窗口内具体日期待核实）</li>
+</ul>
+<h3 id="3-github-把-copilot-推向agent-原生桌面-appagentic-workflows-公测cli-讨论区">3. GitHub 把 Copilot 推向"Agent 原生"：桌面 App、Agentic Workflows 公测、CLI 讨论区<a class="heading-anchor" aria-label="Link to section" href="#3-github-把-copilot-推向agent-原生桌面-appagentic-workflows-公测cli-讨论区">#</a></h3>
+<ul>
+<li><strong>核心摘要</strong>：GitHub 推出 <strong>Copilot 桌面 App（agent-native）</strong>，并将 <strong>Agentic Workflows</strong> 开放公测（可自动化 issue 分诊、CI 失败分析、文档更新等推理型任务）；Build 2026 提出"Canvases"双向人机协作面；GitHub CLI 新增 <code>gh discussion</code> 命令组。</li>
+<li><strong>为什么重要</strong>：开发工具从"补全 / 聊天"迈向"由 Agent 主动参与工作流"，重塑 CI/CD 与协作范式。</li>
+<li><strong>技术 / 采用信号</strong>：Agent 落地到日常研发流水线，供应链安全与可观测性成为配套重点。</li>
+<li><strong>来源与时间</strong>：<a href="https://github.blog/news-insights/product-news/github-copilot-app-the-agent-native-desktop-experience/">GitHub Blog – Copilot App</a>；<a href="https://github.blog/changelog/month/06-2026/">06/2026 Changelog</a>；<a href="https://github.blog/changelog/2026-06-10-list-view-and-create-discussions-in-github-cli/">gh discussion</a> · 2026-06（部分为 Build 2026 发布）</li>
+</ul>
+<h3 id="4-微软开发者栈全面agent-化visual-studio-2026-gaagent-skillsfoundry-local">4. 微软开发者栈全面"Agent 化"：Visual Studio 2026 GA、Agent Skills、Foundry Local<a class="heading-anchor" aria-label="Link to section" href="#4-微软开发者栈全面agent-化visual-studio-2026-gaagent-skillsfoundry-local">#</a></h3>
+<ul>
+<li><strong>核心摘要</strong>：<strong>Visual Studio 2026 正式发布（GA）</strong>，Copilot 从聊天 / 补全进化为可参与调试、性能分析、测试的 Agent，支持 BYOK（自带模型 / 密钥）与 <strong>Agent Skills</strong>（可复用指令集）；<strong>Foundry Local / Azure Local</strong> 强化边缘 AI；<strong>SharePoint Framework (SPFx) 7 月路线图</strong> 更新，推出 SharePoint Copilot Apps；.NET 11 面向 AI 时代（含 C# 联合类型等）。</li>
+<li><strong>为什么重要</strong>：主流 IDE 与企业开发平台把"可复用技能 + 边缘部署 + 自带模型"标准化，降低团队采用 Agent 的门槛。</li>
+<li><strong>技术信号</strong>：BYOK 与 Agent Skills 指向"可控、可治理"的企业级 Agent 开发。</li>
+<li><strong>来源与时间</strong>：<a href="https://devblogs.microsoft.com/visualstudio/whats-coming-next-in-visual-studio-our-microsoft-build-2026-announcements/">Visual Studio Blog（Build 2026）</a>；<a href="https://devblogs.microsoft.com/microsoft365dev/sharepoint-framework-spfx-roadmap-update-july-2026/">SPFx 7 月路线图</a>；<a href="https://devblogs.microsoft.com/foundry/accelerate-edge-ai-development-with-foundry-local/">Foundry Local</a> · 2026-07（部分为 Build 2026 发布）</li>
+</ul>
+<h3 id="5-安全事件与漏洞近期servicenowkluetata-electronics">5. 安全事件与漏洞（近期）：ServiceNow、Klue、Tata Electronics<a class="heading-anchor" aria-label="Link to section" href="#5-安全事件与漏洞近期servicenowkluetata-electronics">#</a></h3>
+<ul>
+<li><strong>核心摘要</strong>：据安全资讯汇总——ServiceNow 披露 6 月安全事件（未认证 API 端点被利用，6-2 起、6-5 修复托管实例）；Klue 确认 6-11 / 6-12 供应链入侵（旧凭据被盗、获取连接客户平台的 OAuth 令牌）；Tata Electronics 遭 World Leaks 勒索团伙泄露逾 20 万份文件。</li>
+<li><strong>为什么重要</strong>：凭据管理、API 鉴权与供应链信任是当前被反复击穿的薄弱环节，直接关系企业 SaaS 集成安全。</li>
+<li><strong>技术信号</strong>：OAuth 令牌与"第三方集成"成为高价值攻击面；FTC 亦强调事前的漏洞管理与事件响应预案。</li>
+<li><strong>来源与时间</strong>：安全事件聚合（<a href="https://www.brightdefense.com/resources/recent-data-breaches/">brightdefense</a>、<a href="https://www.pkware.com/blog/2026-data-breaches">PKWARE</a>）· 2026-06 · ⚠️ 单点来源，建议以厂商公告核实</li>
+</ul>
+<h3 id="6-研究前沿arxivllm-智能体用于软件工程-代码即-agent-载体">6. 研究前沿（arXiv）：LLM 智能体用于软件工程 +"代码即 Agent 载体"<a class="heading-anchor" aria-label="Link to section" href="#6-研究前沿arxivllm-智能体用于软件工程-代码即-agent-载体">#</a></h3>
+<ul>
+<li><strong>核心摘要</strong>：SE 领域 LLM 智能体综述系统梳理 124 篇论文，指出多智能体协作（ChatDev、MetaGPT 等）与人机协同的潜力，并列出开放挑战——超越"最终成功率"的评估、不完整反馈下的验证、无回归的 harness 改进、多智能体共享状态一致性、安全关键动作的人类监督；2026 年新工作提出"以代码作为智能体载体（Code as Agent Harness）"通往可执行、可验证、有状态的 Agent 系统。另有实证研究提出"专业开发者不 vibe，而是控制 AI"。</li>
+<li><strong>为什么重要</strong>：研究界正把重心从"能否生成"转向"如何可验证、可控、可评估"，与工业界 Agent 落地痛点高度一致。</li>
+<li><strong>技术信号</strong>：评估与验证工具链、Agent 状态管理是下一波机会点。</li>
+<li><strong>来源与时间</strong>：<a href="https://arxiv.org/abs/2409.02977">SE 智能体综述</a>；<a href="https://arxiv.org/abs/2605.18747">Code as Agent Harness</a>；<a href="https://arxiv.org/pdf/2512.14012">开发者如何用 AI 编码（2025 实证）</a></li>
+</ul>
+<hr>
+<h3 id="开发者社区高价值小信号v2ex--linuxdo">开发者社区高价值小信号（V2EX / linux.do）<a class="heading-anchor" aria-label="Link to section" href="#开发者社区高价值小信号v2ex--linuxdo">#</a></h3>
+<blockquote>
+<p>反映真实用户需求、痛点、采用趋势与创业机会的"小信号"。时间为帖子近似活跃期。</p>
+</blockquote>
+<ul>
+<li><strong>AI 编码成本焦虑正在放大</strong>：V2EX 出现多贴讨论"每月 AI 花费多少""deepseek-4-pro 用到 22 号已花 100 元，求更便宜的 coding plan""靠谱中转站"等。<strong>信号 / 机会</strong>：面向个人与小团队的 AI 用量成本管理、性价比路由 / 中转、订阅优化是明确需求。来源：<a href="https://www.v2ex.com/t/1224383">月成本</a>、<a href="https://www.v2ex.com/t/1222010">coding plan 降本</a>、<a href="https://www.v2ex.com/t/1224345">中转站</a> · 2026-06 / 07</li>
+<li><strong>本地优先、AI 原生的独立工具受关注</strong>：如 <strong>Markra 1.0.0</strong>（开源、本地优先、原生支持 AI 的所见即所得 Markdown 编辑器，5-11 至 7-1 密集迭代 144 个版本）、"Vibecoding 输入软件"。<strong>信号</strong>：本地优先 + AI 原生的小工具存在采用空间。来源：<a href="https://www.v2ex.com/t/1224360">Markra</a>、<a href="https://www.v2ex.com/t/1223673">Vibecoding 输入法</a> · 2026-07</li>
+<li><strong>"AI 写完的代码有人看吗"引发热议</strong>：linux.do 讨论 AI 生成代码的审查与质量责任。<strong>信号 / 痛点</strong>：AI 代码的评审、可信与责任归属仍是团队落地卡点，对应代码审查 / 验证工具需求。来源：<a href="https://linux.do/t/topic/2462812">linux.do</a> · 2026 近期</li>
+<li><strong>Agent Skills 生态在中文社区扩散</strong>：清华博士开源"COMPASS 司南"个人科研 / 编程 Agent 技能生态。<strong>信号</strong>：可复用"技能包"正成为个人与团队定制 Agent 的主流形态（与微软 Agent Skills、GitHub Agentic Workflows 呼应）。来源：<a href="https://linux.do/t/topic/2409309">linux.do</a> · 2026 近期</li>
+<li><strong>独立开发者追求"一套代码多端发行"</strong>：V2EX 分享一套代码覆盖 web + 微信小游戏 + 抖音小游戏 + TapTap + Steam。<strong>信号</strong>：跨平台发行效率工具 / 模板有需求。来源：<a href="https://www.v2ex.com/t/1224165">V2EX</a> · 2026-07</li>
+</ul>6:[["$","script",null,{"type":"application/ld+json","dangerouslySetInnerHTML":{"__html":"$12"}}],["$","nav",null,{"className":"blog-breadcrumb","aria-label":"Breadcrumb","children":[["$","$L4","0",{"href":"https://www.lijianglei.com/","children":[["$","span",null,{"aria-hidden":"true","children":"▸ "}],"~"]}],["$","$L4","1",{"href":"https://www.lijianglei.com/blog/","children":"blog"}],["$","span","2",{"className":"crumb-current","children":"每日商业与科技简报 · 2026-07-02"}]]}],["$","header",null,{"className":"article-header","children":[["$","h1",null,{"children":"每日商业与科技简报 · 2026-07-02"}],["$","div",null,{"className":"post-meta","children":[["$","time",null,{"dateTime":"2026-07-02","children":"2026-07-02"}],"$undefined",["$","span",null,{"children":[15," min"]}],["$","span",null,{"className":"lang-badge","children":"ZH"}]]}],["$","div",null,{"className":"tag-list","children":[["$","$L4","ai",{"className":"tag-chip","href":"https://www.lijianglei.com/blog/tag/ai/","children":["#","ai"]}],["$","$L4","agent",{"className":"tag-chip","href":"https://www.lijianglei.com/blog/tag/agent/","children":["#","agent"]}],["$","$L4","tech",{"className":"tag-chip","href":"https://www.lijianglei.com/blog/tag/tech/","children":["#","tech"]}],["$","$L4","business",{"className":"tag-chip","href":"https://www.lijianglei.com/blog/tag/business/","children":["#","business"]}]]}]]}],["$","article",null,{"lang":"zh","className":"prose","dangerouslySetInnerHTML":{"__html":"$13"}}],false]
