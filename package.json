@@ -10,7 +10,8 @@
     "lint": "next lint",
     "pdf": "node scripts/build-pdf.mjs",
     "encrypt": "node scripts/build-encrypted.mjs",
-    "test": "vitest run"
+    "test": "vitest run",
+    "publish-site": "node scripts/deploy.mjs"
   },
   "dependencies": {
     "@next/third-parties": "^15.5.20",
