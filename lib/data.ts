@@ -88,15 +88,19 @@ export const RESUME: Resume = {
       date: "2026.5 — Present",
       bullets: {
         zh: [
-          "以 **AI Agent 开发** 方向加入，参与 Agent 相关研发。",
-          "目前主要负责 **模型生成（model generation）服务** 的工程支持与稳定性保障。",
+          "负责 AI Agent 平台 **模型生成链路** 的工程研发与服务支持，覆盖模型接入、请求调度、流式响应、错误处理和任务状态管理。",
+          "基于 **Agent Loop** 与 **Multi-Agent** 架构，参与构建可部署到云端的 Agent 系统，支持复杂任务拆解、工具调用、上下文传递与多智能体协作。",
+          "面向多模型、多供应商场景，完善统一的模型调用与协议适配能力，处理流式输出、异常重试、取消和终态一致性等问题。",
+          "持续排查生产环境中的模型空响应、任务卡住、心跳丢失和服务稳定性问题，结合日志、数据库和代码定位故障边界并推动修复。",
         ],
         en: [
-          "Joined as an **AI agent developer**, working on agent-related development.",
-          "Currently focused on engineering support and reliability for **model-generation services**.",
+          "Engineered and supported the **model-generation pipeline** for an AI Agent platform, covering model integration, request scheduling, streaming responses, error handling, and task state management.",
+          "Built cloud-deployable Agent systems based on **Agent Loop** and **Multi-Agent** architectures, enabling complex task decomposition, tool use, context passing, and multi-agent collaboration.",
+          "Maintained unified model invocation and protocol adapters across multiple models and providers, including streaming semantics, retries, cancellation, and terminal-state consistency.",
+          "Investigated production issues such as empty model responses, stuck tasks, lost heartbeats, and service instability through logs, database state, and source-code analysis.",
         ],
       },
-      stack: ["AI Agent", "LLM", "Python"],
+      stack: ["AI Agent", "Agent Loop", "Multi-Agent", "LLM", "Python"],
     },
     {
       role: { zh: "技术负责人", en: "Tech Lead" },

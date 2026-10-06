@@ -8,7 +8,7 @@ import { getAllPosts, getAllTags } from "@/lib/posts";
 import { PostCard } from "@/components/blog/PostCard";
 import { TagChip } from "@/components/blog/TagChip";
 import { Breadcrumb } from "@/components/blog/Breadcrumb";
-import { urlFor, SITE_NAME, DEFAULT_OG_IMAGE } from "@/lib/site";
+import { urlFor, SITE_NAME, DEFAULT_OG_IMAGE, FRIEND_LINKS } from "@/lib/site";
 
 // 列表页的规范地址：始终指向 /blog/（带结尾斜杠，与 trailingSlash:true 一致）。
 // 所有 metadata 里的 URL 都走 urlFor()，避免出现 localhost 或缺斜杠导致 canonical 分裂。
@@ -67,6 +67,32 @@ export default function BlogIndexPage() {
         posts.map((post) => <PostCard key={post.slug} post={post} />)
       ) : (
         <p className="blog-subtitle">还没有文章 / No posts yet.</p>
+      )}
+
+      {/* 友情链接：与其他独立博客互换的链接。数据来自 lib/site.ts 的 FRIEND_LINKS，
+          数组为空时整块不渲染（&& 短路），避免出现一个空标题。
+          外链统一加 target="_blank"（新标签页打开）+ rel="noopener noreferrer"：
+          noopener 防止对方页面通过 window.opener 操纵本页（安全），noreferrer 不发送来源信息。 */}
+      {FRIEND_LINKS.length > 0 && (
+        <section className="friend-links">
+          <h2 className="friend-links-title">
+            <span className="prompt-char" aria-hidden="true">
+              $
+            </span>
+            友链 / Links
+          </h2>
+          <ul className="friend-link-list">
+            {FRIEND_LINKS.map((f) => (
+              <li key={f.url} className="friend-link">
+                <a href={f.url} target="_blank" rel="noopener noreferrer">
+                  <span className="friend-link-name">{f.name}</span>
+                  <span className="friend-link-author">{f.author}</span>
+                </a>
+                <p className="friend-link-desc">{f.desc}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
     </>
   );

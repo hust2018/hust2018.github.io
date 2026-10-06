@@ -366,3 +366,76 @@
   .prose h1 { font-size: 22px; }
   .prose h2 { font-size: 19px; }
 }
+
+/* ---------------------------------------------------------------------------
+   友情链接（/blog/ 底部）：与其他独立博客互换的链接。
+   视觉上与文章列表拉开距离——上方一条分隔线 + 更大的上边距，
+   让读者明确「文章到此为止，下面是另一类内容」。
+   --------------------------------------------------------------------------- */
+.friend-links {
+  margin-top: 64px;
+  padding-top: 28px;
+  border-top: 1px solid var(--border);
+}
+.friend-links-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 16px;
+  color: var(--fg);
+}
+/* 标题前那个发光的 $，呼应页面主标题的终端提示符风格 */
+.friend-links-title .prompt-char {
+  color: var(--accent);
+  margin-right: 8px;
+  text-shadow: var(--accent-glow);
+}
+
+/* list-style:none + padding:0 去掉 <ul> 默认的圆点和缩进：
+   这里用列表标签是为了语义正确（这确实是一个链接列表，对读屏软件友好），
+   但视觉上我们要自己排版，所以清掉浏览器默认样式。 */
+.friend-link-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+}
+.friend-link {
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  clip-path: var(--clip-notch);   /* 切角，与站内卡片一致 */
+  transition: border-color 0.2s, transform 0.2s;
+}
+.friend-link:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+}
+.friend-link > a {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  text-decoration: none;
+}
+.friend-link-name {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--accent);
+}
+.friend-link:hover .friend-link-name { text-shadow: var(--accent-glow); }
+/* 作者名前自动加一个 @，纯装饰所以用 CSS 的 content 生成，不写进 HTML 内容里 */
+.friend-link-author {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--fg-mute);
+}
+.friend-link-author::before { content: "@"; }
+.friend-link-desc {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--fg-dim);
+}

@@ -12,3 +12,20 @@ export function urlFor(path: string): string {
   const trimmed = path.replace(/^\/+/, "").replace(/\/+$/, "");
   return trimmed === "" ? `${SITE_URL}/` : `${SITE_URL}/${trimmed}/`;
 }
+
+// ---------------------------------------------------------------------------
+// 友情链接（友链）：与其他独立博客互相交换的链接。
+// 数据放在这里而不是写死在组件里，遵循本项目「内容即数据」的约定——
+// 以后加新友链只改这个数组，不用动任何 JSX。
+// 字段：name 站名 / author 作者 / desc 一句话描述 / url 站点地址
+// ---------------------------------------------------------------------------
+export type FriendLink = { name: string; author: string; desc: string; url: string };
+
+export const FRIEND_LINKS: FriendLink[] = [
+  {
+    name: "Matthew Labs",
+    author: "Matthew Hong",
+    desc: "Thinking through the AI-native era —— AI 原生时代的架构、规范与工程笔记",
+    url: "https://matthewohmygosh.com/",
+  },
+];
