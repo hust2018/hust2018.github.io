@@ -59,14 +59,11 @@ export default function NotFound() {
             The page you&rsquo;re looking for doesn&rsquo;t exist or has moved.
           </p>
 
-          {/* 两个出口：返回首页 / 浏览博客。href 走 urlFor()，保证是「绝对 + 带结尾斜杠」的规范地址，
+          {/* 返回首页。href 走 urlFor()，保证是「绝对 + 带结尾斜杠」的规范地址，
               与全站 trailingSlash:true 的 URL 形态一致。 */}
           <div className="notfound-links">
             <Link className="icon-btn" href={urlFor("/")}>
               ← 返回首页 / Home
-            </Link>
-            <Link className="icon-btn" href={urlFor("/blog")}>
-              浏览博客 / Blog →
             </Link>
           </div>
         </div>

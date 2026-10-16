@@ -6,21 +6,23 @@
 ## 关于
 我是 **李姜磊**，**AI Agent 开发工程师**（前 **字节跳动** 安全研发），**华中科技大学** 网络空间安全硕士。
 在 **字节跳动** 安全与风控做了约 **3 年** 网络安全研发——NTA 入侵检测、DDoS 防护、WAF、容器微隔离 HFW，多个系统从 0 到 1 落地，全球多机房部署历经多次大版本升级 **0 事故**。
-如今我专注 **AI Agent** 方向：以 Agent 开发加入 **tapnow**，目前负责模型生成相关的服务支持，并希望在多智能体方向持续深耕。Always day 1。
+如今我专注 **AI Agent** 方向：在 **TapNow** 研发多模型生成平台与 Agent 基础设施，覆盖 **Python / Go** 服务、分布式任务恢复、流式协议与计费一致性，并从 0 到 1 探索多智能体协作平台。
 
 ## 技能
 - **AI / Agent**　AgentScope · LangGraph · MCP · LLM · 多智能体 · Prompt · SSE
 - **语言**　Python · Go · Bash · SQL
 - **后端 / 基础设施**　FastAPI · Redis · PostgreSQL · RabbitMQ · S3 · Stripe · Hertz
 - **安全**　入侵检测 (NTA) · DDoS 防护 · WAF · 容器微隔离 · 漏洞应急
-- **工具**　Git · Docker · Linux · Kubernetes
+- **工具**　Git · Docker · Linux · Kubernetes · GCP Cloud Run · Pub/Sub · OpenTelemetry
 
 ## 工作经历
 ### AI Agent 开发工程师 · tapnow <span class="date">2026.5 — 至今</span>
-- 负责 AI Agent 平台 **模型生成链路** 的工程研发与服务支持，覆盖模型接入、请求调度、流式响应、错误处理和任务状态管理。
-- 基于 **Agent Loop** 与 **Multi-Agent** 架构，参与构建可部署到云端的 Agent 系统，支持复杂任务拆解、工具调用、上下文传递与多智能体协作。
-- 面向多模型、多供应商场景，完善统一的模型调用与协议适配能力，处理流式输出、异常重试、取消和终态一致性等问题。
-- 持续排查生产环境中的模型空响应、任务卡住、心跳丢失和服务稳定性问题，结合日志、数据库和代码定位故障边界并推动修复。
+- 研发 **多模型生成平台**，打通 SDK、模型网关、业务编排与计费链路，覆盖文本、图像、视频、语音及 3D；实现多供应商协议适配、渠道加权降级与参数校验，支撑画布和 Agent 共用模型能力。
+- 设计并实现 **长任务恢复机制**：基于 Redis 所有权锁与心跳、终态 fencing 和数据库 CAS 更新，配合独立 Scheduler 扫描、回收并重投孤儿任务，处理容器退出、锁失效与任务重复执行风险。
+- 完善 **Agent Worker / Proxy** 的流式与会话链路：修复首 token 前超时、客户端断连后上游继续执行、媒体审核拒绝导致会话反复失败等问题；统一错误分类与取消传播，并修复请求透传导致的 Prompt Cache 不命中。
+- 推进 **Go 模型服务重构**，拆分 Gateway / Sync / Async / Scheduler 与共享 Core；实现数据库驱动的模型目录、渠道级模型绑定和配置导入，补齐 Anthropic 协议桥接、实时语音识别及多模态适配。
+- 治理 **估价、预占与实扣一致性**，修复视频按秒计费、输入时长遗漏、Agent 累计成本透传等问题；结合 Cloud Run 日志、PostgreSQL / MySQL 和调用链定位故障，推动跨服务修复与测试验收。
+- 从 0 到 1 研发 **Loop 多智能体协作平台（本地阶段）**：基于 Go、Pi、PostgreSQL 与 Redis 构建项目、Agent、Manager 任务、Inbox 和 loopctl，支持会话接续、任务隔离与权限配置；以模型接入流程探索开发、QA 与 Review 的协作闭环。
 
 ### 技术负责人 · loomu · AI 创作助手 <span class="date">2025.11 — 2026.4</span>
 - 作为技术负责人，从 0 到 1 搭建 AI 创作助手的后端与 SaaS 计费系统（FastAPI + Stripe）。

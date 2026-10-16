@@ -25,7 +25,7 @@ export const RESUME: Resume = {
       en: "Focused on AI agents and multi-agent systems — taking them from zero to production, grounded in the high-concurrency, distributed-systems foundation built during security R&D at ByteDance. Obsessed with making complex systems simple.",
     },
     location: { zh: "深圳，中国", en: "Shenzhen, China" },
-    status: { zh: "在职 · 暂不看机会", en: "Currently employed" },
+    status: { zh: "在职 · 寻找 AI Agent / 后端机会", en: "Open to AI Agent / Backend roles" },
     yearsExp: "4",
     // 首屏「醒目发光徽章」：图标 + 双语文字（这里放游戏成就）。
     badges: [
@@ -41,12 +41,12 @@ export const RESUME: Resume = {
     zh: [
       "我是 **李姜磊**，**AI Agent 开发工程师**（前 **字节跳动** 安全研发），**华中科技大学** 网络空间安全硕士。",
       "在 **字节跳动** 安全与风控做了约 **3 年** 网络安全研发——NTA 入侵检测、DDoS 防护、WAF、容器微隔离 HFW，多个系统从 0 到 1 落地，全球多机房部署历经多次大版本升级 **0 事故**。",
-      "如今我专注 **AI Agent** 方向：以 Agent 开发加入 **tapnow**，目前负责模型生成相关的服务支持，并希望在多智能体方向持续深耕。Always day 1。",
+      "如今我专注 **AI Agent** 方向：在 **TapNow** 研发多模型生成平台与 Agent 基础设施，覆盖 **Python / Go** 服务、分布式任务恢复、流式协议与计费一致性，并从 0 到 1 探索多智能体协作平台。",
     ],
     en: [
       "I'm **Jianglei Li**, an **AI agent engineer** (formerly **ByteDance** security R&D) with a master's in Cyberspace Security from **HUST**.",
       "Spent ~**3 years** on network-security R&D at **ByteDance** — NTA intrusion detection, DDoS protection, WAF, and container micro-segmentation (HFW) — shipping multiple 0-to-1 systems and running global multi-data-center rollouts through repeated major upgrades with **zero incidents**.",
-      "Now I'm focused on **AI agents**: I joined **tapnow** as an agent developer and currently work on service support for model generation, while going deeper into multi-agent systems. Always day 1.",
+      "Now I'm focused on **AI agents**: At **TapNow**, I build multi-model generation services and agent infrastructure across **Python / Go**, distributed task recovery, streaming protocols, and billing consistency, while developing a multi-agent collaboration platform from scratch.",
     ],
   },
   // skills：技能分类数组。items 里纯字符串（如 "Python"）和双语对象（如 {zh,en}）可混放——
@@ -76,7 +76,7 @@ export const RESUME: Resume = {
     },
     {
       cat: { zh: "工具", en: "Tooling" },
-      items: ["Git", "Docker", "Linux", "Kubernetes"],
+      items: ["Git", "Docker", "Linux", "Kubernetes", "GCP Cloud Run", "Pub/Sub", "OpenTelemetry"],
     },
   ],
   // experience：工作经历数组。bullets 是 { zh: [...], en: [...] }，每段下有多条要点。
@@ -88,19 +88,23 @@ export const RESUME: Resume = {
       date: "2026.5 — Present",
       bullets: {
         zh: [
-          "负责 AI Agent 平台 **模型生成链路** 的工程研发与服务支持，覆盖模型接入、请求调度、流式响应、错误处理和任务状态管理。",
-          "基于 **Agent Loop** 与 **Multi-Agent** 架构，参与构建可部署到云端的 Agent 系统，支持复杂任务拆解、工具调用、上下文传递与多智能体协作。",
-          "面向多模型、多供应商场景，完善统一的模型调用与协议适配能力，处理流式输出、异常重试、取消和终态一致性等问题。",
-          "持续排查生产环境中的模型空响应、任务卡住、心跳丢失和服务稳定性问题，结合日志、数据库和代码定位故障边界并推动修复。",
+          "研发 **多模型生成平台**，打通 SDK、模型网关、业务编排与计费链路，覆盖文本、图像、视频、语音及 3D；实现多供应商协议适配、渠道加权降级与参数校验，支撑画布和 Agent 共用模型能力。",
+          "设计并实现 **长任务恢复机制**：基于 Redis 所有权锁与心跳、终态 fencing 和数据库 CAS 更新，配合独立 Scheduler 扫描、回收并重投孤儿任务，处理容器退出、锁失效与任务重复执行风险。",
+          "完善 **Agent Worker / Proxy** 的流式与会话链路：修复首 token 前超时、客户端断连后上游继续执行、媒体审核拒绝导致会话反复失败等问题；统一错误分类与取消传播，并修复请求透传导致的 Prompt Cache 不命中。",
+          "推进 **Go 模型服务重构**，拆分 Gateway / Sync / Async / Scheduler 与共享 Core；实现数据库驱动的模型目录、渠道级模型绑定和配置导入，补齐 Anthropic 协议桥接、实时语音识别及多模态适配。",
+          "治理 **估价、预占与实扣一致性**，修复视频按秒计费、输入时长遗漏、Agent 累计成本透传等问题；结合 Cloud Run 日志、PostgreSQL / MySQL 和调用链定位故障，推动跨服务修复与测试验收。",
+          "从 0 到 1 研发 **Loop 多智能体协作平台（本地阶段）**：基于 Go、Pi、PostgreSQL 与 Redis 构建项目、Agent、Manager 任务、Inbox 和 loopctl，支持会话接续、任务隔离与权限配置；以模型接入流程探索开发、QA 与 Review 的协作闭环。"
         ],
         en: [
-          "Engineered and supported the **model-generation pipeline** for an AI Agent platform, covering model integration, request scheduling, streaming responses, error handling, and task state management.",
-          "Built cloud-deployable Agent systems based on **Agent Loop** and **Multi-Agent** architectures, enabling complex task decomposition, tool use, context passing, and multi-agent collaboration.",
-          "Maintained unified model invocation and protocol adapters across multiple models and providers, including streaming semantics, retries, cancellation, and terminal-state consistency.",
-          "Investigated production issues such as empty model responses, stuck tasks, lost heartbeats, and service instability through logs, database state, and source-code analysis.",
+          "Engineered a **multi-model generation platform** spanning SDKs, gateways, orchestration, and billing for text, images, video, speech, and 3D; built provider adapters, weighted fallback routing, and input validation for Canvas and agent workloads.",
+          "Designed **long-running task recovery** using Redis ownership locks and heartbeats, terminal-state fencing, and database CAS updates, with an independent scheduler to reclaim and requeue orphaned tasks after container exits or ownership loss.",
+          "Improved **Agent Worker / Proxy** streaming and session reliability: addressed timeouts before the first token, upstream work continuing after disconnects, and repeated media-policy failures; implemented cancellation propagation and corrected request forwarding that prevented prompt-cache hits.",
+          "Advanced the **Go model-service architecture** across Gateway, Sync, Async, Scheduler, and shared Core; implemented database-backed model catalogs, channel-level model bindings, and configuration imports, plus Anthropic protocol bridging and real-time speech recognition.",
+          "Aligned **estimation, reservation, and settlement** across services, fixing video-duration accounting and cumulative agent-cost forwarding; diagnosed incidents through Cloud Run logs, PostgreSQL / MySQL, and request traces, and drove fixes and validation.",
+          "Built **Loop, a multi-agent collaboration platform, from scratch through its local stage** using Go, Pi, PostgreSQL, and Redis: projects, agents, Manager tasks, Inbox, and loopctl, with session continuity, isolated task execution, and configurable permissions; explored model-onboarding workflows spanning development, QA, and review."
         ],
       },
-      stack: ["AI Agent", "Agent Loop", "Multi-Agent", "LLM", "Python"],
+      stack: ["Go", "Python", "AI Agent", "Redis", "PostgreSQL", "GCP", "Pub/Sub", "SSE"],
     },
     {
       role: { zh: "技术负责人", en: "Tech Lead" },

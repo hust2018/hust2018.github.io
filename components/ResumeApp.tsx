@@ -3,11 +3,8 @@
 // 必须运行在浏览器里，所以不能用默认的服务器组件，得在顶部写这一行。
 // （服务器组件 vs 客户端组件的区别详见 components/effects.tsx 顶部的说明。）
 //
-// 为什么把简历主体从 app/page.tsx 搬到这里？
-//   app/page.tsx 现在改成了「服务器组件」，好在「构建期」读取最新文章列表（读文件系统只能在服务器侧做）。
-//   但简历主体需要 localStorage / 状态等浏览器能力，必须是客户端组件——两者职责冲突。
-//   解决办法：服务器组件 app/page.tsx 负责取数据，把简历主体（本组件）当作子组件渲染，
-//   并通过 prop 把构建期才拿得到的「最新文章」传进来。这就是「服务器拿数据、客户端管交互」的经典分工。
+// 简历主体保留为客户端组件，负责语言偏好、开机动画和交互。
+// 首页不再读取文章文件，求职页面只展示简历内容。
 "use client";
 
 // 导入两个 Hook：useState 管理会变化的数据，useEffect 处理渲染后的副作用。
@@ -15,7 +12,7 @@ import { useEffect, useState } from "react";
 // 下面这一批是页面要用到的各个「区块组件」。
 // @/ 是项目配置的路径别名，等价于「从项目根目录开始找」，省得写一长串 ../../。
 import { BootSequence } from "@/components/BootSequence"; // 开机动画
-import { TopBar } from "@/components/TopBar";       // 顶部栏（切语言、博客、下载 PDF）
+import { TopBar } from "@/components/TopBar";       // 顶部栏（切语言、下载 PDF）
 import { Hero } from "@/components/Hero";            // 首屏大标题
 import { About } from "@/components/About";          // 关于我
 import { Skills } from "@/components/Skills";         // 技能
@@ -25,14 +22,12 @@ import { Highlights } from "@/components/Highlights"; // 亮点 / 活动
 import { Education } from "@/components/Education";    // 教育
 import { Contact } from "@/components/Contact";       // 联系方式
 import { SideRail } from "@/components/SideRail";      // 侧边导航条
-import { LatestPosts } from "@/components/blog/LatestPosts"; // 首页底部「最新文章」区块
-// 只导入类型 Lang（语言类型 "zh" | "en"）和 PostMeta（文章元信息），编译后会被擦除。
+// 只导入类型 Lang（语言类型 "zh" | "en"），编译后会被擦除。
 import type { Lang } from "@/lib/types";
-import type { PostMeta } from "@/lib/posts";
 
-// 简历主体组件。它接收一个 prop：latest = 最新若干篇文章（由服务器组件在构建期算好传入）。
+// 简历主体组件：所有展示内容来自 lib/data.ts。
 // 注意这里不再是 default export，而是「具名导出」：app/page.tsx 会按名字 { ResumeApp } 来引入它。
-export function ResumeApp({ latest }: { latest: PostMeta[] }) {
+export function ResumeApp() {
   // 语言：初始用默认值 "zh"（与服务器渲染一致），挂载后再从 localStorage 读偏好。
   // 关键点：这里故意用固定默认值而不是直接读 localStorage——
   // 因为服务器端没有 localStorage，若浏览器一上来就用 localStorage 的值，
@@ -101,9 +96,6 @@ export function ResumeApp({ latest }: { latest: PostMeta[] }) {
         <Highlights lang={lang} />
         <Education lang={lang} />
         <Contact lang={lang} />
-        {/* 最新文章区块：放在 Contact 之后、侧边栏之前。数据是构建期注入的 latest（可能为空）。
-            它不依赖界面语言，所以不用传 lang——为空时组件内部会自动什么都不渲染。 */}
-        <LatestPosts posts={latest} />
       </div>
       <SideRail lang={lang} />
     </>
