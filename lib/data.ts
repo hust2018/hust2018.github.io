@@ -125,42 +125,30 @@ export const RESUME: Resume = {
     {
       role: { zh: "安全研发工程师", en: "Security R&D Engineer" },
       company: { zh: "字节跳动 · 安全与风控", en: "ByteDance · Security & Risk Control" },
-      date: "2023.10 — 2025.7",
+      date: "2022.6 — 2025.7",
       bullets: {
         zh: [
           "研发容器微隔离 **HFW v3**：控制面迁移 Hertz 架构，**规则响应提升 400%**，支持热更新，稳定性大幅增强。",
           "海外 HFW 覆盖率从 **74.45% 提升至 91.96%**，显著抬升网络安全水位。",
           "参与网络隔离统一平台方案设计与落地：支持优先级 1~N 排列调整、工单查询过滤、配置文件动态获取等。",
           "海外 **DDoS** 防护全面升级至 v2.8.1，补齐 IPv6 防护；搭建覆盖检测 / 清洗 / 数据库的完整 DDoS 测试环境，支撑后续防护迭代。",
-        ],
-        en: [
-          "Built container micro-segmentation **HFW v3**: migrated the control plane to the Hertz framework for **400% faster rule response**, hot updates, and greatly improved stability.",
-          "Raised overseas HFW coverage from **74.45% to 91.96%**, materially lifting the security baseline.",
-          "Co-designed and shipped the unified network-isolation platform: priority 1..N ordering, ticket query/filtering, dynamic config fetching, and more.",
-          "Comprehensively upgraded overseas **DDoS** protection to v2.8.1 with IPv6 coverage; built a full DDoS test environment (detection / scrubbing / database) to support ongoing iteration.",
-        ],
-      },
-      stack: ["Go", "Hertz", "DDoS", "IPv6"],
-    },
-    {
-      role: { zh: "安全研发工程师", en: "Security R&D Engineer" },
-      company: { zh: "字节跳动 · 安全与风控", en: "ByteDance · Security & Risk Control" },
-      date: "2022.6 — 2023.10",
-      bullets: {
-        zh: [
           "集团网络安全研发（**NTA + DDoS + WAF**）：DDoS 黑洞信息同步，实现秒级封禁、分钟级解封；WAF 黑名单多策略组配置，提升防护灵活性。",
           "**WebP 0day** 漏洞应急：48 小时内开发自动检测工具，在网络侧精准识别利用堆溢出的 WebP 格式图片。",
           "NTA 协议风险识别（Telnet / FTP / MySQL / SMB）：精准识别用户名 / 口令 / SQL 操作 / 文件读写，上线后发现 **20+ 起高危风险**，防止办公网支付数据泄漏、测试网弱密码等安全事件；研发 NTA for AWS 云版本。",
           "安全规则自动化检测工具（0→1）：**规则检测效率提升 70%+、人工成本降低 90%+**，测试覆盖 3521 条规则；负责国内三大核心机房 + 7 个汇聚机房及新加坡 / 马来西亚 / 美东部署，多次大版本升级 **0 事故**。",
         ],
         en: [
+          "Built container micro-segmentation **HFW v3**: migrated the control plane to the Hertz framework for **400% faster rule response**, hot updates, and greatly improved stability.",
+          "Raised overseas HFW coverage from **74.45% to 91.96%**, materially lifting the security baseline.",
+          "Co-designed and shipped the unified network-isolation platform: priority 1..N ordering, ticket query/filtering, dynamic config fetching, and more.",
+          "Comprehensively upgraded overseas **DDoS** protection to v2.8.1 with IPv6 coverage; built a full DDoS test environment (detection / scrubbing / database) to support ongoing iteration.",
           "Group-wide network security R&D (**NTA + DDoS + WAF**): blackhole-sync for second-level bans and minute-level unbans; multi-policy WAF blacklist configuration for flexible protection.",
           "**WebP 0day** emergency response: built an automated detection tool within 48 hours that precisely flags WebP images exploiting the heap overflow at the network layer.",
           "NTA protocol risk detection (Telnet / FTP / MySQL / SMB): accurate detection of credentials / SQL ops / file I/O, surfacing **20+ high-risk findings** post-launch and preventing incidents such as office-network payment-data leakage and test-network weak passwords; built the NTA-for-AWS cloud edition.",
           "Automated security-rule detection tool (0→1): **70%+ faster rule checks, 90%+ less manual effort**, covering 3,521 rules; owned deployment across 3 core + 7 aggregation data centers plus Singapore / Malaysia / US-East, through major upgrades with **zero incidents**.",
         ],
       },
-      stack: ["NTA", "DDoS", "WAF", "AWS"],
+      stack: ["Go", "Hertz", "NTA", "DDoS", "WAF", "IPv6", "AWS"],
     },
   ],
   // highlights：「亮点 / 活动」——黑客马拉松、开源研读等（对应 PDF 的「活动经历」）。
