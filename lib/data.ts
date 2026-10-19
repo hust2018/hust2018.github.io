@@ -88,20 +88,20 @@ export const RESUME: Resume = {
       date: "2026.5 — Present",
       bullets: {
         zh: [
-          "研发 **多模型生成平台**，打通 SDK、模型网关、业务编排与计费链路，覆盖文本、图像、视频、语音及 3D；实现多供应商协议适配、渠道加权降级与参数校验，支撑画布和 Agent 共用模型能力。",
-          "设计并实现 **长任务恢复机制**：基于 Redis 所有权锁与心跳、终态 fencing 和数据库 CAS 更新，配合独立 Scheduler 扫描、回收并重投孤儿任务，处理容器退出、锁失效与任务重复执行风险。",
-          "完善 **Agent Worker / Proxy** 的流式与会话链路：修复首 token 前超时、客户端断连后上游继续执行、媒体审核拒绝导致会话反复失败等问题；统一错误分类与取消传播，并修复请求透传导致的 Prompt Cache 不命中。",
-          "推进 **Go 模型服务重构**，拆分 Gateway / Sync / Async / Scheduler 与共享 Core；实现数据库驱动的模型目录、渠道级模型绑定和配置导入，补齐 Anthropic 协议桥接、实时语音识别及多模态适配。",
-          "治理 **估价、预占与实扣一致性**，修复视频按秒计费、输入时长遗漏、Agent 累计成本透传等问题；结合 Cloud Run 日志、PostgreSQL / MySQL 和调用链定位故障，推动跨服务修复与测试验收。",
-          "从 0 到 1 研发 **Loop 多智能体协作平台（本地阶段）**：基于 Go、Pi、PostgreSQL 与 Redis 构建项目、Agent、Manager 任务、Inbox 和 loopctl，支持会话接续、任务隔离与权限配置；以模型接入流程探索开发、QA 与 Review 的协作闭环。"
+          "修复 **Agent 多轮会话与缓存失效**：隔离被审核拒绝的媒体，补齐来源追踪和受限重试，避免失败内容反复进入会话；修正动态提示词与请求透传，在 **TEST 多步会话**中将可缓存请求命中率从 **0 提升至 90%（26/29）**。",
+          "建设 **分布式长任务恢复机制**：通过 Redis 所有权心跳、原子校验与数据库条件更新回收孤儿任务，并校验终态写入权限；开发独立 Go 调度器、后台派发恢复任务，避免视频长任务阻塞扫描与恢复循环。",
+          "推进 **Go 模型服务重构**：统一模型配置、供应商路由及降级策略，拆分同步与异步执行；以不可变配置快照保证排队任务按提交时配置执行，完成文本、视频模型的 **TEST 端到端验证**。",
+          "研发 **多模态模型接入链路**，贯通 SDK、模型服务、业务编排与计费，统一厂商参数、能力校验和预估 / 实扣口径；分析线上错误，区分审核、参数、限流及瞬时故障，避免确定性失败被重复重试或触发级联降级。",
+          "实现 **支付与异步媒体任务的幂等恢复**：建设 API 支付、退款补偿状态机，推进跨服务账务一致性；研发图层融合、视频合成和音视频分离任务，完成幂等重放与跨组织访问隔离的 **TEST 验证**。",
+          "研发 **Loop 多智能体协作原型（本地阶段）**：基于 Go、Pi、PostgreSQL 与 Redis 实现会话接续、任务隔离和权限配置；在模型接入场景中串联任务分派、消息队列、Lark 状态反馈与提测流程。"
         ],
         en: [
-          "Engineered a **multi-model generation platform** spanning SDKs, gateways, orchestration, and billing for text, images, video, speech, and 3D; built provider adapters, weighted fallback routing, and input validation for Canvas and agent workloads.",
-          "Designed **long-running task recovery** using Redis ownership locks and heartbeats, terminal-state fencing, and database CAS updates, with an independent scheduler to reclaim and requeue orphaned tasks after container exits or ownership loss.",
-          "Improved **Agent Worker / Proxy** streaming and session reliability: addressed timeouts before the first token, upstream work continuing after disconnects, and repeated media-policy failures; implemented cancellation propagation and corrected request forwarding that prevented prompt-cache hits.",
-          "Advanced the **Go model-service architecture** across Gateway, Sync, Async, Scheduler, and shared Core; implemented database-backed model catalogs, channel-level model bindings, and configuration imports, plus Anthropic protocol bridging and real-time speech recognition.",
-          "Aligned **estimation, reservation, and settlement** across services, fixing video-duration accounting and cumulative agent-cost forwarding; diagnosed incidents through Cloud Run logs, PostgreSQL / MySQL, and request traces, and drove fixes and validation.",
-          "Built **Loop, a multi-agent collaboration platform, from scratch through its local stage** using Go, Pi, PostgreSQL, and Redis: projects, agents, Manager tasks, Inbox, and loopctl, with session continuity, isolated task execution, and configurable permissions; explored model-onboarding workflows spanning development, QA, and review."
+          "Fixed **multi-turn agent failures and prompt-cache misses**: isolated rejected media with provenance tracking and bounded retries to prevent repeated failures in conversation history; corrected dynamic prompts and request forwarding, raising the cacheable-request hit rate from **0 to 90% (26/29) in multi-step TEST conversations**.",
+          "Built **distributed recovery for long-running tasks** using Redis ownership heartbeats, atomic checks, conditional database updates, and ownership checks before final-state writes; developed an independent Go scheduler and background recovery dispatch so long video tasks would not block scanning and recovery loops.",
+          "Advanced the **Go model-service refactor** by unifying model configuration, provider routing, and fallback policies while separating synchronous and asynchronous execution; used immutable configuration snapshots so queued tasks retain their submission-time behavior, with **end-to-end TEST validation** for text and video models.",
+          "Built **multimodal model integrations** across SDKs, model services, orchestration, and billing, aligning provider parameters, capability checks, estimation, and settlement; analyzed production errors to distinguish policy, parameter, rate-limit, and transient failures, avoiding repeated retries and cascading fallbacks for deterministic failures.",
+          "Implemented **idempotent recovery for payments and asynchronous media tasks**: built API payment and refund-compensation state machines to improve accounting consistency across services; developed image-layer merging, video composition, and audio/video separation tasks, with **TEST validation** of idempotent replay and access isolation between organizations.",
+          "Developed **Loop, a local multi-agent collaboration prototype**, using Go, Pi, PostgreSQL, and Redis for session continuity, task isolation, and permission controls; connected task assignment, message queues, Lark status updates, and QA submission workflows for model onboarding."
         ],
       },
       stack: ["Go", "Python", "AI Agent", "Redis", "PostgreSQL", "GCP", "Pub/Sub", "SSE"],
