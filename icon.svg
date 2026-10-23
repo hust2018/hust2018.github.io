@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="terminal prompt">
+  <!-- 深色「缺角」方块：右上 + 左下切角，呼应站点的 notched-corner 视觉（--clip-notch） -->
+  <path d="M0 0 H25 L32 7 V32 H7 L0 25 Z" fill="#0a0e18"/>
+  <path d="M0 0 H25 L32 7 V32 H7 L0 25 Z" fill="none" stroke="#5ad8ff" stroke-opacity="0.4" stroke-width="1"/>
+  <!-- 终端提示符 >_（青色 accent） -->
+  <polyline points="9,11 15,16 9,21" fill="none" stroke="#5ad8ff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="17" y="18.7" width="7" height="2.6" rx="0.6" fill="#5ad8ff"/>
+</svg>
