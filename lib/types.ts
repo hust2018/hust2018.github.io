@@ -89,6 +89,8 @@ export interface EducationItem {
 // Contact：联系方式，全是固定文本，所以字段都是 string。
 export interface Contact {
   email: string;
+  // 可选二维码地址；没有配置时，联系方式区域不渲染折叠入口。
+  wechatQr?: string;
 }
 
 // Highlight：一条「亮点 / 活动」经历（黑客马拉松、开源研读等）。

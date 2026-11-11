@@ -601,13 +601,25 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 /* ============ About ============ */
+/* 关于是连续阅读的正文，用中文友好字体和正常断行，避免继承终端的 keep-all。
+   用实际宽度约束替代按西文字宽计算的 ch，让中英文段落保持一致的阅读区域。 */
+.about-copy { max-width: 920px; }
 .about p {
   color: var(--fg-dim);
-  max-width: 72ch;
-  margin-bottom: 14px;
+  margin: 0 0 18px;
+  font-family: var(--font-zh);
+  font-size: 15px;
+  line-height: 1.9;
+  word-break: normal;
+  overflow-wrap: break-word;
   text-wrap: pretty;
-  font-size: 14px;
-  line-height: 1.8;
+}
+.about p:first-child { font-size: 16px; color: var(--fg); }
+.about p:last-child { margin-bottom: 0; }
+.about-phrase { white-space: nowrap; }
+@media (max-width: 640px) {
+  .about p { font-size: 14px; line-height: 1.85; margin-bottom: 16px; }
+  .about p:first-child { font-size: 15px; }
 }
 .about .highlight { color: var(--fg); font-weight: 600; }
 .about .accent { color: var(--accent); }
@@ -738,7 +750,32 @@ button { font-family: inherit; cursor: pointer; }
   padding-top: 14px;
   line-height: 1.75;
 }
+/* 简历正文采用自然中文断行；不继承终端区域的 keep-all，避免在英文空格处扎堆换行。 */
+.exp-inner {
+  font-family: var(--font-zh);
+  word-break: normal;
+  overflow-wrap: break-word;
+}
 .exp-inner ul { list-style: none; }
+.exp-inner .highlight { color: var(--fg); font-weight: 600; }
+.exp-inner .exp-point { margin-bottom: 16px; }
+.exp-inner .exp-point:last-child { margin-bottom: 0; }
+.exp-point-title {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--fg);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.exp-point-copy { line-height: 1.85; }
+.exp-term { white-space: nowrap; }
+/* 手机上的正文会更高，展开态不设固定高度，避免后半段与技术标签被裁掉。 */
+@media (max-width: 640px) {
+  .exp.open .exp-body { max-height: none; }
+  .exp-inner { padding: 16px 16px 20px; }
+  .exp-point-title { font-size: 13px; }
+}
 .exp-inner li {
   position: relative;
   padding-left: 20px;
@@ -811,18 +848,55 @@ button { font-family: inherit; cursor: pointer; }
   color: var(--fg-mute);
   letter-spacing: 0.12em;
 }
-.contact-line { display: flex; gap: 14px; align-items: baseline; }
-.contact-line .key {
+.contact-block { --contact-label-width: 100px; --contact-gap: 14px; }
+.contact-line { display: grid; grid-template-columns: var(--contact-label-width) minmax(0, 1fr); gap: var(--contact-gap); align-items: baseline; }
+.contact-line .key, .contact-qr-label {
   color: var(--fg-mute);
-  width: 100px;
+  width: var(--contact-label-width);
   flex-shrink: 0;
   font-size: 11px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
-.contact-line .key::after { content: " ▸"; color: var(--accent); }
+.contact-line .key::after, .contact-qr-label::after { content: " ▸"; color: var(--accent); }
+.contact-qr[open] .contact-qr-label::after { content: " ▾"; }
 .contact-line .val { color: var(--fg); }
 .contact-line .val a:hover { color: var(--accent); }
+
+/* 微信默认收起；展开文案直接由 details 的 open 属性切换。 */
+.contact-qr { margin-top: 12px; }
+/* 两行共用标签列宽；隐藏浏览器默认箭头，让展开标记与 EMAIL 的箭头对齐。 */
+.contact-qr summary {
+  display: grid;
+  grid-template-columns: var(--contact-label-width) minmax(0, 1fr);
+  gap: var(--contact-gap);
+  align-items: baseline;
+  cursor: pointer;
+  color: var(--accent);
+  list-style: none;
+}
+.contact-qr summary::-webkit-details-marker { display: none; }
+.contact-qr summary:hover .qr-show, .contact-qr summary:hover .qr-hide { text-decoration: underline; text-underline-offset: 4px; }
+.contact-qr summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 5px; }
+
+.contact-qr .qr-hide, .contact-qr[open] .qr-show { display: none; }
+.contact-qr[open] .qr-hide { display: inline; }
+.contact-qr-content { margin: 14px 0 0 calc(var(--contact-label-width) + var(--contact-gap)); font-family: var(--font-zh); word-break: normal; }
+.contact-qr-content img {
+  display: block;
+  width: min(260px, 100%);
+  height: auto;
+  padding: 12px;
+  background: #fff;
+  border-radius: 8px;
+}
+.contact-qr-content p { margin-top: 10px; color: var(--fg-dim); }
+.contact-qr-content a { color: var(--accent); font-size: 12px; }
+@media (max-width: 640px) {
+  .contact-block { padding: 28px 18px 20px; --contact-label-width: 68px; --contact-gap: 12px; }
+  .contact-qr-content { margin-left: 0; }
+  .contact-line .val { min-width: 0; overflow-wrap: anywhere; }
+}
 
 .signoff {
   margin-top: 64px;

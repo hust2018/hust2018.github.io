@@ -53,12 +53,27 @@ function ExpItem({
             {/* 用 .map 把「要点数组」转成一组 <li> 列表项。
                 React 渲染列表时要求每项有唯一的 key，方便它高效更新；
                 这里没有更合适的唯一值，就用下标 i（数组不会重排，所以可接受）。 */}
-            {bullets.map((b, i) => (
-              <li key={i}>
-                {/* 用 FormattedBold 渲染，让要点里的 **关键指标** 高亮显示 */}
-                <FormattedBold text={b} />
-              </li>
-            ))}
+            {bullets.map((b, i) => {
+              // 只有「**标题**：正文」这种要点才拆出标题；其他经历保留原来的行内格式。
+              // 文案仍来自 data.ts，不在组件里复制内容，中英文也共用这条渲染规则。
+              const titled = b.match(/^\*\*(.+?)\*\*[：:]\s*(.+)$/);
+              const body = titled ? titled[2] : b;
+              return (
+                <li key={i} className={titled ? "exp-point" : undefined}>
+                  {titled && <strong className="exp-point-title">{titled[1]}</strong>}
+                  <span className="exp-point-copy">
+                    {/* 斜杠连接的两个服务名作为一个短语排版，避免 Worker 留在上一行。 */}
+                    {body.split(/(Worker[／/]Proxy)/g).map((part, j) =>
+                      /^Worker[／/]Proxy$/.test(part) ? (
+                        <span key={j} className="exp-term">{part}</span>
+                      ) : (
+                        <FormattedBold key={j} text={part} />
+                      ),
+                    )}
+                  </span>
+                </li>
+              );
+            })}
           </ul>
           {/* 条件渲染：item.stack && (...) 表示「有 stack 才渲染后面这块」。
               如果 stack 是 undefined，&& 的结果是假值，什么都不显示。 */}

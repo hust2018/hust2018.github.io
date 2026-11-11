@@ -3,6 +3,7 @@
 // Node 22+ 原生支持直接 import .ts（自动擦除类型），所以能直接读 lib/data.ts。
 import { RESUME } from "../lib/data.ts";
 import { pickLang } from "../lib/i18n.ts";
+import { SITE_URL } from "../lib/site.ts";
 import MarkdownIt from "markdown-it";
 
 const date = (d) => d.replace("Present", "至今"); // 中文里把英文 Present 显示为「至今」
@@ -14,7 +15,8 @@ export function buildResumeMarkdown(lang = "zh") {
   const md = [];
   md.push(`# ${L(h.name)}　${h.name.en}`);
   md.push(`<div class="subtitle">${L(h.role)}</div>`);
-  md.push(`<div class="meta">${L(h.location)}　·　${RESUME.contact.email}</div>`);
+  // 复用站点的正式地址；保留可读域名和真正的超链接，兼顾纸质阅读与 PDF 点击访问。
+  md.push(`<div class="meta">${L(h.location)}　·　${RESUME.contact.email}　·　<a href="${SITE_URL}/">${new URL(SITE_URL).host}</a></div>`);
   md.push(`<div class="tagline">${L(h.tagline)}</div>`);
   md.push("");
 

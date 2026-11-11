@@ -1,6 +1,7 @@
 // 客户端组件。
 "use client";
 
+import Image from "next/image";
 import { RESUME, STRINGS } from "@/lib/data";
 import { pickLang } from "@/lib/i18n";
 import { FadeUp, SectionHead } from "./effects";
@@ -41,6 +42,24 @@ export function Contact({ lang }: { lang: Lang }) {
               </span>
             </div>
           ))}
+          {/* details 默认关闭，并原生支持键盘操作；无需额外 state，也不会产生水合差异。 */}
+          {c.wechatQr && (
+            <details className="contact-qr">
+              <summary>
+                <span className="contact-qr-label">{pickLang(STRINGS.wechat, lang)}</span>
+                <span className="qr-show">{pickLang(STRINGS.showWechat, lang)}</span>
+                <span className="qr-hide">{pickLang(STRINGS.hideWechat, lang)}</span>
+              </summary>
+              <div className="contact-qr-content">
+                {/* 保留原图和白底，不对二维码加滤镜或裁切，方便直接扫码。 */}
+                <Image src={c.wechatQr} alt={pickLang(STRINGS.wechatQrAlt, lang)} width={587} height={605} />
+                <p>{pickLang(STRINGS.wechatHint, lang)}</p>
+                <a href={c.wechatQr} target="_blank" rel="noopener noreferrer">
+                  {pickLang(STRINGS.viewQr, lang)} ↗
+                </a>
+              </div>
+            </details>
+          )}
         </div>
       </FadeUp>
       {/* 页面结尾的「签名」行，模仿在终端里 echo 一句话。

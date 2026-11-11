@@ -29,13 +29,23 @@ export function About({ lang }: { lang: Lang }) {
       <FadeUp>
         {/* 用 .map 遍历段落数组，把每个段落 p 渲染成一个 <p> 标签，形成一列段落。 */}
         {/* .map 会对数组每一项执行括号里的函数并收集返回的 JSX。p 是当前段落内容，i 是它的下标（0、1、2…）。 */}
-        {paras.map((p, i) => (
-          // key 是 React 渲染列表时要求的唯一标识，帮 React 高效地区分/更新每一项；这里用下标 i 作为 key。
-          <p key={i}>
-            {/* FormattedBold 接收文本 p，把其中的标记片段显示成加粗后再渲染出来。 */}
-            <FormattedBold text={p} />
-          </p>
-        ))}
+        <div className="about-copy">
+          {paras.map((p, i) => (
+            // key 是 React 渲染列表时要求的唯一标识，帮 React 高效地区分/更新每一项；这里用下标 i 作为 key。
+            <p key={i}>
+              {/* FormattedBold 接收文本 p，把其中的标记片段显示成加粗后再渲染出来。 */}
+              {/* 「0 到 1」是一组完整含义，用不换行的短语保留它；其余正文自然断行。
+                  只改变展示方式，简历数据与下载版内容不受影响。 */}
+              {p.split(/(0 到 1)/g).map((part, j) =>
+                part === "0 到 1" ? (
+                  <span key={j} className="about-phrase">{part}</span>
+                ) : (
+                  <FormattedBold key={j} text={part} />
+                ),
+              )}
+            </p>
+          ))}
+        </div>
       </FadeUp>
     </section>
   );

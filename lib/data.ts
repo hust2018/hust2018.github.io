@@ -25,10 +25,11 @@ export const RESUME: Resume = {
       en: "Focused on AI agents and multi-agent systems — taking them from zero to production, grounded in the high-concurrency, distributed-systems foundation built during security R&D at ByteDance. Obsessed with making complex systems simple.",
     },
     location: { zh: "深圳，中国", en: "Shenzhen, China" },
-    status: { zh: "在职 · 寻找 AI Agent / 后端机会", en: "Open to AI Agent / Backend roles" },
+    status: { zh: "已离职 · 寻找 AI Agent / 后端机会", en: "Available · Open to AI Agent / Backend roles" },
     yearsExp: "4",
     // 首屏「醒目发光徽章」：图标 + 双语文字（这里放游戏成就）。
     badges: [
+      { icon: "⚫", label: { zh: "围棋 · 业余四段", en: "Go · Amateur 4-dan" } },
       { icon: "🎮", label: { zh: "英雄联盟 · 前钻石", en: "LoL · ex-Diamond" } },
       { icon: "🃏", label: { zh: "炉石传说 · 月榜", en: "Hearthstone · Leaderboard" } },
       { icon: "👾", label: { zh: "星际争霸 · 手残玩家", en: "StarCraft · low APM" } },
@@ -41,12 +42,12 @@ export const RESUME: Resume = {
     zh: [
       "我是 **李姜磊**，**AI Agent 开发工程师**（前 **字节跳动** 安全研发），**华中科技大学** 网络空间安全硕士。",
       "在 **字节跳动** 安全与风控做了约 **3 年** 网络安全研发——NTA 入侵检测、DDoS 防护、WAF、容器微隔离 HFW，多个系统从 0 到 1 落地，全球多机房部署历经多次大版本升级 **0 事故**。",
-      "如今我专注 **AI Agent** 方向：在 **TapNow** 研发多模型生成平台与 Agent 基础设施，覆盖 **Python / Go** 服务、分布式任务恢复、流式协议与计费一致性，并从 0 到 1 探索多智能体协作平台。",
+      "如今我专注 **AI Agent** 方向：曾在 **TapNow** 研发多模型生成平台与 Agent 基础设施，覆盖 **Python / Go** 服务、分布式任务恢复、流式协议与计费一致性，并从 0 到 1 探索多智能体协作平台。",
     ],
     en: [
       "I'm **Jianglei Li**, an **AI agent engineer** (formerly **ByteDance** security R&D) with a master's in Cyberspace Security from **HUST**.",
       "Spent ~**3 years** on network-security R&D at **ByteDance** — NTA intrusion detection, DDoS protection, WAF, and container micro-segmentation (HFW) — shipping multiple 0-to-1 systems and running global multi-data-center rollouts through repeated major upgrades with **zero incidents**.",
-      "Now I'm focused on **AI agents**: At **TapNow**, I build multi-model generation services and agent infrastructure across **Python / Go**, distributed task recovery, streaming protocols, and billing consistency, while developing a multi-agent collaboration platform from scratch.",
+      "Now I'm focused on **AI agents**: At **TapNow**, I built multi-model generation services and agent infrastructure across **Python / Go**, distributed task recovery, streaming protocols, and billing consistency, and explored multi-agent collaboration from scratch.",
     ],
   },
   // skills：技能分类数组。items 里纯字符串（如 "Python"）和双语对象（如 {zh,en}）可混放——
@@ -85,42 +86,36 @@ export const RESUME: Resume = {
     {
       role: { zh: "AI Agent 开发工程师", en: "AI Agent Engineer" },
       company: { zh: "tapnow", en: "tapnow" },
-      date: "2026.5 — Present",
+      date: "2026.5 — 2026.10",
       bullets: {
         zh: [
-          "修复 **Agent 多轮会话与缓存失效**：隔离被审核拒绝的媒体，补齐来源追踪和受限重试，避免失败内容反复进入会话；修正动态提示词与请求透传，在 **TEST 多步会话**中将可缓存请求命中率从 **0 提升至 90%（26/29）**。",
-          "建设 **分布式长任务恢复机制**：通过 Redis 所有权心跳、原子校验与数据库条件更新回收孤儿任务，并校验终态写入权限；开发独立 Go 调度器、后台派发恢复任务，避免视频长任务阻塞扫描与恢复循环。",
-          "推进 **Go 模型服务重构**：统一模型配置、供应商路由及降级策略，拆分同步与异步执行；以不可变配置快照保证排队任务按提交时配置执行，完成文本、视频模型的 **TEST 端到端验证**。",
-          "研发 **多模态模型接入链路**，贯通 SDK、模型服务、业务编排与计费，统一厂商参数、能力校验和预估 / 实扣口径；分析线上错误，区分审核、参数、限流及瞬时故障，避免确定性失败被重复重试或触发级联降级。",
-          "实现 **支付与异步媒体任务的幂等恢复**：建设 API 支付、退款补偿状态机，推进跨服务账务一致性；研发图层融合、视频合成和音视频分离任务，完成幂等重放与跨组织访问隔离的 **TEST 验证**。",
-          "研发 **Loop 多智能体协作原型（本地阶段）**：基于 Go、Pi、PostgreSQL 与 Redis 实现会话接续、任务隔离和权限配置；在模型接入场景中串联任务分派、消息队列、Lark 状态反馈与提测流程。"
+          "**核心模型服务与架构重构**：端到端负责多模态模型平台，打通 SDK、供应商适配、路由、任务编排与计费，统一支撑画布和 Agent；主导 Go 架构重构，拆分网关、同步／异步执行与调度服务，通过配置化治理、所有权心跳和终态保护，提升模型扩展与长任务可靠性。",
+          "**AI Agent 多模型与运行基础设施**：负责统一 Agent Runtime 下的多模型接入，适配工具调用、思考参数、多模态输入与流式协议；完善 Worker／Proxy 的取消传播、媒体审核恢复和成本统计，修复动态提示词与请求透传导致的 **Prompt Cache 失效**问题，恢复多轮 Agent 会话的缓存复用。",
+          "**多 Agent 自主协作平台（Loop）**：将分散运行于本地与云端的 Agent 纳入统一平台，通过角色分工、任务编排、消息通信与会话接续，让 Agent 团队协同推进原本需要多人配合的复杂任务；支持结果交接、审查返工与持续跟进，减少人工拆单、跨 Agent 传话和逐轮推动，将人的精力集中于目标与关键决策，应用于模型接入、线上故障排查、自动 Bug 修复、代码审查与质量测试。",
         ],
         en: [
-          "Fixed **multi-turn agent failures and prompt-cache misses**: isolated rejected media with provenance tracking and bounded retries to prevent repeated failures in conversation history; corrected dynamic prompts and request forwarding, raising the cacheable-request hit rate from **0 to 90% (26/29) in multi-step TEST conversations**.",
-          "Built **distributed recovery for long-running tasks** using Redis ownership heartbeats, atomic checks, conditional database updates, and ownership checks before final-state writes; developed an independent Go scheduler and background recovery dispatch so long video tasks would not block scanning and recovery loops.",
-          "Advanced the **Go model-service refactor** by unifying model configuration, provider routing, and fallback policies while separating synchronous and asynchronous execution; used immutable configuration snapshots so queued tasks retain their submission-time behavior, with **end-to-end TEST validation** for text and video models.",
-          "Built **multimodal model integrations** across SDKs, model services, orchestration, and billing, aligning provider parameters, capability checks, estimation, and settlement; analyzed production errors to distinguish policy, parameter, rate-limit, and transient failures, avoiding repeated retries and cascading fallbacks for deterministic failures.",
-          "Implemented **idempotent recovery for payments and asynchronous media tasks**: built API payment and refund-compensation state machines to improve accounting consistency across services; developed image-layer merging, video composition, and audio/video separation tasks, with **TEST validation** of idempotent replay and access isolation between organizations.",
-          "Developed **Loop, a local multi-agent collaboration prototype**, using Go, Pi, PostgreSQL, and Redis for session continuity, task isolation, and permission controls; connected task assignment, message queues, Lark status updates, and QA submission workflows for model onboarding."
+          "**Core model platform and architecture refactor**: Owned end-to-end delivery across SDKs, provider adapters, routing, task orchestration, and billing for Canvas and Agent workloads. Led the Go refactor into gateway, sync/async execution, and scheduling services, with configuration-driven governance, ownership heartbeats, and final-state protection for extensibility and long-running task reliability.",
+          "**AI Agent multi-model and runtime infrastructure**: Integrated models into a unified Agent Runtime, adapting tool calls, reasoning parameters, multimodal inputs, and streaming protocols. Improved Worker/Proxy cancellation propagation, media-policy recovery, and cost accounting; fixed **Prompt Cache failures** caused by dynamic prompts and request forwarding, restoring cache reuse across multi-turn Agent conversations.",
+          "**Autonomous multi-agent collaboration platform (Loop)**: Unified agents running locally and in the cloud through role assignment, task orchestration, messaging, and session continuity, enabling agent teams to advance complex tasks that previously required multiple people. Supported handoffs, review-and-rework cycles, and ongoing follow-up, reducing manual task breakdown, message relaying, and turn-by-turn supervision so people could focus on goals and key decisions. Applied to model onboarding, production-incident investigation, automated bug fixing, code review, and quality testing.",
         ],
       },
       stack: ["Go", "Python", "AI Agent", "Redis", "PostgreSQL", "GCP", "Pub/Sub", "SSE"],
     },
     {
-      role: { zh: "技术负责人", en: "Tech Lead" },
-      company: { zh: "loomu · AI 创作助手", en: "loomu · AI creation assistant" },
-      date: "2025.11 — 2026.4",
+      role: { zh: "AI 技术深造与独立项目开发", en: "AI Studies & Independent Project Development" },
+      company: { zh: "个人学习与实践", en: "Independent Learning & Practice" },
+      date: "2025.07 — 2026.05",
       bullets: {
         zh: [
-          "作为技术负责人，从 0 到 1 搭建 AI 创作助手的后端与 SaaS 计费系统（FastAPI + Stripe）。",
-          "基于 AgentScope 设计多智能体内容生成系统，服务社交媒体内容创作。",
+          "**技术学习与方向转型**：从安全研发转向 AI Agent，系统学习 LLM 应用开发与多智能体协作；结合 OpenClaw、Claude 相关开源代码研读，深入理解 Agent 推理链路、工具调用与上下文管理，并应用于项目实践。",
+          "**loomu AI 创作助手**：作为独立实践项目，从 0 到 1 开发 FastAPI 后端、接入 Stripe 计费，基于 AgentScope 构建面向社交媒体创作的多智能体内容生成流程，积累从后端服务到 Agent 应用的完整开发经验。",
         ],
         en: [
-          "As tech lead, built the AI creation assistant's backend and SaaS billing from scratch (FastAPI + Stripe).",
-          "Designed a multi-agent content-generation system on AgentScope for social-media content.",
+          "**Technical learning and career transition**: Transitioned from security R&D to AI agents through systematic study of LLM application development and multi-agent collaboration. Studied OpenClaw and Claude-related open-source code to understand agent reasoning, tool calls, and context management, applying the findings in project work.",
+          "**loomu AI creation assistant**: Developed an independent practice project from scratch, building a FastAPI backend, integrating Stripe billing, and implementing an AgentScope-based multi-agent content-generation workflow for social-media creation. Gained end-to-end development experience spanning backend services and agent applications.",
         ],
       },
-      stack: ["Python", "FastAPI", "AgentScope"],
+      stack: ["Python", "FastAPI", "AgentScope", "LLM", "MCP", "Stripe"],
     },
     {
       role: { zh: "安全研发工程师", en: "Security R&D Engineer" },
@@ -164,15 +159,6 @@ export const RESUME: Resume = {
       link: "https://github.com/AI-for-anyone/RedAlert",
       stack: ["Python", "LangGraph", "Prompt", "MCP", "Async/Concurrency", "Multithreading"],
     },
-    {
-      date: "2026.1 — 2026.4",
-      title: { zh: "开源代码研读", en: "Open-source deep dive" },
-      desc: {
-        zh: "系统研读 OpenClaw、Claude 相关开源代码，深入理解 LLM Agent 推理链路、工具调用机制与上下文管理实现，并应用于多智能体架构设计。",
-        en: "Studied OpenClaw and Claude-related open-source code in depth — LLM agent reasoning chains, tool-calling, and context management — applying the findings to multi-agent architecture design.",
-      },
-      stack: ["LLM", "Agent", "MCP"],
-    },
   ],
   // education：教育经历数组（最近的放最前）。extra 字段可选，这里没填就省略。
   education: [
@@ -187,9 +173,10 @@ export const RESUME: Resume = {
       degree: { zh: "信息安全 · 学士", en: "B.Eng., Information Security" },
     },
   ],
-  // contact：联系方式（只公开邮箱；手机号不放到公开网站上）。
+  // contact：联系方式（公开邮箱和可折叠的微信二维码）。
   contact: {
     email: "1158471109@qq.com",
+    wechatQr: "/wechat-qr.jpg",
   },
 };
 
@@ -203,6 +190,12 @@ export const STRINGS: Record<string, Localized> = {
   highlights: { zh: "亮点", en: "Highlights" },
   education: { zh: "教育", en: "Education" },
   contact: { zh: "联系方式", en: "Contact" },
+  wechat: { zh: "wechat", en: "wechat" },
+  showWechat: { zh: "展开二维码", en: "Show QR code" },
+  hideWechat: { zh: "收起二维码", en: "Hide QR code" },
+  wechatHint: { zh: "使用微信扫码添加好友", en: "Scan with WeChat to add me" },
+  wechatQrAlt: { zh: "李姜磊的微信二维码", en: "Jianglei Li’s WeChat QR code" },
+  viewQr: { zh: "查看原图", en: "View full-size image" },
   download: { zh: "下载 PDF", en: "Download PDF" },
   print: { zh: "打印", en: "Print" },
   expandAll: { zh: "展开全部", en: "Expand all" },
