@@ -1,234 +1,346 @@
 // "use client" 指令：告诉 Next.js「这个文件是客户端组件」。
 // 背景知识：Next.js 默认把组件当成「服务器组件」——只在服务器上跑、生成好 HTML 再发给浏览器，
 //   不能用浏览器才有的东西（useState、useEffect、点击事件、window/document 等）。
-// 一旦组件需要这些「交互能力」或浏览器 API，就必须在文件最顶部写 "use client"，
-//   它会让这些组件额外打包发到浏览器里运行（即「客户端组件」）。
-// 本文件里的特效都依赖 useState/useEffect/IntersectionObserver 等，所以必须声明为客户端组件。
+// 一旦组件需要这些「交互能力」或浏览器 API，就必须在文件最顶部写 "use client"。
+// 本文件里的积木都依赖 useEffect、IntersectionObserver、鼠标事件等，所以必须声明为客户端组件。
 "use client";
 
-// 从 react 里导入几个常用的「Hook」。Hook 是 React 提供的特殊函数，名字都以 use 开头，
-// 只能在组件函数（或自定义 Hook）内部调用，用来给函数组件「加上记忆和副作用能力」：
-//   - useState：让组件拥有「状态」（会变化、变化后自动重新渲染的数据）。
-//   - useEffect：在组件渲染后执行「副作用」（定时器、订阅、操作 DOM 等与渲染本身无关的事）。
-//   - useRef：拿到一个「引用容器」，常用来引用某个真实 DOM 元素，或存一个不触发重渲染的值。
-import { useCallback, useEffect, useRef, useState } from "react";
-// 这里只导入「类型」（import type 只在编译期用，打包后会被删掉，不产生运行时代码）：
-//   - ReactNode：能被 React 渲染的任意内容的类型（字符串、数字、JSX、它们的数组等），常用于 children。
-//   - RefObject：useRef 返回值的类型。
-import type { ReactNode, RefObject } from "react";
-// 3D 甲板的角度计算保持为纯函数；这个文件只负责把浏览器事件接到它上面。
-import { calculateTilt } from "../lib/tilt";
+// 这个文件是全站共用的「小积木」：各个区块组件从这里拿现成的零件，而不是各写各的。
+//   展示类：FormattedBold、Icon、Decode、SectionHeader、Ghost、Chips
+//   特效类：useFrame、useLayout、useReveal、usePointerTilt、useMagnetic、useFitText
+//   其他：  useClock、useShortcutLabel、scrollToSection
+// 约定：纯计算放在 lib/（可单元测试），这里只做「把浏览器事件接到那些函数上」的事。
 
-// ---------- 故障风文字 ----------
-// 视觉特效靠 CSS 实现，这里只把文字同时塞进 data-text 属性供 CSS 用。
-//
-// 这是一个「函数组件」：本质就是一个返回 JSX 的普通函数，函数名首字母大写（React 约定，
-// 用来和普通 HTML 标签区分）。括号里 { text } 是「解构 props」——
-// props 是父组件传进来的参数对象，这里直接把其中的 text 字段取出来用。
-// 冒号后面的 { text: string } 是 TypeScript 类型注解：说明 props 必须有一个 string 类型的 text。
-export function GlitchText({ text }: { text: string }) {
-  // return 后面这一段尖括号写法就是 JSX：长得像 HTML，实际是 JavaScript 的语法糖，
-  // 最终会被编译成创建界面元素的函数调用。
-  return (
-    // className 对应 HTML 的 class 属性（JSX 里因为 class 是 JS 关键字，所以改叫 className）。
-    // data-text={text} 把文字也放进自定义的 data-* 属性，CSS 的故障特效会读取它来做重影。
-    // 属性值用 {} 包起来表示「这里嵌入一个 JS 表达式」，而不是普通字符串。
-    <span className="glitch" data-text={text}>
-      {/* {text} 表示把变量 text 的值渲染到这里——在 JSX 中，{} 内可以放任意 JS 表达式 */}
-      {text}
-    </span>
-  );
-}
-
-// ---------- 打字机效果 ----------
-// 一个字一个字地把 text 显示出来。start 为 false 时不开始（等开机动画结束）。
-//
-// 这个组件的 props 有三个，其中 speed 和 start 在解构时写了「= 默认值」，
-// 表示父组件不传时就用这个默认值（speed 默认 55 毫秒一个字，start 默认 true 立即开始）。
-// 类型里 speed?: number 的问号表示「这个属性是可选的」，可传可不传。
-export function Typewriter({
-  text,
-  speed = 55,
-  start = true,
-}: {
-  text: string;
-  speed?: number;
-  start?: boolean;
-}) {
-  // useState(0) 创建一个状态 n，初始值是 0；它表示「当前已经显示到第几个字」。
-  // 返回值是一个数组：[当前值, 修改它的函数]。这里用解构拿到 n 和 setN。
-  // 关键概念：必须通过 setN(...) 来改 n，不能直接 n = 5；只有调用 setN，React 才知道
-  // 状态变了，从而「重新渲染」组件（重新执行这个函数、刷新界面）。
-  const [n, setN] = useState(0);
-  // useEffect(回调, 依赖数组)：组件渲染完成后执行回调里的「副作用」。
-  // 这里的副作用是开一个定时器，按节奏推进 n。
-  useEffect(() => {
-    // 若 start 为 false（还没轮到开始打字），直接 return 退出，什么都不做。
-    if (!start) return;
-    // 每次（重新）开始打字前，把已显示字数清零，从头打。
-    setN(0);
-    // i 是本次 effect 内部用的普通变量（不需要触发重渲染，所以不用 state）。
-    let i = 0;
-    // setInterval：浏览器 API，每隔 speed 毫秒重复执行一次回调，返回一个「定时器 id」。
-    const id = setInterval(() => {
-      i += 1;
-      setN(i); // 把已显示字数 +1 并写回状态，触发界面更新，于是又多显示一个字。
-      // 打到最后一个字时，用 clearInterval 停掉定时器，避免它一直空转。
-      if (i >= text.length) clearInterval(id);
-    }, speed);
-    // useEffect 回调可以 return 一个「清理函数」。它会在「组件卸载」或「依赖变化、effect 即将重跑」前被调用。
-    // 这里清理掉定时器，防止旧定时器残留导致重复打字或内存泄漏。
-    return () => clearInterval(id);
-    // 依赖数组 [text, start, speed]：只要其中任一值变化，effect 就会先清理、再重新执行。
-    // 这样换了文字、或 start 从 false 变 true 时，打字机会重新开始。
-  }, [text, start, speed]);
-  // 渲染：用 slice(0, n) 取 text 的前 n 个字符显示出来，n 不断增大就形成「逐字出现」的效果。
-  return <span>{text.slice(0, n)}</span>;
-}
+import { useEffect, useRef, useState } from "react";
+// import type 只在编译期用，打包后会被删掉，不产生运行时代码。
+import type { CSSProperties, DependencyList, ReactNode, RefObject } from "react";
+import { SECTIONS } from "@/lib/data";
+import { fitFontSize, pad2 } from "@/lib/fx";
+import { cancelScramble, scramble } from "@/lib/scramble";
+import { calculateTilt } from "@/lib/tilt";
+import { getFrameState, onFrame, onLayout, requestLayout } from "@/lib/ticker";
+import type { FrameState } from "@/lib/ticker";
 
 // ---------- 把 **xxx** 渲染成高亮 ----------
-// 简易 markdown：文本里的 **加粗** 转成带高亮样式的 <span>。
+// 简易 markdown：文本里的 **加粗** 转成带高亮样式的 <b>。
 export function FormattedBold({ text }: { text: string }) {
-  // split(正则) 把字符串切成数组。这里的正则用「捕获分组 (...)」括起了 **...** 这种片段，
-  // 当分隔符带括号时，split 会把分隔符本身也保留在结果数组里。
-  // 含义：\*\* 匹配两个星号，[^*]+ 匹配中间一段「非星号」的字符，末尾再两个 \*\*；g 表示全局匹配。
-  // 于是 "我会**React**和**Vue**" 会被切成 ["我会","**React**","和","**Vue**",""] 这样，
-  // 加粗片段和普通文字片段交替出现。String(text) 是保险起见把入参转成字符串。
+  // split 的正则带捕获分组 (...) 时，分隔符本身也会保留在结果数组里，
+  // 于是 "我会**React**和**Vue**" 会被切成 ["我会","**React**","和","**Vue**",""]。
   const parts = String(text).split(/(\*\*[^*]+\*\*)/g);
   return (
-    // <>...</> 叫 Fragment（片段），是一个「空壳容器」：组件必须返回单个根节点，
-    // 但我们又不想多包一层真实的 <div>，于是用 Fragment 把多个子元素打包返回，
-    // 它本身不会在页面上生成任何标签。
     <>
-      {/* 用数组的 .map 把每个片段映射成一个 JSX 元素，从而渲染出一个元素列表。
-          回调的第一个参数 p 是片段内容，第二个参数 i 是它在数组中的下标。 */}
-      {parts.map((p, i) =>
-        // 这里用「三元表达式 条件 ? A : B」做条件渲染：是 **...** 包裹的就渲染成高亮 span，否则普通 span。
-        p.startsWith("**") && p.endsWith("**") ? (
-          // key 是 React 渲染列表时必须给每个元素的「身份证」，帮助 React 高效地识别、
-          // 复用和更新列表项。这里用下标 i 作为 key（数据顺序固定时可以这样用）。
-          <span key={i} className="highlight">
-            {/* slice(2, -2) 去掉首尾各两个星号，只保留中间真正要显示的文字 */}
-            {p.slice(2, -2)}
-          </span>
+      {parts.map((part, i) =>
+        part.startsWith("**") && part.endsWith("**") ? (
+          // key 是 React 渲染列表时给每个元素的「身份证」；这里顺序固定，用下标即可。
+          <b key={i} className="hl">
+            {part.slice(2, -2)}
+          </b>
         ) : (
-          <span key={i}>{p}</span>
-        )
+          <span key={i}>{part}</span>
+        ),
       )}
     </>
   );
 }
 
-// ---------- 「元素是否进入视口」的自定义 Hook ----------
-// 用浏览器的 IntersectionObserver 监听某个元素是否滚动进了可视区域，
-// 配合 FadeUp 实现「滚到哪里、哪里淡入」。
-//
-// 这是一个「自定义 Hook」：本质是个普通函数，但名字以 use 开头、内部又用了别的 Hook（useState/useEffect）。
-// 作用是把一段「带状态的逻辑」抽出来复用。它不返回 JSX，而是返回一个值（这里返回布尔值）。
-// 参数 ref 是外部传进来的「DOM 引用」（指向要监听的那个元素）；返回 boolean 表示该元素是否已进入视口。
-export function useInView(ref: RefObject<HTMLElement | null>): boolean {
-  // 状态 inView：该元素是否已经出现在屏幕里。初始 false，进入视口后置为 true。
-  const [inView, setInView] = useState(false);
-  useEffect(() => {
-    // ref.current 是 ref 真正指向的 DOM 元素。组件首次渲染时 DOM 可能还没就绪，
-    // 这时 current 为 null，直接 return 不做事（等下次有值再说）。
-    if (!ref.current) return;
-    // checkNow：立刻手动判断一次元素当前是否已经在视口内（应对「一进页面就已经可见」的情况）。
-    const checkNow = () => {
-      const el = ref.current;
-      if (!el) return false;
-      // getBoundingClientRect() 返回元素相对「浏览器可视窗口」的位置和尺寸（top/bottom 等）。
-      const r = el.getBoundingClientRect();
-      // window.innerHeight 是可视窗口的高度；后面的 || 是兜底写法，个别环境下用文档元素的高度。
-      const vh = window.innerHeight || document.documentElement.clientHeight;
-      // 元素顶端在窗口下边界之上（top < vh）且底端在窗口上边界之下（bottom > 0），即与视口有交叠 = 可见。
-      if (r.top < vh && r.bottom > 0) {
-        setInView(true);
-        return true;
-      }
-      return false;
-    };
-    // 如果一开始就已经可见，置位完成后直接 return，不必再装监听器。
-    if (checkNow()) return;
-    // IntersectionObserver：浏览器 API，专门「高效地」监听元素是否进入/离开视口，
-    // 比自己监听 scroll 事件再反复计算位置更省性能。new 出来时传入一个回调。
-    const obs = new IntersectionObserver(
-      // 回调参数是「被观察元素的状态列表」，这里用解构 [entry] 取第一个（我们只观察一个元素）。
-      ([entry]) => {
-        // isIntersecting 为 true 表示元素已经和视口交叠（进入屏幕）。
-        if (entry.isIntersecting) {
-          setInView(true);
-          // 已经淡入过就不用再监听了，disconnect() 停止观察、释放资源。
-          obs.disconnect();
-        }
-      },
-      // 配置项：threshold: 0 表示「只要露出一点点（交叠比例超过 0）」就触发回调。
-      { threshold: 0 }
-    );
-    // 开始观察目标元素。
-    obs.observe(ref.current);
-    // requestAnimationFrame：让浏览器在「下一帧绘制前」执行一次 checkNow，
-    // 作为再补一次的即时检查（返回一个 id，便于后面取消）。
-    const raf = requestAnimationFrame(checkNow);
-    // 清理函数：组件卸载或依赖变化时，断开观察器并取消那次 rAF，避免泄漏。
-    return () => {
-      obs.disconnect();
-      cancelAnimationFrame(raf);
-    };
-    // 依赖数组写 [ref]：ref 变化时重新建立观察。
-  }, [ref]);
-  // 把「是否已进入视口」这个结果返回给调用方使用。
-  return inView;
+// ---------- 图标 ----------
+// 全站只用这一套线性图标：统一的线宽、方头端点，保证风格一致。
+// Record<IconName, ReactNode> 表示「每个图标名都必须对应一段 SVG 路径」，漏写会报错。
+export type IconName =
+  | "download"
+  | "terminal"
+  | "arrowDown"
+  | "arrowRight"
+  | "arrowUpRight"
+  | "arrowUp"
+  | "copy"
+  | "check"
+  | "close";
+
+const ICON_PATHS: Record<IconName, ReactNode> = {
+  download: (
+    <>
+      <path d="M12 4v11" />
+      <path d="M7 11l5 5 5-5" />
+      <path d="M5 20h14" />
+    </>
+  ),
+  terminal: (
+    <>
+      <path d="M5 7l5 5-5 5" />
+      <path d="M12 18h7" />
+    </>
+  ),
+  arrowDown: (
+    <>
+      <path d="M12 5v14" />
+      <path d="M6 13l6 6 6-6" />
+    </>
+  ),
+  arrowRight: (
+    <>
+      <path d="M5 12h14" />
+      <path d="M13 6l6 6-6 6" />
+    </>
+  ),
+  arrowUpRight: (
+    <>
+      <path d="M7 17L17 7" />
+      <path d="M8 7h9v9" />
+    </>
+  ),
+  arrowUp: (
+    <>
+      <path d="M12 19V5" />
+      <path d="M6 11l6-6 6 6" />
+    </>
+  ),
+  copy: (
+    <>
+      <rect x="9" y="9" width="11" height="11" />
+      <path d="M5 15V4h11" />
+    </>
+  ),
+  check: <path d="M4 12l5 5L20 6" />,
+  close: (
+    <>
+      <path d="M6 6l12 12" />
+      <path d="M18 6L6 18" />
+    </>
+  ),
+};
+
+export function Icon({ name, className = "" }: { name: IconName; className?: string }) {
+  return (
+    // aria-hidden：图标只是装饰，读屏软件跳过它；真正的含义由旁边的文字或按钮的 aria-label 提供。
+    <svg
+      className={`icon ${className}`.trim()}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="square"
+      strokeLinejoin="miter"
+      aria-hidden="true"
+      focusable="false"
+    >
+      {ICON_PATHS[name]}
+    </svg>
+  );
 }
 
-// ---------- 指针驱动的 3D 倾斜 ----------
-// 返回一个 ref，调用方把它挂到需要产生视差的 DOM 元素上即可。
+// ---------- 可「解码」的文字 ----------
+// 同一段文字渲染两份：
+//   · sr-only 那份只给读屏软件，永远是真实文字；
+//   · 另一份 aria-hidden，乱码动画只发生在它身上。
+// 这样做动画时，读屏用户不会听到一串乱码。
+// play 为 true 时播放一次解码动画；文字或 play 变化时会重新播放。
+export function Decode({ text, play = false }: { text: string; play?: boolean }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (play) scramble(el);
+    // 清理函数：文字变了（比如切换语言）或组件卸载时，停掉还在跑的动画。
+    return () => cancelScramble(el);
+  }, [text, play]);
+  return (
+    <span className="dec">
+      <span className="sr-only">{text}</span>
+      <span className="dec-v" aria-hidden="true" data-text={text} ref={ref}>
+        {text}
+      </span>
+    </span>
+  );
+}
+
+// ---------- 区块标题 ----------
+// 各个区块顶部统一的标题：编号 / 英文代号 + 大标题。
+// 编号不是手写的，而是按这个区块在 SECTIONS 里的位置算出来的——以后增删区块，编号自动跟着变。
+export function SectionHeader({ id, title }: { id: string; title: string }) {
+  const index = Math.max(0, SECTIONS.findIndex((s) => s.id === id));
+  const section = SECTIONS[index];
+  return (
+    // data-reveal：滚动到这里时由 useReveal 加上 .in，标题从遮罩下方滑出。
+    <header className="sec-head" data-reveal>
+      <p className="sec-idx lbl">
+        <span className="sec-num">{pad2(index + 1)}</span>
+        <span aria-hidden="true">/</span>
+        <Decode text={section.ghost} />
+      </p>
+      {/* id 给 <section aria-labelledby> 用：读屏软件会把这个标题念作区块的名字 */}
+      <h2 className="sec-title" id={`${id}-title`}>
+        <span className="line">
+          <span className="line-in">{title}</span>
+        </span>
+      </h2>
+    </header>
+  );
+}
+
+// ---------- 幽灵大字 ----------
+// 区块背后那行描边的英文大字，随滚动横向滑动，纯装饰。
+export function Ghost({ id }: { id: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  // 位置信息存在 ref 里而不是 state 里：它每次测量都会变，但不需要触发重新渲染。
+  const box = useRef({ top: 0, height: 1 });
+  const section = SECTIONS.find((s) => s.id === id);
+
+  useLayout(() => {
+    const parent = ref.current?.parentElement;
+    if (!parent) return;
+    const rect = parent.getBoundingClientRect();
+    box.current = { top: rect.top + window.scrollY, height: Math.max(1, rect.height) };
+  }, []);
+
+  useFrame((s) => {
+    const el = ref.current;
+    if (!el || s.reduced) return;
+    // progress：这个区块从「刚从屏幕底部冒头」(0) 到「完全滚出屏幕顶部」(1) 的进度。
+    const progress = (s.sy + s.vh - box.current.top) / (s.vh + box.current.height);
+    if (progress < -0.1 || progress > 1.1) return; // 不在屏幕附近就不用动
+    el.style.transform = `translate3d(${((0.25 - progress) * s.vw * 0.7).toFixed(1)}px,0,0)`;
+  });
+
+  if (!section) return null;
+  return (
+    <div className="ghost" aria-hidden="true" ref={ref}>
+      {section.ghost}
+    </div>
+  );
+}
+
+// ---------- 错开出现的顺序 ----------
+// 一组元素依次出现时，每个比前一个晚一点点。这里只是把序号写进 CSS 变量 --i，
+// 真正的延迟由 globals.css 用 calc(var(--i) * 40ms) 算出来。
+// 「as CSSProperties」是类型断言：React 的 style 类型里没有自定义变量，这里告诉 TS「我知道我在做什么」。
+export const stagger = (index: number): CSSProperties => ({ "--i": index }) as CSSProperties;
+
+// ---------- 技术标签 ----------
+export function Chips({ items }: { items: string[] }) {
+  if (!items.length) return null; // 没有标签时不输出空列表
+  return (
+    <ul className="chips">
+      {items.map((item) => (
+        <li key={item}>{item}</li>
+      ))}
+    </ul>
+  );
+}
+
+// ---------- 订阅每一帧 ----------
+// 用法：useFrame((s) => { ...每帧要做的事... })。s 里有滚动位置、鼠标位置等（见 lib/ticker.ts）。
+// 回调里通常直接改 DOM 的 style，而不是 setState：一秒 60 次的 setState 会让组件反复重新渲染。
+export function useFrame(fn: (state: FrameState) => void): void {
+  // 把最新的回调存进 ref：这样订阅只需要建立一次，但每帧调用的总是最新那份回调
+  // （回调里用到的 props / state 也就总是最新的）。
+  const latest = useRef(fn);
+  useEffect(() => {
+    latest.current = fn;
+  });
+  useEffect(() => onFrame((state) => latest.current(state)), []);
+}
+
+// ---------- 订阅「需要重新测量」 ----------
+// 很多特效要先量出元素的位置和大小。fn 会在这些时刻被调用：
+//   组件挂载后、deps 变化后（比如切换语言）、窗口大小变化、网络字体加载完成、文档高度变化。
+export function useLayout(fn: () => void, deps: DependencyList): void {
+  const latest = useRef(fn);
+  useEffect(() => {
+    latest.current = fn;
+  });
+  useEffect(() => {
+    latest.current();
+    return onLayout(() => latest.current());
+    // deps 由调用方传入，这里没法让 lint 静态检查，所以关掉这一条规则。
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps);
+}
+
+// ---------- 滚动揭示 ----------
+// 给 root 里所有带 data-reveal 的元素装上「滚到才出现」的效果：进入视口时加上 .in 这个 class，
+// 具体怎么出现（淡入、上移、从遮罩滑出）由 globals.css 决定。
+//
+// 概念：IntersectionObserver 是浏览器提供的「元素是否进入视口」的监听器，
+// 比自己监听 scroll 再反复计算位置省性能得多。
+//
+// 注意：.in 是直接加在 DOM 上的，不经过 React。所以带 data-reveal 的元素，
+// className 要保持固定（不要随 state 变化），否则 React 重写 class 时会把 .in 冲掉。
+export function useReveal(root: RefObject<HTMLElement | null>, deps: DependencyList): void {
+  useEffect(() => {
+    const el = root.current;
+    if (!el) return;
+    const targets = Array.from(el.querySelectorAll<HTMLElement>("[data-reveal]:not(.in)"));
+    if (!targets.length) return;
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced || !("IntersectionObserver" in window)) {
+      targets.forEach((t) => t.classList.add("in"));
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          const target = entry.target as HTMLElement;
+          target.classList.add("in");
+          observer.unobserve(target); // 出现过一次就不用再盯着了
+          // 区块标题出现时，顺便把旁边的英文代号「解码」一下
+          if (target.classList.contains("sec-head")) {
+            scramble(target.querySelector<HTMLElement>(".dec-v"));
+          }
+        }
+      },
+      // rootMargin 把判定区域的底边往上收 10%：元素要真正进到屏幕里一点才算出现。
+      { threshold: 0, rootMargin: "0px 0px -10% 0px" },
+    );
+    targets.forEach((t) => observer.observe(t));
+    return () => observer.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps);
+}
+
+// ---------- 指针驱动的 3D 倾斜 + 光斑 ----------
+// 返回一个 ref，调用方把它挂到需要倾斜的元素上即可。
 // 高频的 pointermove 不写 React state，而是经 requestAnimationFrame 合并后直接更新 CSS 变量：
-// 这样只重绘甲板自身，不会让整份简历跟着每一帧重新渲染。
+//   --tilt-x / --tilt-y  倾斜角度（globals.css 里用它们拼 transform）
+//   --spot-x / --spot-y  鼠标在元素内的位置（亮点卡片上跟随鼠标的光斑用）
 export function usePointerTilt<T extends HTMLElement>(maxAngle = 6): RefObject<T | null> {
   const ref = useRef<T | null>(null);
-  // 把尚未执行的动画帧 id 存进 ref；改它不会触发组件重渲染。
-  const frameRef = useRef<number | null>(null);
-
-  // useCallback 保证函数引用稳定，避免下面的 effect 因每次渲染拿到新函数而反复拆装监听器。
-  const writeTilt = useCallback((rotateX: number, rotateY: number) => {
-    const element = ref.current;
-    if (!element) return;
-    element.style.setProperty("--tilt-x", `${rotateX}deg`);
-    element.style.setProperty("--tilt-y", `${rotateY}deg`);
-  }, []);
 
   useEffect(() => {
     const element = ref.current;
     if (!element) return;
-
-    // 只有带精确指针的桌面设备才启用鼠标跟随；触屏交给 CSS 的慢速漂浮。
-    // 用户系统若要求减少动态效果，这里也完全不注册高频事件。
-    const finePointer = window.matchMedia("(pointer: fine)").matches;
+    // 只有鼠标这类精确指针才启用；用户要求减少动态效果时也完全不注册事件。
+    const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (!finePointer || reduceMotion) return;
 
+    let frame = 0;
     const onMove = (event: PointerEvent) => {
-      // 同一绘制帧内只保留最后一次指针位置，避免高刷新率鼠标堆积大量 DOM 写入。
-      if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
-      frameRef.current = requestAnimationFrame(() => {
-        const result = calculateTilt({
+      // 同一帧内只保留最后一次指针位置，避免高刷新率鼠标堆积大量 DOM 写入。
+      if (frame) cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        const bounds = element.getBoundingClientRect();
+        const { rotateX, rotateY } = calculateTilt({
           pointerX: event.clientX,
           pointerY: event.clientY,
-          bounds: element.getBoundingClientRect(),
+          bounds,
           maxAngle,
         });
-        writeTilt(result.rotateX, result.rotateY);
-        frameRef.current = null;
+        element.style.setProperty("--tilt-x", `${rotateX}deg`);
+        element.style.setProperty("--tilt-y", `${rotateY}deg`);
+        element.style.setProperty("--spot-x", `${Math.round(event.clientX - bounds.left)}px`);
+        element.style.setProperty("--spot-y", `${Math.round(event.clientY - bounds.top)}px`);
+        element.classList.add("is-tilting");
       });
     };
-
     const onLeave = () => {
-      if (frameRef.current !== null) {
-        cancelAnimationFrame(frameRef.current);
-        frameRef.current = null;
-      }
-      writeTilt(0, 0);
+      if (frame) cancelAnimationFrame(frame);
+      frame = 0;
+      element.style.setProperty("--tilt-x", "0deg");
+      element.style.setProperty("--tilt-y", "0deg");
+      element.classList.remove("is-tilting");
     };
 
     element.addEventListener("pointermove", onMove, { passive: true });
@@ -236,16 +348,133 @@ export function usePointerTilt<T extends HTMLElement>(maxAngle = 6): RefObject<T
     return () => {
       element.removeEventListener("pointermove", onMove);
       element.removeEventListener("pointerleave", onLeave);
-      if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
+      if (frame) cancelAnimationFrame(frame);
     };
-  }, [maxAngle, writeTilt]);
+  }, [maxAngle]);
 
   return ref;
 }
 
-// ---------- 滚动淡入容器 ----------
-// 把任意内容包进来，滚动到它时就自动淡入。
-// children 是个特殊 prop：写在 <FadeUp>这里的内容</FadeUp> 之间的东西会作为 children 传进来。
+// ---------- 磁吸按钮 ----------
+// 鼠标在按钮上移动时，按钮会朝鼠标的方向偏一点，像被吸住；移开后弹回原位。
+// 偏移量写进 --mx / --my 两个 CSS 变量，.btn 的 transform 会读取它们。
+export function useMagnetic<T extends HTMLElement>(): RefObject<T | null> {
+  const ref = useRef<T | null>(null);
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+    const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!finePointer || reduceMotion) return;
+
+    const onMove = (event: PointerEvent) => {
+      const r = element.getBoundingClientRect();
+      element.style.setProperty("--mx", `${((event.clientX - (r.left + r.width / 2)) * 0.28).toFixed(1)}px`);
+      element.style.setProperty("--my", `${((event.clientY - (r.top + r.height / 2)) * 0.4).toFixed(1)}px`);
+    };
+    const onLeave = () => {
+      element.style.setProperty("--mx", "0px");
+      element.style.setProperty("--my", "0px");
+    };
+    element.addEventListener("pointermove", onMove, { passive: true });
+    element.addEventListener("pointerleave", onLeave);
+    return () => {
+      element.removeEventListener("pointermove", onMove);
+      element.removeEventListener("pointerleave", onLeave);
+    };
+  }, []);
+  return ref;
+}
+
+// ---------- 大字自适应 ----------
+// 名字、公司名这类「一行不换行的大字」，文字比容器宽时自动缩小字号。
+// 用法：把返回的 ref 挂在外层元素上，里面放一个带 data-fit-in 的行内块，量的就是它的宽度。
+export function useFitText<T extends HTMLElement>(deps: DependencyList): RefObject<T | null> {
+  const ref = useRef<T | null>(null);
+  useLayout(() => {
+    const el = ref.current;
+    const inner = el?.querySelector<HTMLElement>("[data-fit-in]");
+    if (!el || !inner) return;
+    const before = el.style.fontSize;
+    el.style.fontSize = ""; // 先恢复成 CSS 里写的字号，再量
+    const next = fitFontSize({
+      fontSize: parseFloat(getComputedStyle(el).fontSize) || 16,
+      boxWidth: el.clientWidth,
+      contentWidth: inner.offsetWidth,
+    });
+    const value = next === null ? "" : `${next}px`;
+    el.style.fontSize = value;
+    // 字号变了，页面高度也可能跟着变：请其他特效在下一帧重新测量。
+    if (value !== before) requestLayout();
+  }, deps);
+  return ref;
+}
+
+// ---------- 实时时钟 Hook ----------
+// 每秒更新一次当前时间，给顶栏用。
+export function useClock(): Date | null {
+  // 初值为 null：构建时渲染没有「当前时间」，等浏览器挂载后再设，
+  // 避免两边渲染出不同的时间导致 hydration 不匹配。
+  // 补充「hydration（水合）」概念：Next 会先把组件渲成 HTML 发给浏览器（首屏快），
+  //   随后浏览器再让 React「接管」这段已有 HTML、给它装上交互逻辑——这一步就叫水合。
+  //   它要求两边首次渲染的结果完全一致，所以时间、随机数、localStorage 这类
+  //   「只有浏览器才知道」的值，都要等到 useEffect 里再读。
+  const [now, setNow] = useState<Date | null>(null);
+  useEffect(() => {
+    setNow(new Date());
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  return now;
+}
+
+// ---------- 快捷键提示文字 ----------
+// 呼出终端的快捷键：Mac 上显示 ⌘K，其他系统显示 Ctrl K。
+// 同样遵守水合规则：先用固定默认值渲染，挂载后再按真实系统修正。
+export function useShortcutLabel(): string {
+  const [label, setLabel] = useState("Ctrl K");
+  useEffect(() => {
+    if (/Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent)) setLabel("⌘K");
+  }, []);
+  return label;
+}
+
+// ---------- 滚动到某个区块 ----------
+export function scrollToSection(id: string): void {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const state = getFrameState();
+  const top = id === "hero" ? 0 : el.getBoundingClientRect().top + window.scrollY;
+  window.scrollTo({ top, behavior: state.reduced ? "auto" : "smooth" });
+  // 键盘用户跳转后把焦点也带过去，接着按 Tab 才会从新位置继续。
+  if (state.keyboard) el.focus({ preventScroll: true });
+}
+
+// =====================================================================
+// 以下三个是旧版（终端风格）留下的积木，现在只有休眠中的博客组件
+// components/blog/LatestPosts.tsx 还在引用。保留它们是为了不动博客代码。
+// =====================================================================
+
+export function useInView(ref: RefObject<HTMLElement | null>): boolean {
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          obs.disconnect();
+        }
+      },
+      { threshold: 0 },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [ref]);
+  return inView;
+}
+
 export function FadeUp({
   children,
   delay = 0,
@@ -255,74 +484,27 @@ export function FadeUp({
   delay?: number;
   className?: string;
 }) {
-  // useRef<HTMLDivElement>(null)：创建一个引用容器，初始 null。
-  // 下面把它通过 ref={ref} 绑到 <div> 上后，ref.current 就会指向那个真实的 div DOM 元素。
   const ref = useRef<HTMLDivElement>(null);
-  // 复用上面写的自定义 Hook，得到「这个 div 是否已进入视口」。
   const visible = useInView(ref);
   return (
     <div
       ref={ref}
-      // 模板字符串（反引号）拼 class：基础类 fade-up；可见时追加 in 类（CSS 据此做淡入）；
-      // 再拼上外部传入的 className。${...} 里嵌入 JS 表达式，visible ? "in" : "" 是条件拼接。
       className={`fade-up ${visible ? "in" : ""} ${className}`}
-      // style 接收一个 JS 对象（注意是双层花括号：外层是 JSX 的{}，内层是对象字面量{}）。
-      // transitionDelay 设置 CSS 过渡延迟，让多个元素能错开先后淡入。
       style={{ transitionDelay: `${delay}ms` }}
     >
-      {/* 把包裹的内容原样渲染出来 */}
       {children}
     </div>
   );
 }
 
-// ---------- 实时时钟 Hook ----------
-// 每秒更新一次当前时间，给顶栏的 TIME 用。
-export function useClock(): Date | null {
-  // 初值为 null：服务器端渲染时没有「当前时间」，等浏览器挂载后再设，
-  // 避免服务器和浏览器渲染出不同的时间导致 hydration 警告。
-  // 补充「hydration（水合）」概念：Next 会先在服务器把组件渲成 HTML 字符串发给浏览器（首屏快），
-  //   随后浏览器再让 React「接管」这段已有 HTML、给它装上交互逻辑——这一步就叫水合。
-  //   要求服务器渲染的结果和浏览器首次渲染的结果必须一致，否则会报 hydration 不匹配警告。
-  //   时间每时每刻都不同，若一开始就用 new Date()，服务器和浏览器算出的时间会不一样，
-  //   所以这里先给 null，等到了浏览器（useEffect 里）才填真实时间。
-  const [now, setNow] = useState<Date | null>(null);
-  useEffect(() => {
-    // useEffect 只在浏览器里执行（不会在服务器跑），所以在这里取真实当前时间是安全的。
-    setNow(new Date());
-    // 每隔 1000 毫秒（1 秒）刷新一次时间，让时钟走起来。
-    const id = setInterval(() => setNow(new Date()), 1000);
-    // 清理定时器，组件卸载时停掉，避免它在后台一直跑。
-    return () => clearInterval(id);
-    // 空依赖数组 []：表示这个 effect 只在组件「首次挂载」时执行一次，之后不再重复。
-  }, []);
-  return now;
-}
-
-// ---------- 区块标题 ----------
-// 各个区块（关于/技能/经历…）顶部那行统一样式的标题。
-// num 是编号，title 是标题文字，meta 是可选的附加信息（类型 ReactNode，可放文字或 JSX）。
-export function SectionHead({
-  num,
-  title,
-  meta,
-}: {
-  num: string;
-  title: string;
-  meta?: ReactNode;
-}) {
+export function SectionHead({ num, title, meta }: { num: string; title: string; meta?: ReactNode }) {
   return (
     <div className="section-head">
-      {/* [ 01 ] 这种编号；{num} 把编号变量插进方括号中间，注意保留了前后空格 */}
       <span className="num">[ {num} ]</span>
       <h2>
-        {/* 模拟终端提示符的 $ 符号 */}
         <span className="prompt-char">$</span>
         {title}
       </h2>
-      {/* 条件渲染的另一种写法：meta && <...>。
-          当 meta 有值（真）时渲染后面的 span；为空（假）时整体结果是假值，React 不渲染任何东西。
-          这是「只在有内容时才显示」的常用简写。 */}
       {meta && <span className="meta">{meta}</span>}
     </div>
   );

@@ -4,7 +4,7 @@
 // 这个文件和 types.ts 的关系：types.ts 定义「形状」（每个字段该是什么类型），
 // 这里填「内容」（具体的名字、经历、文案）。把数据和它的结构定义分开放，
 // 是很常见的组织方式——以后想改简历内容，基本只动这一个文件。
-import type { Resume, Localized } from "./types";
+import type { Resume, Localized, SectionDef } from "./types";
 
 // 概念：`const` 声明一个常量；变量名全大写 RESUME 是约定，表示「固定的配置数据」。
 // `: Resume` 是类型标注：约束这个对象必须严格符合 Resume 接口——漏字段/类型不对会立刻标红。
@@ -25,8 +25,10 @@ export const RESUME: Resume = {
       en: "Focused on AI agents and multi-agent systems — taking them from zero to production, grounded in the high-concurrency, distributed-systems foundation built during security R&D at ByteDance. Obsessed with making complex systems simple.",
     },
     location: { zh: "深圳，中国", en: "Shenzhen, China" },
-    status: { zh: "已离职 · 寻找 AI Agent / 后端机会", en: "Available · Open to AI Agent / Backend roles" },
+    status: { zh: "刚入职 Open Design", en: "Just joined Open Design" },
     yearsExp: "4",
+    // 头像下方的座右铭（原来写死在组件里，现在收进数据）。
+    motto: "尽管提需求，我来想办法实现",
     // 首屏「醒目发光徽章」：图标 + 双语文字（这里放游戏成就）。
     badges: [
       { icon: "⚫", label: { zh: "围棋 · 业余四段", en: "Go · Amateur 4-dan" } },
@@ -42,12 +44,12 @@ export const RESUME: Resume = {
     zh: [
       "我是 **李姜磊**，**AI Agent 开发工程师**（前 **字节跳动** 安全研发），**华中科技大学** 网络空间安全硕士。",
       "在 **字节跳动** 安全与风控做了约 **3 年** 网络安全研发——NTA 入侵检测、DDoS 防护、WAF、容器微隔离 HFW，多个系统从 0 到 1 落地，全球多机房部署历经多次大版本升级 **0 事故**。",
-      "如今我专注 **AI Agent** 方向：曾在 **TapNow** 研发多模型生成平台与 Agent 基础设施，覆盖 **Python / Go** 服务、分布式任务恢复、流式协议与计费一致性，并从 0 到 1 探索多智能体协作平台。",
+      "如今我专注 **AI Agent** 方向：曾在 **TapNow** 研发多模型生成平台与 Agent 基础设施，覆盖 **Python / Go** 服务、分布式任务恢复、流式协议与计费一致性，并从 0 到 1 探索多智能体协作平台。**2026 年 11 月**，我加入了 **Open Design**。",
     ],
     en: [
       "I'm **Jianglei Li**, an **AI agent engineer** (formerly **ByteDance** security R&D) with a master's in Cyberspace Security from **HUST**.",
       "Spent ~**3 years** on network-security R&D at **ByteDance** — NTA intrusion detection, DDoS protection, WAF, and container micro-segmentation (HFW) — shipping multiple 0-to-1 systems and running global multi-data-center rollouts through repeated major upgrades with **zero incidents**.",
-      "Now I'm focused on **AI agents**: At **TapNow**, I built multi-model generation services and agent infrastructure across **Python / Go**, distributed task recovery, streaming protocols, and billing consistency, and explored multi-agent collaboration from scratch.",
+      "Now I'm focused on **AI agents**: At **TapNow**, I built multi-model generation services and agent infrastructure across **Python / Go**, distributed task recovery, streaming protocols, and billing consistency, and explored multi-agent collaboration from scratch. In **November 2026**, I joined **Open Design**.",
     ],
   },
   // skills：技能分类数组。items 里纯字符串（如 "Python"）和双语对象（如 {zh,en}）可混放——
@@ -82,8 +84,21 @@ export const RESUME: Resume = {
   ],
   // experience：工作经历数组。bullets 是 { zh: [...], en: [...] }，每段下有多条要点。
   // 要点里的 **加粗** 会被 Experience 组件用 FormattedBold 高亮（突出关键指标）。
+  // 要点如果以「**小标题**：」开头，页面会把它拆成「标题一行 + 正文一段」。
+  // era 是时期标记（agent / security），页面用它切换强调色。
   experience: [
     {
+      // 2026.11 入职。要点先留空，有内容后再补；
+      // bullets 为空数组时，页面只显示公司、时间和职位。
+      era: "agent",
+      role: { zh: "AI Agent 开发工程师", en: "AI Agent Engineer" },
+      company: { zh: "Open Design", en: "Open Design" },
+      date: "2026.11 — Present",
+      bullets: { zh: [], en: [] },
+      stack: [],
+    },
+    {
+      era: "agent",
       role: { zh: "AI Agent 开发工程师", en: "AI Agent Engineer" },
       company: { zh: "tapnow", en: "tapnow" },
       date: "2026.5 — 2026.10",
@@ -102,6 +117,7 @@ export const RESUME: Resume = {
       stack: ["Go", "Python", "AI Agent", "Redis", "PostgreSQL", "GCP", "Pub/Sub", "SSE"],
     },
     {
+      era: "agent",
       role: { zh: "AI 技术深造与独立项目开发", en: "AI Studies & Independent Project Development" },
       company: { zh: "个人学习与实践", en: "Independent Learning & Practice" },
       date: "2025.07 — 2026.05",
@@ -118,6 +134,7 @@ export const RESUME: Resume = {
       stack: ["Python", "FastAPI", "AgentScope", "LLM", "MCP", "Stripe"],
     },
     {
+      era: "security",
       role: { zh: "安全研发工程师", en: "Security R&D Engineer" },
       company: { zh: "字节跳动 · 安全与风控", en: "ByteDance · Security & Risk Control" },
       date: "2022.6 — 2025.7",
@@ -204,4 +221,47 @@ export const STRINGS: Record<string, Localized> = {
   basedIn: { zh: "坐标", en: "Based in" },
   available: { zh: "状态", en: "Status" },
   whoami: { zh: "whoami", en: "whoami" },
+
+  // ---- 以下是「信号」新版界面用到的固定文案 ----
+  skip: { zh: "跳到正文", en: "Skip to content" },
+  introLine: { zh: "正在解码身份", en: "Decoding identity" },
+  introSkip: { zh: "跳过", en: "Skip" },
+  navLabel: { zh: "分区导航", en: "Section navigation" },
+  langSwitch: { zh: "切换语言", en: "Switch language" },
+  heroCta: { zh: "看经历", en: "See experience" },
+  termHint: { zh: "呼出终端", en: "open the shell" },
+  offDuty: { zh: "下班之后", en: "Off duty" },
+  experienceYears: { zh: "经验", en: "Experience" },
+  portraitAlt: { zh: "李姜磊的头像", en: "Portrait of Jianglei Li" },
+  xpHint: { zh: "继续向下滚动，横向翻阅", en: "Keep scrolling to move sideways" },
+  xpMore: { zh: "查看全部 {n} 条", en: "View all {n}" }, // {n} 会被替换成要点条数
+  xpFull: { zh: "查看完整内容", en: "View full details" },
+  xpMoreAria: { zh: "查看这段经历的全部要点", en: "View every bullet for this role" },
+  eraAgent: { zh: "AGENT 时期", en: "AGENT ERA" },
+  eraSecurity: { zh: "安全时期", en: "SECURITY ERA" },
+  present: { zh: "至今", en: "Present" },
+  contactBig: { zh: "来聊聊", en: "Let's talk" },
+  email: { zh: "邮箱", en: "Email" },
+  copy: { zh: "复制邮箱", en: "Copy email" },
+  copied: { zh: "已复制到剪贴板", en: "Copied to clipboard" },
+  copyFail: { zh: "复制失败，请手动选中邮箱", en: "Copy failed — please select the address manually" },
+  close: { zh: "关闭", en: "Close" },
+  backTop: { zh: "回到顶部", en: "Back to top" },
+  termNote: {
+    zh: "resume.sh · 交互式终端 — 输入 help 查看可用命令",
+    en: 'resume.sh · interactive shell — type "help" for commands',
+  },
+  termPlaceholder: { zh: "输入命令，回车执行…", en: "type a command, hit enter…" },
+  termInputLabel: { zh: "终端输入", en: "Terminal input" },
 };
+
+// 页面分区表：顺序就是页面从上到下的顺序，也是右侧导轨和区块编号（01、02…）的来源。
+// ghost 是区块背后那行横向滑动的装饰大字（固定英文）；label 是导轨上的短标签。
+export const SECTIONS: SectionDef[] = [
+  { id: "about", ghost: "ABOUT", label: { zh: "关于", en: "About" } },
+  { id: "experience", ghost: "EXPERIENCE", label: { zh: "经历", en: "Exp" } },
+  { id: "skills", ghost: "STACK", label: { zh: "技能", en: "Skills" } },
+  { id: "highlights", ghost: "HIGHLIGHTS", label: { zh: "亮点", en: "More" } },
+  { id: "education", ghost: "EDUCATION", label: { zh: "教育", en: "Edu" } },
+  { id: "contact", ghost: "CONTACT", label: { zh: "联系", en: "Contact" } },
+];

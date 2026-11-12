@@ -2,7 +2,7 @@
 // 根布局通常应该是服务器组件——它不需要交互，只负责搭骨架，这样首屏更快。
 
 // 导入 Metadata 类型，仅用于给下面的 metadata 对象做类型检查。
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 // 导入全局样式表。在组件里直接 import css 文件是 Next 的用法，会把样式应用到整个站点。
 import "./globals.css";
 // Google Analytics 4：Next 官方第三方组件。它负责在页面注入 gtag.js 统计脚本，
@@ -20,6 +20,12 @@ export const metadata: Metadata = {
   description: "李姜磊 (Jianglei Li) 的个人简历 — AI Agent 开发工程师，前字节跳动安全研发。", // 搜索引擎/分享预览用的描述
 };
 
+// viewport 也是 Next.js 的约定导出：这里只用它设置浏览器界面的主题色
+// （手机浏览器的地址栏会染成这个颜色，和页面的黑色背景连成一片）。
+export const viewport: Viewport = {
+  themeColor: "#08090a",
+};
+
 // app/layout.tsx 也是 Next.js 的约定文件：它是「根布局」，包裹所有页面，
 // 是唯一可以渲染 <html> 和 <body> 标签的地方。
 // 参数里的 children 就是被它包裹的页面内容（也就是 app/page.tsx 渲染出来的东西）。
@@ -30,20 +36,28 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    // 这些 data-* 初始值与 page.tsx 的默认 state 一致，保证首屏不闪烁。
-    // 为什么要一致？服务器先用这里的初始属性渲染出 HTML，浏览器水合（hydration）时要求两边一致；
-    // page.tsx 的默认状态也是 terminal/dark/blink-on/crt-off，因此首屏不会出现样式跳变（闪烁）。
-    // 之后用户改设置时，page.tsx 的 useEffect 会动态更新这些属性。
-    <html lang="zh-CN" data-variant="terminal" data-theme="dark" data-blink="on" data-crt="off">
+    // lang 的初始值与 ResumeApp 的默认语言一致（中文）。
+    // 为什么要一致？构建时先用这里的初始属性渲染出 HTML，浏览器水合（hydration）时要求两边一致；
+    // 之后用户切换语言时，ResumeApp 的 useEffect 会动态更新这个属性。
+    // 全站只有一套深色主题，所以这里不再需要任何主题相关的 data-* 属性。
+    <html lang="zh-CN">
       <head>
         {/* preconnect：提前和字体服务器建立连接，让后面真正下载字体时更快 */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        {/* 引入 Google Fonts：等宽字体 JetBrains Mono、标题字体 Space Grotesk、中文字体 Noto Sans SC */}
+        {/* 引入 Google Fonts：
+            · Archivo —— 英文大标题。它是「可变字体」：一个文件里包含连续变化的字宽（wdth）和字重（wght）；
+            · JetBrains Mono —— 等宽小字（标签、日期、终端）；
+            · Noto Sans SC —— 中文，900 这档特粗用于名字和大标题。 */}
         <link
-          href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap"
           rel="stylesheet"
         />
+        {/* 开场遮罩默认盖住整个页面，由脚本负责撤掉。
+            万一访客禁用了 JavaScript，就用这条样式直接把遮罩藏起来，保证内容照样看得到。 */}
+        <noscript>
+          <style>{".intro{display:none}"}</style>
+        </noscript>
       </head>
       <body>
         {/* 把页面内容渲染进这个 #root 容器里。{children} 即当前路由对应页面的 JSX。 */}

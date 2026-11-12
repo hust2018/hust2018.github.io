@@ -1,103 +1,242 @@
 // "use client"：声明本文件是「客户端组件」。
-// 这个组件用到了 useState/useEffect、点击事件、localStorage、sessionStorage 等浏览器能力，
-// 必须运行在浏览器里，所以不能用默认的服务器组件，得在顶部写这一行。
+// 这个组件用到了 useState/useEffect、键盘事件、localStorage 等浏览器能力，必须运行在浏览器里。
 // （服务器组件 vs 客户端组件的区别详见 components/effects.tsx 顶部的说明。）
-//
-// 简历主体保留为客户端组件，负责语言偏好、开机动画和交互。
-// 首页不再读取文章文件，求职页面只展示简历内容。
 "use client";
 
-// 导入两个 Hook：useState 管理会变化的数据，useEffect 处理渲染后的副作用。
-import { useEffect, useState } from "react";
-// 下面这一批是页面要用到的各个「区块组件」。
-// @/ 是项目配置的路径别名，等价于「从项目根目录开始找」，省得写一长串 ../../。
-import { BootSequence } from "@/components/BootSequence"; // 开机动画
-import { TopBar } from "@/components/TopBar";       // 顶部栏（切语言、下载 PDF）
-import { Hero } from "@/components/Hero";            // 首屏大标题
-import { About } from "@/components/About";          // 关于我
-import { Skills } from "@/components/Skills";         // 技能
-import { Experience } from "@/components/Experience"; // 工作经历
-import { Terminal } from "@/components/Terminal";     // 交互式终端（替代原项目区）
-import { Highlights } from "@/components/Highlights"; // 亮点 / 活动
-import { Education } from "@/components/Education";    // 教育
-import { Contact } from "@/components/Contact";       // 联系方式
-import { SideRail } from "@/components/SideRail";      // 侧边导航条
-// 只导入类型 Lang（语言类型 "zh" | "en"），编译后会被擦除。
+// 简历首页的「总装」组件：它拥有整页的状态，并把各个区块按顺序拼起来。
+//
+// 状态都集中在这里，区块组件只负责展示：
+//   lang        当前语言（"zh" | "en"）
+//   live        开场是否结束——结束后首屏内容才出场
+//   introGone   开场遮罩是否已经撤掉
+//   fromIntro   这次是否真的播放过开场（决定名字是「原地显现」还是「滑入」）
+//   termOpen    终端面板是否打开
+//   wipe        语言切换时那块擦除幕布的状态
+//
+// 数据往下流（props），事件往上传（回调）——这是 React 最常见的组织方式。
+
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { SECTIONS, STRINGS } from "@/lib/data";
+import { clamp } from "@/lib/fx";
+import { pickLang } from "@/lib/i18n";
+import { getFrameState, requestLayout, syncScroll } from "@/lib/ticker";
 import type { Lang } from "@/lib/types";
+import { About } from "@/components/About";
+import { Contact } from "@/components/Contact";
+import { CursorRing } from "@/components/CursorRing";
+import { Education } from "@/components/Education";
+import { Experience } from "@/components/Experience";
+import { Hero } from "@/components/Hero";
+import { Highlights } from "@/components/Highlights";
+import { Intro } from "@/components/Intro";
+import { ParticleField } from "@/components/ParticleField";
+import type { FieldHandle } from "@/components/ParticleField";
+import { SideRail } from "@/components/SideRail";
+import { Skills } from "@/components/Skills";
+import { Terminal } from "@/components/Terminal";
+import { TopBar } from "@/components/TopBar";
+import { Icon, scrollToSection, useReveal } from "@/components/effects";
 
-// 简历主体组件：所有展示内容来自 lib/data.ts。
-// 注意这里不再是 default export，而是「具名导出」：app/page.tsx 会按名字 { ResumeApp } 来引入它。
+type Anchor = { id: string | null; ratio: number };
+
+// 具名导出：app/page.tsx 会按名字 { ResumeApp } 来引入它。
 export function ResumeApp() {
-  // 语言：初始用默认值 "zh"（与服务器渲染一致），挂载后再从 localStorage 读偏好。
-  // 关键点：这里故意用固定默认值而不是直接读 localStorage——
-  // 因为服务器端没有 localStorage，若浏览器一上来就用 localStorage 的值，
-  // 会导致服务器渲染结果和浏览器首次渲染结果不一致（hydration 不匹配）。
-  // 正确做法是：先用和服务器一致的默认值渲染，等水合完成后（下面的 useEffect 里）再读偏好覆盖。
-  // （主题固定为深色 dark，不再提供深/浅切换；data-theme="dark" 由 app/layout.tsx 静态写死。）
+  // 语言：初始用固定默认值 "zh"（和构建时渲染的 HTML 一致），挂载后再从 localStorage 读偏好。
+  // 关键点：构建时没有 localStorage，如果浏览器一上来就用它的值，
+  // 两边首次渲染的结果会不一致（hydration 不匹配）。所以先用默认值渲染，再在 useEffect 里覆盖。
   const [lang, setLang] = useState<Lang>("zh");
-  // 开机动画：本次会话首次进入才播放。booted 表示「是否已经过了开机动画」。
-  const [booted, setBooted] = useState(false);
+  const [live, setLive] = useState(false);
+  const [introGone, setIntroGone] = useState(false);
+  const [fromIntro, setFromIntro] = useState(false);
+  const [termOpen, setTermOpen] = useState(false);
+  const [wipe, setWipe] = useState<"" | "cover" | "leave">("");
 
-  // 挂载后读取用户上次的偏好，避免 SSR/首屏 hydration 不一致。
-  // 空依赖数组 []，所以这段只在组件首次挂载（已经到浏览器）后执行一次。
-  useEffect(() => {
-    // localStorage：浏览器提供的「持久化键值存储」，数据会一直留着（除非主动清除），
-    // 关掉浏览器再打开也还在。这里读出上次保存的语言。
-    const savedLang = localStorage.getItem("resume-lang");
-    if (savedLang === "zh" || savedLang === "en") setLang(savedLang);
-    // sessionStorage：和 localStorage 类似，但只在「当前会话（标签页）」有效，关掉标签页就清空。
-    // 用它记录本次会话是否已经播放过开机动画，避免在站内切换/刷新时反复播放。
-    if (sessionStorage.getItem("resume-booted") === "1") setBooted(true);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const field = useRef<FieldHandle | null>(null); // 粒子场交出来的「遥控器」，给开场动画用
+  const switching = useRef(false);
+  const anchor = useRef<Anchor | null>(null);
+
+  // 给 <html> 加上 fx（启用出场动画）或 rm（减少动态效果）。
+  // 用 useLayoutEffect 而不是 useEffect：它在浏览器绘制之前执行，
+  // 这样「先把内容藏好、再播放出场动画」不会闪一下。
+  // 之所以不直接把 class 写进 HTML，是为了在没有 JavaScript 时内容依然全部可见。
+  useLayoutEffect(() => {
+    const root = document.documentElement;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const name = reduced || !("IntersectionObserver" in window) ? "rm" : "fx";
+    root.classList.add(name);
+    return () => root.classList.remove(name);
   }, []);
 
-  // 语言变化时写回 localStorage。
-  // 依赖数组里放了 lang，所以每当 lang 变化，这个 effect 就重跑一次，把新值存起来。
+  // 挂载后读取上次保存的语言偏好。
   useEffect(() => {
-    localStorage.setItem("resume-lang", lang);
+    try {
+      const saved = localStorage.getItem("resume-lang");
+      if (saved === "zh" || saved === "en") setLang(saved);
+    } catch {
+      // 隐私模式下 localStorage 可能不可用：用默认语言即可。
+    }
+  }, []);
+
+  // 语言变化时：写回 localStorage，并同步到 <html lang>（对读屏软件和 SEO 友好，CSS 也靠它选中文字体）。
+  useEffect(() => {
+    try {
+      localStorage.setItem("resume-lang", lang);
+    } catch {
+      // 存不进去不影响使用。
+    }
+    document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
   }, [lang]);
 
-  // 把当前语言同步到 <html lang> 上（对无障碍/SEO 友好）。
-  // 主题、风格、强调色等都固定为默认值，已由 app/layout.tsx 的静态属性
-  // （data-theme="dark" 等）和 globals.css 的 :root 提供，这里不再动态切换。
+  // 切换语言后恢复阅读位置。
+  // 中英文长度不同，同一个滚动距离对应的内容会变；所以切换前记下「在哪个区块、看到它的百分之几」，
+  // 切换后按同样的比例滚回去。父组件的 effect 在所有子组件的 effect 之后执行，
+  // 这时各区块已经按新语言排好版了。
   useEffect(() => {
-    document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
-    // 依赖数组：lang 变化时，重新同步到 <html>。
+    const saved = anchor.current;
+    if (!saved) return;
+    anchor.current = null;
+    if (saved.id) {
+      const el = document.getElementById(saved.id);
+      if (el) {
+        const rect = el.getBoundingClientRect();
+        window.scrollTo(0, Math.round(rect.top + window.scrollY + saved.ratio * rect.height));
+      }
+    }
+    syncScroll();
+    requestLayout();
   }, [lang]);
+
+  // 滚动出现的效果：语言切换后会有新元素，所以把 lang 放进依赖里重新扫描一遍。
+  useReveal(rootRef, [lang, live]);
+
+  // 记下当前的阅读位置，然后切换语言。
+  const applyLang = (next: Lang) => {
+    let current: HTMLElement | null = null;
+    for (const section of SECTIONS) {
+      const el = document.getElementById(section.id);
+      if (el && el.getBoundingClientRect().top <= 1) current = el;
+    }
+    if (current) {
+      const rect = current.getBoundingClientRect();
+      anchor.current = { id: current.id, ratio: clamp(-rect.top / Math.max(1, rect.height), 0, 1) };
+    } else {
+      anchor.current = { id: null, ratio: 0 };
+    }
+    setLang(next);
+  };
+
+  // 带「擦除转场」的语言切换：幕布从下盖上来 → 换内容 → 幕布向上离开。
+  const toggleLang = () => {
+    const next: Lang = lang === "zh" ? "en" : "zh";
+    if (switching.current) return; // 转场还没结束时忽略重复点击
+    if (!live || getFrameState().reduced) {
+      applyLang(next);
+      return;
+    }
+    switching.current = true;
+    setWipe("cover");
+    window.setTimeout(() => {
+      applyLang(next);
+      // 等两帧，让新内容先渲染出来，再让幕布离开。
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => {
+          setWipe("leave");
+          window.setTimeout(() => {
+            setWipe("");
+            switching.current = false;
+          }, 380);
+        }),
+      );
+    }, 290);
+  };
+
+  // 全局快捷键：⌘K / Ctrl K，或者 ` 键，开关终端面板。
+  useEffect(() => {
+    if (!live) return; // 开场期间不响应
+    const onKey = (event: KeyboardEvent) => {
+      const key = event.key.toLowerCase();
+      const target = event.target as HTMLElement | null;
+      const typing = !!target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable);
+      if ((event.metaKey || event.ctrlKey) && key === "k") {
+        event.preventDefault();
+        setTermOpen((open) => !open);
+      } else if (key === "`" && !typing && !event.metaKey && !event.ctrlKey && !event.altKey) {
+        event.preventDefault();
+        setTermOpen((open) => !open);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    // 清理函数：依赖变化或组件卸载时移除监听，避免重复注册。
+    return () => window.removeEventListener("keydown", onKey);
+  }, [live]);
+
+  // 外层的 class 决定首屏的出场方式，globals.css 里有对应的选择器。
+  const className = ["site", live ? "is-live" : "", fromIntro ? "from-intro" : ""].filter(Boolean).join(" ");
 
   return (
-    // <>...</> 是 Fragment：组件必须返回单一根节点，用它把多个顶层元素打包又不额外生成标签。
-    <>
-      {/* 条件渲染：只有还没开机（!booted 为真）时才渲染开机动画组件。
-          注意 JSX 里的注释必须用 {/* ... *​/} 这种花括号包裹的形式，不能用 // 。 */}
-      {!booted && (
-        <BootSequence
+    <div className={className} ref={rootRef}>
+      {/* 「跳到正文」：平时看不见，键盘用户按第一下 Tab 时出现，回车就能跳过导航。 */}
+      <a className="skip-link" href="#main">
+        {pickLang(STRINGS.skip, lang)}
+      </a>
+
+      <ParticleField front={!introGone} handle={field} />
+
+      {/* 条件渲染：开场遮罩撤掉之后，这个组件就从页面上移除。 */}
+      {!introGone && (
+        <Intro
           lang={lang}
-          // onDone 是传给子组件的「回调函数」prop：动画播完后子组件会调用它。
-          // 这里用箭头函数定义：标记已开机，并把状态存进 sessionStorage 防止本会话重复播放。
-          onDone={() => {
-            setBooted(true);
-            sessionStorage.setItem("resume-booted", "1");
+          field={field}
+          onReveal={(played) => {
+            setFromIntro(played);
+            setLive(true);
           }}
+          onGone={() => setIntroGone(true)}
         />
       )}
-      {/* 顶部栏。把语言的「当前值」和「修改函数」传下去，
-          子组件就能读取并通过 setter 反过来修改父组件的状态（这叫状态提升 + 受控）。 */}
-      <TopBar lang={lang} setLang={setLang} />
-      <div className="app">
-        {/* 装饰用的扫描光带特效 */}
-        <div className="scan-sweep"></div>
-        {/* 把当前语言 lang 作为 prop 传给每个区块，让它们显示中文或英文内容。
-            Hero 还额外需要知道开机动画是否结束（booted）以决定何时开始打字等。 */}
-        <Hero lang={lang} booted={booted} />
+
+      <div className={wipe ? `wipe ${wipe}` : "wipe"} aria-hidden="true" />
+      <CursorRing />
+
+      <TopBar lang={lang} onToggleLang={toggleLang} onOpenTerminal={() => setTermOpen(true)} />
+      <SideRail lang={lang} />
+
+      <main id="main" tabIndex={-1}>
+        <Hero lang={lang} live={live} />
         <About lang={lang} />
-        <Terminal lang={lang} />
-        <Skills lang={lang} />
         <Experience lang={lang} />
+        <Skills lang={lang} />
         <Highlights lang={lang} />
         <Education lang={lang} />
         <Contact lang={lang} />
-      </div>
-      <SideRail lang={lang} />
-    </>
+      </main>
+
+      <footer className="footer">
+        <div className="wrap footer-in">
+          <p>© 李姜磊 · Jianglei Li</p>
+          <p>www.lijianglei.com</p>
+          <a
+            className="footer-top"
+            href="#hero"
+            onClick={(event) => {
+              event.preventDefault();
+              scrollToSection("hero");
+            }}
+          >
+            <span>{pickLang(STRINGS.backTop, lang)}</span>
+            <Icon name="arrowUp" />
+          </a>
+        </div>
+      </footer>
+
+      {/* 终端里的 lang 命令直接切换语言，不走擦除转场（面板本身盖在页面上）。 */}
+      <Terminal
+        lang={lang}
+        open={termOpen}
+        onClose={() => setTermOpen(false)}
+        onToggleLang={() => applyLang(lang === "zh" ? "en" : "zh")}
+      />
+    </div>
   );
 }

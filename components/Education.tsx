@@ -1,35 +1,35 @@
-// 客户端组件。
 "use client";
+
+// 「教育」：每段一行——时间、学校、学位。
 
 import { RESUME, STRINGS } from "@/lib/data";
 import { pickLang } from "@/lib/i18n";
-import { FadeUp, SectionHead } from "./effects";
 import type { Lang } from "@/lib/types";
+import { Ghost, SectionHeader, stagger } from "./effects";
 
-// 「教育」区块：纯展示组件——遍历教育经历数组，每条渲染成一行。
 export function Education({ lang }: { lang: Lang }) {
-  // 取出教育经历数组。
-  const items = RESUME.education;
   return (
-    <section className="section" id="education">
-      {/* 这个区块没有右侧 meta，所以只传 num 和 title 两个 prop */}
-      <SectionHead num="06" title={pickLang(STRINGS.education, lang)} />
-      <FadeUp>
-        <div className="edu-list">
-          {/* 遍历每条教育经历渲染一行 */}
-          {items.map((e, i) => (
-            <div key={i} className="edu">
-              {/* date 是纯字符串，school/degree/extra 是双语对象，需要 pickLang */}
-              <div className="date">{e.date}</div>
-              <div>
-                <div className="school">{pickLang(e.school, lang)}</div>
-                <div className="degree">{pickLang(e.degree, lang)}</div>
+    <section className="sec" id="education" aria-labelledby="education-title" tabIndex={-1}>
+      <div className="wrap">
+        <SectionHeader id="education" title={pickLang(STRINGS.education, lang)} />
+        <ul className="edu-list">
+          {RESUME.education.map((item, i) => (
+            <li className="edu-row" data-reveal style={stagger(i)} key={i}>
+              {/* 外层 <li> 负责滚动出现，里层 .edu-in 负责悬停时右移一点：两个位移不打架。 */}
+              <div className="edu-in">
+                <p className="edu-date nowrap">{item.date}</p>
+                <h3 className="edu-school">{pickLang(item.school, lang)}</h3>
+                <p className="edu-degree">
+                  {pickLang(item.degree, lang)}
+                  {/* extra 是可选字段；没填时 && 的结果是假值，什么都不渲染。 */}
+                  {item.extra && ` · ${pickLang(item.extra, lang)}`}
+                </p>
               </div>
-              <div className="extra">{pickLang(e.extra, lang)}</div>
-            </div>
+            </li>
           ))}
-        </div>
-      </FadeUp>
+        </ul>
+      </div>
+      <Ghost id="education" />
     </section>
   );
 }

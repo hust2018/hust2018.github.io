@@ -6,7 +6,7 @@
 ## 关于
 我是 **李姜磊**，**AI Agent 开发工程师**（前 **字节跳动** 安全研发），**华中科技大学** 网络空间安全硕士。
 在 **字节跳动** 安全与风控做了约 **3 年** 网络安全研发——NTA 入侵检测、DDoS 防护、WAF、容器微隔离 HFW，多个系统从 0 到 1 落地，全球多机房部署历经多次大版本升级 **0 事故**。
-如今我专注 **AI Agent** 方向：曾在 **TapNow** 研发多模型生成平台与 Agent 基础设施，覆盖 **Python / Go** 服务、分布式任务恢复、流式协议与计费一致性，并从 0 到 1 探索多智能体协作平台。
+如今我专注 **AI Agent** 方向：曾在 **TapNow** 研发多模型生成平台与 Agent 基础设施，覆盖 **Python / Go** 服务、分布式任务恢复、流式协议与计费一致性，并从 0 到 1 探索多智能体协作平台。**2026 年 11 月**，我加入了 **Open Design**。
 
 ## 技能
 - **AI / Agent**　AgentScope · LangGraph · MCP · LLM · 多智能体 · Prompt · SSE
@@ -16,6 +16,8 @@
 - **工具**　Git · Docker · Linux · Kubernetes · GCP Cloud Run · Pub/Sub · OpenTelemetry
 
 ## 工作经历
+### AI Agent 开发工程师 · Open Design <span class="date">2026.11 — 至今</span>
+
 ### AI Agent 开发工程师 · tapnow <span class="date">2026.5 — 2026.10</span>
 - **核心模型服务与架构重构**：端到端负责多模态模型平台，打通 SDK、供应商适配、路由、任务编排与计费，统一支撑画布和 Agent；主导 Go 架构重构，拆分网关、同步／异步执行与调度服务，通过配置化治理、所有权心跳和终态保护，提升模型扩展与长任务可靠性。
 - **AI Agent 多模型与运行基础设施**：负责统一 Agent Runtime 下的多模型接入，适配工具调用、思考参数、多模态输入与流式协议；完善 Worker／Proxy 的取消传播、媒体审核恢复和成本统计，修复动态提示词与请求透传导致的 **Prompt Cache 失效**问题，恢复多轮 Agent 会话的缓存复用。

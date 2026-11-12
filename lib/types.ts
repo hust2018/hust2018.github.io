@@ -55,6 +55,8 @@ export interface Hero {
   yearsExp: string;
   // 首屏的「醒目徽章」：每个含一个图标(emoji)和一段双语文字。`?` 表示可选。
   badges?: { icon: string; label: Localized }[];
+  // 头像下方的一句座右铭（只有中文，所以是普通 string）。可选。
+  motto?: string;
 }
 
 // SkillGroup：一组技能，比如「语言」「前端」。
@@ -68,12 +70,26 @@ export interface SkillGroup {
 // ExperienceItem：一段工作经历。
 // bullets 用 LocalizedList，因为每段经历下有多条要点，中英文各是一个数组。
 // stack 是 string[]：技术栈标签都是固定英文，不需要翻译。
+//
+// era 是「时期」标记，页面用它切换强调色：AI Agent 时期是青柠色，安全时期是橙色。
+// 它的类型是两个字面量的联合，写成别的字符串会报错；带 `?` 表示可以不写（默认当作 agent）。
+export type Era = "agent" | "security";
+
 export interface ExperienceItem {
   role: Localized;
   company: Localized;
   date: string;
   bullets: LocalizedList;
   stack: string[];
+  era?: Era;
+}
+
+// SectionDef：页面上一个分区的「身份信息」——锚点 id、背后那行装饰大字、导航里的短标签。
+// 分区的顺序和编号都从这张表来，增删分区只需要改 data.ts 里的 SECTIONS。
+export interface SectionDef {
+  id: string;
+  ghost: string;
+  label: Localized;
 }
 
 // EducationItem：一段教育经历。

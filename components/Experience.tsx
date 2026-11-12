@@ -1,137 +1,305 @@
-// 客户端组件：因为用到了 useState/useEffect（只能在浏览器跑的 React Hook）。
 "use client";
 
-// 从 React 导入两个最常用的 Hook：
-//   useState —— 给组件一个「局部状态」（会变的数据），变了就自动重新渲染；
-//   useEffect —— 处理「副作用」（渲染之外的事，比如订阅、定时器、同步外部状态）。
-import { useEffect, useState } from "react";
-import { RESUME, STRINGS } from "@/lib/data";
-import { pickLang } from "@/lib/i18n";
-// FadeUp（滚动淡入容器）、FormattedBold（把 **加粗** 渲染成高亮）、SectionHead（区块标题），均来自 effects.tsx。
-import { FadeUp, FormattedBold, SectionHead } from "./effects";
-// ExperienceItem 是「一条工作经历」的类型，Lang 是语言类型。
-import type { ExperienceItem, Lang } from "@/lib/types";
+// 「工作经历」。它有两种排版：
+//
+//   · 默认（手机、矮屏、减少动态效果）：每段经历从上到下排列，要点全部展开。
+//   · 屏幕够宽够高时：切换成「视口固定 + 横向滚动」——整块区域吸在屏幕上，
+//     继续往下滚，各段经历像胶片一样从右往左滑过。为了保证每一屏都放得下，
+//     这时每段只露前三条要点、每条最多几行；完整内容点「查看全部」从右侧滑出。
+//
+// 横向滚动的原理：给外层（.xp-pin）一个很高的高度，里面的 .xp-sticky 用
+// position: sticky 吸在屏幕顶部。于是这段很高的距离里，画面看起来不动；
+// 我们把「在这段距离里滚了多少」换成轨道的横向位移（见 lib/fx.ts 的 pinnedOffset）。
 
-// 单条经历：点标题可展开/收起。defaultOpen 由父组件的「展开全部/收起」控制。
-// 这是一个只在本文件内部用的小组件（没 export），专门渲染列表里的一行。
-function ExpItem({
-  item, // 这一条经历的数据
-  lang, // 当前语言
-  defaultOpen, // 初始/被父组件统一控制的展开状态
-}: {
-  item: ExperienceItem;
-  lang: Lang;
-  defaultOpen: boolean;
-}) {
-  // useState 返回一个数组：[当前值, 改这个值的函数]，这里用解构同时取出。
-  // open 记录「这一条当前是否展开」，是本组件自己的局部状态。
-  // 用 defaultOpen 作为初始值。调用 setOpen(...) 会改变 open 并触发重新渲染。
-  const [open, setOpen] = useState(defaultOpen);
-  // 父组件切换「全部展开/收起」时，同步每条的展开状态。
-  // useEffect(回调, [依赖数组])：当依赖数组里的值变化时执行回调。
-  // 这里依赖 [defaultOpen]，所以父组件改变 defaultOpen 时，就把本条的 open 跟着改。
-  useEffect(() => setOpen(defaultOpen), [defaultOpen]);
-  // item.bullets 是 { zh: [...], en: [...] }，用 [lang] 取当前语言那一组要点。
-  const bullets = item.bullets[lang];
+import { useRef, useState } from "react";
+import type { FocusEvent } from "react";
+import { RESUME, STRINGS } from "@/lib/data";
+import {
+  clamp,
+  formatDate,
+  needsFullView,
+  pad2,
+  pinnedOffset,
+  splitBullet,
+  splitCompany,
+  startYear,
+} from "@/lib/fx";
+import { pickLang } from "@/lib/i18n";
+import { getFrameState, requestLayout } from "@/lib/ticker";
+import type { ExperienceItem, Lang } from "@/lib/types";
+import {
+  Chips,
+  FormattedBold,
+  Icon,
+  SectionHeader,
+  stagger,
+  useFitText,
+  useFrame,
+  useLayout,
+} from "./effects";
+import { Modal } from "./Modal";
+
+// 启用横向模式的条件：够宽，也够高。
+const PIN_QUERY = "(min-width: 1024px) and (min-height: 640px)";
+
+type RoleGeo = { el: HTMLElement; left: number; ghost: HTMLElement | null };
+
+// 一段经历的要点列表。reveal 为 true 时每条带滚动出现的效果（详情侧栏里不需要）。
+function BulletList({ bullets, reveal }: { bullets: string[]; reveal: boolean }) {
   return (
-    // 模板字符串拼 className：展开时额外加上 "open" 类（交给 CSS 控制展开样式/动画）。
-    <div className={`exp ${open ? "open" : ""}`}>
-      {/* 整个标题行是个按钮，点一下就把 open 取反（!open = 相反值）。
-          aria-expanded 是无障碍属性，告诉读屏软件「这个区域当前是展开还是收起」。 */}
-      <button className="exp-head" onClick={() => setOpen(!open)} aria-expanded={open}>
-        <span className="exp-caret">▶</span>
-        <span className="exp-title">
-          <span className="role">{pickLang(item.role, lang)}</span>
-          <span className="at">@</span>
-          <span className="company">{pickLang(item.company, lang)}</span>
-        </span>
-        <span className="exp-date">{item.date}</span>
-      </button>
-      <div className="exp-body">
-        <div className="exp-inner">
-          <ul>
-            {/* 用 .map 把「要点数组」转成一组 <li> 列表项。
-                React 渲染列表时要求每项有唯一的 key，方便它高效更新；
-                这里没有更合适的唯一值，就用下标 i（数组不会重排，所以可接受）。 */}
-            {bullets.map((b, i) => {
-              // 只有「**标题**：正文」这种要点才拆出标题；其他经历保留原来的行内格式。
-              // 文案仍来自 data.ts，不在组件里复制内容，中英文也共用这条渲染规则。
-              const titled = b.match(/^\*\*(.+?)\*\*[：:]\s*(.+)$/);
-              const body = titled ? titled[2] : b;
-              return (
-                <li key={i} className={titled ? "exp-point" : undefined}>
-                  {titled && <strong className="exp-point-title">{titled[1]}</strong>}
-                  <span className="exp-point-copy">
-                    {/* 斜杠连接的两个服务名作为一个短语排版，避免 Worker 留在上一行。 */}
-                    {body.split(/(Worker[／/]Proxy)/g).map((part, j) =>
-                      /^Worker[／/]Proxy$/.test(part) ? (
-                        <span key={j} className="exp-term">{part}</span>
-                      ) : (
-                        <FormattedBold key={j} text={part} />
-                      ),
-                    )}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-          {/* 条件渲染：item.stack && (...) 表示「有 stack 才渲染后面这块」。
-              如果 stack 是 undefined，&& 的结果是假值，什么都不显示。 */}
-          {item.stack && (
-            <div className="stack">
-              {/* 把技术栈数组渲染成一个个小标签 chip */}
-              {item.stack.map((s, i) => (
-                <span key={i} className="chip">
-                  {s}
-                </span>
-              ))}
+    <ol className="xp-bullets">
+      {bullets.map((bullet, i) => {
+        // 以「**小标题**：」开头的要点，拆成标题一行 + 正文一段。
+        const { title, body } = splitBullet(bullet);
+        return (
+          <li key={i} data-reveal={reveal ? "" : undefined} style={reveal ? stagger(Math.min(i, 6)) : undefined}>
+            <span className="xp-n" aria-hidden="true">
+              {pad2(i + 1)}
+            </span>
+            <div className="xp-b">
+              {title && <p className="xp-bt">{title}</p>}
+              <p>
+                <FormattedBold text={body} />
+              </p>
             </div>
-          )}
-        </div>
-      </div>
-    </div>
+          </li>
+        );
+      })}
+    </ol>
   );
 }
 
-// 这才是对外导出的「工作经历」区块组件，由页面调用并传入 lang。
-export function Experience({ lang }: { lang: Lang }) {
-  // 从简历数据里取出所有经历条目。
-  const items = RESUME.experience;
-  // allOpen：控制「全部展开还是全部收起」的状态，初始 true（全部展开）。
-  // 它会通过 defaultOpen 传给每一条 ExpItem，实现父控制子。
-  const [allOpen, setAllOpen] = useState(true);
+// 公司名用很大的字，而且不换行；太长时自动缩小字号（比如 "Open Design"、"ByteDance"）。
+// watch 变化（语言切换、排版切换）时重新测量。
+function CompanyName({ name, watch }: { name: string; watch: string }) {
+  const ref = useFitText<HTMLHeadingElement>([name, watch]);
   return (
-    // <section> 加 id="experience"，让右侧导航条 SideRail 能定位并跳转到这里。
-    <section className="section" id="experience">
-      {/* 复用的区块标题组件：num 是编号，title 是标题文字，
-          meta 这个 prop 接收的是一段 JSX（按钮），会显示在标题旁边。 */}
-      {/* meta 传入的这个按钮点一下就把 allOpen 取反，让所有经历同时展开或收起 */}
-      <SectionHead
-        num="04"
-        title={pickLang(STRINGS.experience, lang)}
-        meta={
-          <button
-            className="icon-btn"
-            style={{ padding: "2px 8px", fontSize: 10 }}
-            onClick={() => setAllOpen(!allOpen)}
-          >
-            {/* 按钮文字也随状态变化：展开时显示「收起」，收起时显示「展开全部」 */}
-            {allOpen
-              ? pickLang(STRINGS.collapseAll, lang)
-              : pickLang(STRINGS.expandAll, lang)}
-          </button>
-        }
-      />
-      {/* 用 FadeUp 包裹列表：滚动进视口时整块淡入出现 */}
-      <FadeUp>
-        <div className="exp-list">
-          {/* 遍历每条经历渲染一个 ExpItem。把 allOpen 作为 defaultOpen 传下去，
-              所以点上面那个按钮时，每一条都会同步展开/收起。 */}
-          {items.map((it, i) => (
-            <ExpItem key={i} item={it} lang={lang} defaultOpen={allOpen} />
-          ))}
+    <h3 className="xp-company" ref={ref}>
+      <span data-fit-in>{name}</span>
+    </h3>
+  );
+}
+
+function eraLabel(item: ExperienceItem, lang: Lang): string {
+  return pickLang(item.era === "security" ? STRINGS.eraSecurity : STRINGS.eraAgent, lang);
+}
+
+export function Experience({ lang }: { lang: Lang }) {
+  const items = RESUME.experience;
+  const [pinned, setPinned] = useState(false); // 是否处于横向模式
+  // 详情侧栏：open 控制开关，index 记住显示哪一段——关闭动画期间内容还要留在那里，所以分成两个状态。
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [sheetIndex, setSheetIndex] = useState(0);
+
+  const pinRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const barRef = useRef<HTMLElement>(null);
+  const idxRef = useRef<HTMLElement>(null);
+  const geo = useRef<{ top: number; maxX: number; idx: number; roles: RoleGeo[] }>({
+    top: 0,
+    maxX: 0,
+    idx: -1,
+    roles: [],
+  });
+
+  useLayout(() => {
+    const pin = pinRef.current;
+    const track = trackRef.current;
+    if (!pin || !track) return;
+    const want = !getFrameState().reduced && window.matchMedia(PIN_QUERY).matches;
+    // 模式要变：先改 state 让 class 生效；pinned 在依赖数组里，变了之后这个回调会再跑一次。
+    if (want !== pinned) {
+      setPinned(want);
+      return;
+    }
+    track.style.transform = "";
+    if (!want) {
+      if (pin.style.height) {
+        pin.style.height = "";
+        requestLayout(); // 页面高度变了，请其他特效重新测量
+      }
+      geo.current = { top: 0, maxX: 0, idx: -1, roles: [] };
+      return;
+    }
+    // 横向一共能移多远 = 轨道总宽 - 屏幕宽。外层高度 = 一屏 + 这段距离（竖向滚 1px = 横向移 1px）。
+    const maxX = Math.max(0, track.offsetWidth - window.innerWidth);
+    const height = `${window.innerHeight + maxX}px`;
+    if (pin.style.height !== height) {
+      pin.style.height = height;
+      requestLayout();
+    }
+    geo.current = {
+      top: pin.getBoundingClientRect().top + window.scrollY,
+      maxX,
+      idx: -1,
+      roles: Array.from(track.querySelectorAll<HTMLElement>(".xp-role")).map((el) => ({
+        el,
+        left: el.offsetLeft,
+        ghost: el.querySelector<HTMLElement>(".xp-ghost"),
+      })),
+    };
+  }, [lang, pinned]);
+
+  useFrame((s) => {
+    const track = trackRef.current;
+    if (!pinned || !track) return;
+    const g = geo.current;
+    const { progress, x } = pinnedOffset({ scrollY: s.sy, top: g.top, maxX: g.maxX });
+    track.style.transform = `translate3d(${(-x).toFixed(1)}px,0,0)`;
+    if (barRef.current) barRef.current.style.transform = `scaleX(${progress.toFixed(4)})`;
+
+    let idx = 0;
+    g.roles.forEach((role, i) => {
+      // rel：这块面板的左边缘在屏幕上的位置，以「屏宽」为单位（0 = 贴左，1 = 贴右）。
+      const rel = (role.left - x) / s.vw;
+      if (rel < 0.55) idx = i;
+      // 背后的年份大字移动得比面板慢一点，形成前后层次（视差）。
+      if (role.ghost && rel > -1.2 && rel < 1.2) {
+        role.ghost.style.transform = `translate3d(${(rel * 160).toFixed(1)}px,0,0)`;
+      }
+    });
+    // 左下角的「01 / 04」只在序号变化时才更新。
+    if (idx !== g.idx) {
+      g.idx = idx;
+      if (idxRef.current) idxRef.current.textContent = pad2(idx + 1);
+    }
+  });
+
+  // 键盘用户按 Tab 走到屏幕外的面板时，浏览器没法自己把它「滚」进来（它是靠 transform 移动的），
+  // 所以这里手动把页面滚到那块面板对应的位置。只对键盘操作生效，鼠标点击不会触发。
+  const onFocus = (event: FocusEvent<HTMLDivElement>) => {
+    const state = getFrameState();
+    if (!pinned || !state.keyboard) return;
+    const panel = event.target.closest(".xp-role");
+    const role = geo.current.roles.find((r) => r.el === panel);
+    if (!role) return;
+    const x = clamp(role.left - state.vw * 0.08, 0, geo.current.maxX);
+    window.scrollTo(0, Math.round(geo.current.top + x));
+  };
+
+  const years = items.map((item) => startYear(item.date)).filter((y) => y > 0);
+  const ongoing = items.some((item) => item.date.includes("Present"));
+  const lastYear = Math.max(...items.map((item) => parseInt(item.date.split("—")[1] ?? "", 10) || 0));
+  const range = `${Math.min(...years)} — ${ongoing ? pickLang(STRINGS.present, lang) : lastYear}`;
+  const sheetItem = items[sheetIndex] ?? items[0];
+  const sheetBullets = sheetItem.bullets[lang];
+
+  return (
+    <section
+      className={pinned ? "sec xp is-pinned" : "sec xp"}
+      id="experience"
+      aria-labelledby="experience-title"
+      tabIndex={-1}
+    >
+      <div className="xp-pin" ref={pinRef}>
+        <div className="xp-sticky">
+          <div className="xp-track" ref={trackRef} onFocus={onFocus}>
+            <div className="xp-panel xp-title">
+              <SectionHeader id="experience" title={pickLang(STRINGS.experience, lang)} />
+              <p className="xp-range nowrap">{range}</p>
+              <p className="lbl xp-hint">
+                <span>{pickLang(STRINGS.xpHint, lang)}</span>
+                <Icon name="arrowRight" />
+              </p>
+            </div>
+
+            {items.map((item, i) => {
+              const bullets = item.bullets[lang];
+              const company = splitCompany(pickLang(item.company, lang));
+              const moreLabel =
+                bullets.length > 3
+                  ? pickLang(STRINGS.xpMore, lang).replace("{n}", String(bullets.length))
+                  : pickLang(STRINGS.xpFull, lang);
+              return (
+                // 没有要点的经历（比如刚入职的那段）用紧凑版：只显示公司、时间和职位。
+                <article
+                  key={i}
+                  className={bullets.length ? "xp-panel xp-role" : "xp-panel xp-role xp-role--brief"}
+                  data-era={item.era ?? "agent"}
+                >
+                  <span className="xp-ghost" aria-hidden="true">
+                    {startYear(item.date)}
+                  </span>
+                  <div className="xp-meta" data-reveal>
+                    <p className="lbl xp-era">{eraLabel(item, lang)}</p>
+                    <p className="xp-date nowrap">{formatDate(item.date, lang, pickLang(STRINGS.present, lang))}</p>
+                    <CompanyName name={company.name} watch={`${lang}-${pinned}`} />
+                    {company.dept && <p className="xp-dept">{company.dept}</p>}
+                    <p className="xp-rolename">{pickLang(item.role, lang)}</p>
+                    <Chips items={item.stack} />
+                  </div>
+                  {bullets.length > 0 && (
+                    <div className="xp-body">
+                      <BulletList bullets={bullets} reveal />
+                      {needsFullView(bullets, lang) && (
+                        <button
+                          type="button"
+                          className="btn btn-ghost xp-more"
+                          aria-haspopup="dialog"
+                          aria-label={`${pickLang(STRINGS.xpMoreAria, lang)} · ${company.name}`}
+                          onClick={() => {
+                            setSheetIndex(i);
+                            setSheetOpen(true);
+                          }}
+                        >
+                          {moreLabel}
+                          <Icon name="arrowUpRight" />
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </article>
+              );
+            })}
+          </div>
+
+          {/* 横向模式下左下角的进度：当前第几段 / 共几段 + 进度条。纯装饰，读屏跳过。 */}
+          <p className="xp-hud" aria-hidden="true">
+            <b ref={idxRef} />
+            <span>/ {pad2(items.length)}</span>
+            <span className="xp-hud-bar">
+              <i ref={barRef} />
+            </span>
+          </p>
         </div>
-      </FadeUp>
+      </div>
+
+      {/* 详情侧栏：完整的要点和技术栈。 */}
+      <Modal
+        open={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        className="sheet"
+        labelledBy="sheet-title"
+        closeMs={240}
+        era={sheetItem.era ?? "agent"}
+      >
+        {/* key 换了，这层会被重新创建——于是每次打开不同的经历，滚动位置都从顶部开始。 */}
+        <div className="sheet-in" key={sheetIndex}>
+          <header className="sheet-head">
+            <div className="stat">
+              <p className="lbl">
+                {eraLabel(sheetItem, lang)} · {formatDate(sheetItem.date, lang, pickLang(STRINGS.present, lang))}
+              </p>
+              <h2 className="sheet-title" id="sheet-title">
+                {pickLang(sheetItem.company, lang)}
+              </h2>
+              <p className="sheet-role">{pickLang(sheetItem.role, lang)}</p>
+            </div>
+            <button
+              type="button"
+              className="icon-btn"
+              onClick={() => setSheetOpen(false)}
+              aria-label={pickLang(STRINGS.close, lang)}
+            >
+              <Icon name="close" />
+            </button>
+          </header>
+          <div className="sheet-content">
+            <BulletList bullets={sheetBullets} reveal={false} />
+            <Chips items={sheetItem.stack} />
+          </div>
+        </div>
+      </Modal>
     </section>
   );
 }

@@ -1,81 +1,172 @@
-// "use client" 表示这是客户端组件（在浏览器里运行，能用交互和 Hook）。详见 ImageSlot.tsx 的说明。
 "use client";
 
-// RESUME：整份简历数据，来自 lib/data.ts。
-import { RESUME } from "@/lib/data";
-// pickLang(值, lang)：按当前语言从双语对象 { zh, en } 里取出对应文本的小工具。
-import { pickLang } from "@/lib/i18n";
-// 同目录 effects 里的两个动画文字组件：
-//   - GlitchText：把文字渲染成带「故障/抖动」特效。
-//   - Typewriter：把文字以「打字机」逐字出现的方式显示。
-import { GlitchText, Typewriter } from "./effects";
-// 首屏右侧的立体终端甲板：内部复用头像位，并负责轻量指针视差。
-import { HeroDeck } from "./HeroDeck";
-// 只导入类型 Lang（语言类型，如 "zh" | "en"），仅用于类型检查。
-import type { Lang } from "@/lib/types";
+// 首屏：超大的名字、职位、一句话简介、头像，以及底部一条「下班之后」的徽章带。
+//
+// live 表示开场动画是否已经结束：结束后职位那行会播放一次「解码」动画。
+// 其余元素的出场（淡入、上移）完全由 globals.css 根据外层的 .is-live 控制，这里不用管。
 
-// Hero 组件：渲染首屏。props 解构出两个属性：
-//   - lang：当前语言，类型 Lang。
-//   - booted：布尔值，表示页面「开机动画」是否已播完；用来控制打字机什么时候开始打字。
-export function Hero({ lang, booted }: { lang: Lang; booted: boolean }) {
-  // 从 RESUME 里同时解构出 hero（首屏相关数据）和 meta（命令行提示符里用到的用户名/主机名等）。
+import { useRef } from "react";
+import { RESUME, STRINGS } from "@/lib/data";
+import { clamp } from "@/lib/fx";
+import { pickLang } from "@/lib/i18n";
+import type { Lang } from "@/lib/types";
+import {
+  Decode,
+  Icon,
+  scrollToSection,
+  stagger,
+  useFitText,
+  useFrame,
+  useLayout,
+  useMagnetic,
+  usePointerTilt,
+  useShortcutLabel,
+} from "./effects";
+import { Marquee } from "./Marquee";
+
+export function Hero({ lang, live }: { lang: Lang; live: boolean }) {
   const { hero, meta } = RESUME;
+  // 名字下面那行小字显示「另一种语言」的名字：中文界面显示英文名，反之亦然。
+  const other: Lang = lang === "zh" ? "en" : "zh";
+  const shortcut = useShortcutLabel();
+
+  const heroRef = useRef<HTMLElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const nameRef = useFitText<HTMLHeadingElement>([lang]); // 名字太宽时自动缩小字号
+  const tiltRef = usePointerTilt<HTMLDivElement>(5); // 头像随鼠标轻微倾斜
+  const ctaRef = useMagnetic<HTMLAnchorElement>();
+  const box = useRef({ height: 1, last: -1 });
+
+  useLayout(() => {
+    box.current.height = Math.max(1, heroRef.current?.offsetHeight ?? 1);
+    box.current.last = -1;
+  }, [lang]);
+
+  // 往下滚时，首屏内容整体上移一点并淡出，和后面的内容拉开层次。
+  useFrame((s) => {
+    const wrap = wrapRef.current;
+    if (!wrap || s.reduced) return;
+    const progress = clamp(s.sy / box.current.height, 0, 1);
+    if (Math.abs(progress - box.current.last) < 0.0005) return; // 没变化就不写 DOM
+    box.current.last = progress;
+    wrap.style.transform = `translate3d(0,${(progress * -72).toFixed(1)}px,0)`;
+    wrap.style.opacity = clamp(1 - progress * 1.15, 0, 1).toFixed(3);
+  });
+
+  const badges = (hero.badges ?? []).map((badge) => (
+    <>
+      <span className="badge-ico" aria-hidden="true">
+        {badge.icon}
+      </span>
+      {pickLang(badge.label, lang)}
+    </>
+  ));
+
   return (
-    // 首屏外层容器，className 配合全局 CSS 控制布局/样式。
-    <section className="hero">
-      <div className="hero-lines">
-        {/* 这一块模仿命令行的提示符那一行，例如：user@host:~/path$ cat about.md --format=human */}
-        <div className="hero-prompt">
-          <span className="prompt">
-            {/* 花括号里嵌入变量的值并拼接；中间的 @ 是普通文字，直接写在 JSX 里。 */}
-            {meta.user}@{meta.host}
-          </span>
-          {/* style={{ ... }}：JSX 里写行内样式。外层花括号表示「嵌入 JS」，内层花括号是一个 JS 对象（样式键值对）。 */}
-          {/* var(--fg-mute) 是引用全局 CSS 里定义的颜色变量。 */}
-          <span style={{ color: "var(--fg-mute)" }}>:</span>
-          <span className="prompt-path">{meta.cwd}</span>
-          <span style={{ color: "var(--fg-mute)" }}>$ </span>
-          <span>cat about.md --format=human</span>
-        </div>
-        {/* 姓名：<h1> 是页面主标题。用 GlitchText 渲染，文字内容由 pickLang 取当前语言的姓名。 */}
-        <h1 className="hero-name">
-          <GlitchText text={pickLang(hero.name, lang)} />
-        </h1>
-        <div className="hero-role">
-          <span className="arrow">▸</span>
-          {/* 打字机效果显示角色/职位。start={booted}：等开机动画播完（booted 为 true）才开始打字。 */}
-          <Typewriter text={pickLang(hero.role, lang)} start={booted} />
-          <span className="cursor"></span>
-        </div>
-        {/* 标语（一句话简介）。 */}
-        <p className="hero-tagline">{pickLang(hero.tagline, lang)}</p>
-        <div className="hero-meta">
-          <span>
-            <span style={{ color: "var(--fg-mute)" }}>◉ </span>
-            {/* <b> 把所在地文字加粗显示。 */}
-            <b>{pickLang(hero.location, lang)}</b>
-          </span>
-          <span className="dotsep">│</span>
-          <span className="status">
-            <span className="live-dot"></span>
-            {pickLang(hero.status, lang)}
-          </span>
-        </div>
-        {/* 醒目发光徽章（游戏成就等）。hero.badges 可能没有，用 && 短路：有才渲染。 */}
-        {hero.badges && hero.badges.length > 0 && (
-          <div className="hero-badges">
-            {hero.badges.map((b, i) => (
-              <span key={i} className="hero-badge">
-                <span className="ico">{b.icon}</span>
-                {pickLang(b.label, lang)}
+    <section className="hero" id="hero" aria-labelledby="hero-name" tabIndex={-1} ref={heroRef}>
+      <div className="wrap hero-wrap" ref={wrapRef}>
+        <div className="hero-grid">
+          <div className="hero-main">
+            {/* data-hrev：首屏专用的出场标记；--i 决定出场的先后顺序（见 stagger）。 */}
+            <p className="eyebrow" data-hrev style={stagger(0)}>
+              <span className="eyebrow-dim">
+                {meta.user}@{meta.host}:{meta.cwd} $
+              </span>{" "}
+              whoami
+            </p>
+            {/* .line 是遮罩，.line-in 是里面真正的文字：出场时文字从遮罩下方滑上来。
+                data-fit-in 标出「要量宽度的那一层」，供 useFitText 使用。 */}
+            <h1 className="hero-name" id="hero-name" ref={nameRef}>
+              <span className="line">
+                <span className="line-in" data-fit-in>
+                  {pickLang(hero.name, lang)}
+                </span>
               </span>
-            ))}
+            </h1>
+            <p className="hero-alt" data-hrev style={stagger(2)} lang={other === "zh" ? "zh-CN" : "en"}>
+              {pickLang(hero.name, other)}
+            </p>
+            <p className="hero-role" data-hrev style={stagger(3)}>
+              <Decode text={pickLang(hero.role, lang)} play={live} />
+              <i className="caret" aria-hidden="true" />
+            </p>
+            <p className="hero-tagline" data-hrev style={stagger(4)}>
+              {pickLang(hero.tagline, lang)}
+            </p>
           </div>
-        )}
+
+          <figure className="hero-portrait" data-hrev style={stagger(3)}>
+            <div className="portrait-tilt" data-tilt ref={tiltRef}>
+              <div className="portrait-frame">
+                {/* width / height 写的是图片的真实像素尺寸：浏览器据此提前留好位置，图片加载时页面不会跳。 */}
+                <img
+                  className="media"
+                  src="/portrait.jpg"
+                  width={900}
+                  height={1200}
+                  alt={pickLang(STRINGS.portraitAlt, lang)}
+                  decoding="async"
+                />
+                <span className="portrait-cover" aria-hidden="true" />
+              </div>
+            </div>
+            <figcaption className="portrait-cap">
+              <span className="lbl portrait-id">ID_0001</span>
+              {hero.motto && (
+                <span className="portrait-motto" lang="zh-CN">
+                  {hero.motto}
+                </span>
+              )}
+            </figcaption>
+          </figure>
+
+          <div className="hero-foot">
+            {/* <dl> 是「名称—值」列表的语义标签：dt 是名称，dd 是值。 */}
+            <dl className="hero-facts" data-hrev style={stagger(5)}>
+              <div className="stat">
+                <dt className="lbl">{pickLang(STRINGS.basedIn, lang)}</dt>
+                <dd>{pickLang(hero.location, lang)}</dd>
+              </div>
+              <div className="stat">
+                <dt className="lbl">{pickLang(STRINGS.available, lang)}</dt>
+                <dd>
+                  <span className="live" aria-hidden="true" />
+                  {pickLang(hero.status, lang)}
+                </dd>
+              </div>
+              <div className="stat">
+                <dt className="lbl">{pickLang(STRINGS.experienceYears, lang)}</dt>
+                <dd className="nowrap">
+                  {hero.yearsExp} {pickLang(STRINGS.yearsExp, lang)}
+                </dd>
+              </div>
+            </dl>
+            <div className="hero-cta" data-hrev style={stagger(6)}>
+              <a
+                className="btn btn-ghost"
+                href="#experience"
+                ref={ctaRef}
+                onClick={(event) => {
+                  event.preventDefault();
+                  scrollToSection("experience");
+                }}
+              >
+                {pickLang(STRINGS.heroCta, lang)}
+                <Icon name="arrowDown" />
+              </a>
+              <p className="hero-hint">
+                <kbd>{shortcut}</kbd>
+                <span>{pickLang(STRINGS.termHint, lang)}</span>
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
-      {/* 右栏交给独立的 HeroDeck：头像是前景身份卡，后方终端面板只负责空间层次。
-          Hero 本身继续专注简历文案，不直接处理指针事件或 3D 细节。 */}
-      <HeroDeck lang={lang} />
+
+      <div className="hero-badges" data-hrev style={stagger(7)}>
+        <p className="lbl hero-badges-lbl">{pickLang(STRINGS.offDuty, lang)}</p>
+        <Marquee items={badges} speed={30} dir={-1} itemClassName="badge" watch={lang} />
+      </div>
     </section>
   );
 }

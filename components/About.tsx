@@ -1,52 +1,77 @@
-// "use client" 表示这是客户端组件（在浏览器里运行，能用交互和 Hook）。详见 ImageSlot.tsx 的说明。
 "use client";
 
-// 从 lib/data.ts 导入简历内容。@ 是这个项目配置的路径别名，代表项目根目录，所以 @/lib/data 就是 根目录/lib/data。
-//   - RESUME：整份简历的数据（姓名、关于、技能等都在里面）。
-//   - STRINGS：界面上用到的固定文案（比如各区块的标题）。
-import { RESUME, STRINGS } from "@/lib/data";
-// pickLang(值, lang) 是本项目的小工具：很多内容都存成「双语对象」如 { zh: "中文", en: "English" }，
-// pickLang 会根据当前语言 lang 从中取出对应那一份文本。
-import { pickLang } from "@/lib/i18n";
-// 从同目录的 effects 文件导入几个用于视觉效果/排版的组件：
-//   - FadeUp：让内容滚动到视野时「淡入上浮」出现。
-//   - FormattedBold：把文本里特定标记的部分渲染成加粗。
-//   - SectionHead：区块标题栏（带编号、标题、注释样式的小标）。
-import { FadeUp, FormattedBold, SectionHead } from "./effects";
-// 只导入类型 Lang（语言类型，一般是 "zh" | "en"）。import type 表示「只在类型检查时用，编译后不留下代码」。
-import type { Lang } from "@/lib/types";
+// 「关于」：三段大字，随着滚动逐字（英文逐词）点亮。
+//
+// 做法：把每段话拆成一个个 <span class="w">，默认是暗的；
+// 每帧根据滚动位置算出「这段该亮多少个」，给前面那些 span 加上 .on。
+// 拆词和计数都是纯函数，在 lib/fx.ts 里（splitWords / litCount），有单元测试。
 
-// About 组件：渲染「关于」区块。props 解构出 lang（当前语言），类型是 Lang。
+import { useRef } from "react";
+import { RESUME, STRINGS } from "@/lib/data";
+import { litCount, splitWords } from "@/lib/fx";
+import { pickLang } from "@/lib/i18n";
+import type { Lang } from "@/lib/types";
+import { Ghost, SectionHeader, useFrame, useLayout } from "./effects";
+
+type WordSet = { words: HTMLElement[]; top: number; height: number; lit: number };
+
 export function About({ lang }: { lang: Lang }) {
-  // RESUME.about 是按语言存的段落数据；用 [lang] 取出当前语言对应的那一组段落（是个字符串数组）。
-  const paras = RESUME.about[lang];
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const sets = useRef<WordSet[]>([]);
+  const paragraphs = RESUME.about[lang];
+
+  // 量出每段话的位置，并把「已点亮数量」清零（下一帧会按当前滚动位置重新点亮）。
+  useLayout(() => {
+    const body = bodyRef.current;
+    if (!body) return;
+    sets.current = Array.from(body.querySelectorAll<HTMLElement>("[data-words]")).map((p) => {
+      const rect = p.getBoundingClientRect();
+      const words = Array.from(p.querySelectorAll<HTMLElement>(".w"));
+      words.forEach((w) => w.classList.remove("on"));
+      return { words, top: rect.top + window.scrollY, height: Math.max(1, rect.height), lit: 0 };
+    });
+  }, [lang]);
+
+  useFrame((s) => {
+    if (s.reduced) return; // 减少动态效果时，CSS 会让所有文字直接是亮的
+    for (const set of sets.current) {
+      const target = litCount({
+        scrollY: s.y,
+        viewportH: s.vh,
+        top: set.top,
+        height: set.height,
+        total: set.words.length,
+      });
+      if (target === set.lit) continue;
+      // 只改「这一帧新亮起 / 新熄灭」的那几个词，而不是每帧把所有词都设一遍。
+      if (target > set.lit) for (let i = set.lit; i < target; i++) set.words[i].classList.add("on");
+      else for (let i = target; i < set.lit; i++) set.words[i].classList.remove("on");
+      set.lit = target;
+    }
+  });
+
   return (
-    // <section> 是一个语义化的区块容器。className 指定 CSS 类名，配合 lib 里的全局 CSS 来控制外观。
-    // id="about" 给区块一个锚点，方便导航栏点击跳转到这里。
-    <section className="section about" id="about">
-      {/* 区块标题栏：num 是编号，title 用 pickLang 取当前语言的「关于」标题，meta 是右侧的小注释文字 */}
-      <SectionHead num="01" title={pickLang(STRINGS.about, lang)} meta="// cat about.md" />
-      <FadeUp>
-        {/* 用 .map 遍历段落数组，把每个段落 p 渲染成一个 <p> 标签，形成一列段落。 */}
-        {/* .map 会对数组每一项执行括号里的函数并收集返回的 JSX。p 是当前段落内容，i 是它的下标（0、1、2…）。 */}
-        <div className="about-copy">
-          {paras.map((p, i) => (
-            // key 是 React 渲染列表时要求的唯一标识，帮 React 高效地区分/更新每一项；这里用下标 i 作为 key。
-            <p key={i}>
-              {/* FormattedBold 接收文本 p，把其中的标记片段显示成加粗后再渲染出来。 */}
-              {/* 「0 到 1」是一组完整含义，用不换行的短语保留它；其余正文自然断行。
-                  只改变展示方式，简历数据与下载版内容不受影响。 */}
-              {p.split(/(0 到 1)/g).map((part, j) =>
-                part === "0 到 1" ? (
-                  <span key={j} className="about-phrase">{part}</span>
+    <section className="sec" id="about" aria-labelledby="about-title" tabIndex={-1}>
+      <div className="wrap about-grid">
+        <SectionHeader id="about" title={pickLang(STRINGS.about, lang)} />
+        <div className="about-body" ref={bodyRef}>
+          {paragraphs.map((paragraph, i) => (
+            // key 里带上语言：切换语言时整段重新创建，不会残留上一种语言点亮到一半的状态。
+            <p className="about-p" data-words key={`${lang}-${i}`}>
+              {splitWords(paragraph, lang).map((token, j) =>
+                token.space ? (
+                  " "
                 ) : (
-                  <FormattedBold key={j} text={part} />
+                  <span key={j} className={token.bold ? "w hl" : "w"}>
+                    {token.text}
+                  </span>
                 ),
               )}
             </p>
           ))}
         </div>
-      </FadeUp>
+      </div>
+      <Ghost id="about" />
     </section>
   );
 }

@@ -3,11 +3,29 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { Hero } from "../components/Hero";
 
+// renderToStaticMarkup 把组件渲染成一段 HTML 字符串（和构建时生成静态页面是同一回事），
+// 不会执行 useEffect，所以这里测的是「首屏的静态内容对不对」，不涉及动画。
 describe("Hero", () => {
-  it("uses the spatial terminal deck instead of the flat photo frame", () => {
-    const html = renderToStaticMarkup(createElement(Hero, { lang: "zh", booted: true }));
+  it("renders the name, the portrait and its identity label", () => {
+    const html = renderToStaticMarkup(createElement(Hero, { lang: "zh", live: true }));
 
-    expect(html).toContain('class="hero-deck"');
-    expect(html).not.toContain('class="hero-photo"');
+    expect(html).toContain("李姜磊");
+    expect(html).toContain('alt="李姜磊的头像"');
+    expect(html).toContain("ID_0001");
+    // 旧版的 3D 终端甲板已经移除
+    expect(html).not.toContain("hero-deck");
+  });
+
+  it("localizes the name and the portrait alternative text", () => {
+    const html = renderToStaticMarkup(createElement(Hero, { lang: "en", live: true }));
+
+    expect(html).toContain("Jianglei Li");
+    expect(html).toContain('alt="Portrait of Jianglei Li"');
+  });
+
+  it("shows the current status from the résumé data", () => {
+    const html = renderToStaticMarkup(createElement(Hero, { lang: "zh", live: false }));
+
+    expect(html).toContain("刚入职 Open Design");
   });
 });
