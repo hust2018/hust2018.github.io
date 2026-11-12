@@ -57,13 +57,22 @@ dialog:not([open]) { display: none !important; }
   --accent: var(--signal);
 
   /* 字体 */
-  --f-display: "Archivo", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
-  --f-display-zh: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  /* 字体分三个角色：
+     · 展示字（名字、区块标题、公司名、技能跑马灯）—— 中文用毛笔楷书「马善政」，
+       英文用高对比的衬线斜体 Bodoni Moda。笔墨的粗细变化配上衬线体的粗细对比，是一对经典搭配；
+     · 正文 —— 英文 Archivo，中文 思源黑体，保证大段文字好读；
+     · 等宽小字（标签、日期、邮箱、终端）—— Martian Mono，保留一点终端的气质。
+     --f-display 把英文字体排在前面：中英混排时，拉丁字母和数字用 Bodoni，汉字落到毛笔字；
+     --f-display-zh 反过来，给纯中文的大字用（名字、区块标题），这样行高按中文字体来算。
+     毛笔字只有一个字重、也没有斜体，所以全站关掉了「浏览器自动加粗 / 自动倾斜」
+     （见 body 的 font-synthesis）；展示字规则里写的 italic 因此只作用在英文和数字上。 */
+  --f-display: "Bodoni Moda", "Ma Shan Zheng", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", serif;
+  --f-display-zh: "Ma Shan Zheng", "Bodoni Moda", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", serif;
   --f-body: "Archivo", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
-  --f-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, "Noto Sans SC", monospace;
+  --f-mono: "Martian Mono", ui-monospace, "SF Mono", Menlo, Consolas, "Noto Sans SC", monospace;
 
   /* 字号 */
-  --t-label: 13px;
+  --t-label: 12px;
   --t-small: 14px;
   --t-base: 16px;
   --t-lead: 18px;
@@ -111,6 +120,9 @@ body {
   background: var(--bg);
   color: var(--fg);
   font-family: var(--f-body);
+  /* 字体没有对应的粗体 / 斜体时，浏览器默认会用算法「硬描」一个出来，笔画会糊。
+     这里统一关掉：没有就用字体本来的样子。 */
+  font-synthesis: none;
   font-size: var(--t-base);
   line-height: 1.65;
   overflow-x: hidden; /* 幽灵大字、跑马灯会超出屏宽；只裁横向，不影响 sticky */
@@ -335,7 +347,8 @@ main, footer { position: relative; z-index: 1; }
 .brand-mark {
   font-family: var(--f-display);
   font-weight: 900;
-  font-size: 20px;
+  font-style: italic;
+  font-size: 22px;
   line-height: 1;
   letter-spacing: -0.02em;
   padding: var(--s-2);
@@ -540,9 +553,15 @@ main, footer { position: relative; z-index: 1; }
 .cursor.is-off .cursor-ring { opacity: 0; }
 
 /* ============ 6. 入场揭示（只在脚本确认可用后才隐藏，避免脚本失败时内容消失） ============ */
-.line { display: block; overflow: hidden; padding-block: 0.08em; margin-block: -0.08em; }
+/* 遮罩四周都多留一点（再用负 margin 抵消，不影响排版）：
+   毛笔字的笔画、斜体字母的弯钩都会伸出字框，留少了会被切掉。 */
+.line { display: block; overflow: hidden; padding: 0.2em 0.14em; margin: -0.2em -0.14em; }
 .line-in { display: inline-block; }
 [data-fit-in] { display: inline-block; } /* 脚本量它的宽度，超出容器时自动缩小字号 */
+/* 一行实在放不下（要缩到一半左右）时，脚本会加上 data-fit-wrap：改成允许换行。 */
+/* 选择器里带上类名，是为了让它的优先级高于各自规则里的 white-space: nowrap。 */
+.hero-name[data-fit-wrap], .xp-company[data-fit-wrap], .kin[data-fit-wrap] { white-space: normal; overflow-wrap: anywhere; }
+.xp-company[data-fit-wrap] { font-size: clamp(26px, 2.8vw, 40px); line-height: 1.12; }
 
 .fx [data-reveal] {
   opacity: 0;
@@ -554,7 +573,7 @@ main, footer { position: relative; z-index: 1; }
 
 /* 区块标题：不做淡入，而是从遮罩下方滑出 */
 .fx .sec-head[data-reveal] { opacity: 1; transform: none; }
-.fx .sec-head[data-reveal] .line-in { transform: translate3d(0, 110%, 0); transition: transform 560ms var(--e-out); }
+.fx .sec-head[data-reveal] .line-in { transform: translate3d(0, 135%, 0); transition: transform 560ms var(--e-out); }
 .fx .sec-head[data-reveal].in .line-in { transform: none; }
 .fx .sec-head[data-reveal] .sec-idx { opacity: 0; transition: opacity var(--d-3) linear; }
 .fx .sec-head[data-reveal].in .sec-idx { opacity: 1; }
@@ -570,7 +589,7 @@ main, footer { position: relative; z-index: 1; }
   transition: opacity var(--d-3) var(--e-out), transform var(--d-3) var(--e-out);
   transition-delay: calc(var(--i, 0) * 60ms + 120ms);
 }
-.fx .hero-name .line-in { transform: translate3d(0, 108%, 0); }
+.fx .hero-name .line-in { transform: translate3d(0, 135%, 0); }
 .fx .is-live .hero-name .line-in { transform: none; transition: transform var(--d-hero) var(--e-out) 80ms; }
 /* 走过开场动画时：名字已经由粒子拼好，原地直接显现 */
 .fx .from-intro .hero-name { opacity: 0; }
@@ -603,23 +622,25 @@ main, footer { position: relative; z-index: 1; }
   margin-block: var(--s-3) var(--s-2);
   font-family: var(--f-display);
   font-weight: 900;
+  font-style: italic;
   font-size: clamp(64px, 17vw, 300px);
   line-height: 0.95;
   letter-spacing: -0.02em;
-  text-transform: uppercase;
   white-space: nowrap;
 }
-html[lang="zh-CN"] .hero-name { font-family: var(--f-display-zh); }
-html[lang="en"] .hero-name { font-size: clamp(40px, 8.2vw, 150px); }
+/* 中文名字：毛笔字只有常规这一个字重，明确写 400；字距稍微放开一点。 */
+html[lang="zh-CN"] .hero-name { font-family: var(--f-display-zh); font-weight: 400; letter-spacing: 0.02em; }
+/* 英文名字比中文长得多，字号相应小一些。 */
+html[lang="en"] .hero-name { font-size: clamp(48px, 10.5vw, 190px); }
 @supports (font-size: 1cqi) {
   .hero-name { font-size: clamp(64px, min(31cqi, 40vh), 340px); }
-  html[lang="en"] .hero-name { font-size: clamp(40px, min(14cqi, 26vh), 220px); }
+  html[lang="en"] .hero-name { font-size: clamp(48px, min(17cqi, 30vh), 260px); }
 }
 
 .hero-alt { font-family: var(--f-mono); font-size: var(--t-small); letter-spacing: 0.3em; text-transform: uppercase; color: var(--fg-2); }
 .hero-role {
   margin-top: var(--s-5);
-  font-family: var(--f-display);
+  font-family: var(--f-body);
   font-weight: 700;
   font-size: clamp(20px, 2.4vw, 32px);
   line-height: 1.3;
@@ -725,12 +746,13 @@ html[lang="en"] .hero-name { font-size: clamp(40px, 8.2vw, 150px); }
 .sec-title {
   font-family: var(--f-display);
   font-weight: 900;
+  font-style: italic;
   font-size: clamp(36px, 5.2vw, 76px);
   line-height: 1.04;
   letter-spacing: -0.02em;
-  text-transform: uppercase;
 }
-html[lang="zh-CN"] .sec-title { font-family: var(--f-display-zh); }
+.sec-title { overflow-wrap: anywhere; } /* 兜底：一个很长的英文单词放不下时允许断开，而不是被遮罩切掉 */
+html[lang="zh-CN"] .sec-title { font-family: var(--f-display-zh); font-weight: 400; letter-spacing: 0.02em; }
 
 /* 幽灵大字：区块背后横向滑动的描边英文，纯装饰 */
 .ghost {
@@ -740,12 +762,15 @@ html[lang="zh-CN"] .sec-title { font-family: var(--f-display-zh); }
   z-index: -1;
   font-family: var(--f-display);
   font-weight: 900;
-  font-stretch: 125%;
+  font-style: italic;
   font-size: clamp(120px, 22vw, 380px);
   line-height: 0.8;
   white-space: nowrap;
-  color: transparent;
-  -webkit-text-stroke: 1px var(--line);
+  /* 描边字的画法：先描一圈边，再用背景色填充盖住内侧（paint-order: stroke fill）。
+     不用「透明填充」是因为可变字体的笔画轮廓互相重叠，透明时字里面会露出多余的线。 */
+  color: var(--bg);
+  -webkit-text-stroke: 2px var(--line);
+  paint-order: stroke fill;
   pointer-events: none;
   user-select: none;
   will-change: transform;
@@ -756,12 +781,12 @@ html[lang="zh-CN"] .sec-title { font-family: var(--f-display-zh); }
 .about-body { display: grid; gap: clamp(32px, 5vw, 64px); }
 .about-p {
   max-width: 30em;
-  font-family: var(--f-display);
+  font-family: var(--f-body); /* 大段文字用正文字体：展示字太重，连着读会累 */
   font-weight: 600;
   font-size: clamp(22px, 2.6vw, 38px);
   line-height: 1.5;
 }
-.about-p .hl { color: var(--signal); font-weight: 800; }
+.about-p .hl { color: var(--signal); font-weight: 700; }
 .fx .about-p .w { opacity: 0.2; transition: opacity var(--d-2) linear; }
 .fx .about-p .w.on { opacity: 1; }
 @media (min-width: 1024px) {
@@ -801,11 +826,15 @@ html[lang="zh-CN"] .sec-title { font-family: var(--f-display-zh); }
   z-index: -1;
   font-family: var(--f-display);
   font-weight: 900;
+  font-style: italic;
   font-size: clamp(96px, 18vw, 280px);
   line-height: 1;
   letter-spacing: -0.03em;
-  color: transparent;
-  -webkit-text-stroke: 1px var(--line);
+  /* 描边字的画法：先描一圈边，再用背景色填充盖住内侧（paint-order: stroke fill）。
+     不用「透明填充」是因为可变字体的笔画轮廓互相重叠，透明时字里面会露出多余的线。 */
+  color: var(--bg);
+  -webkit-text-stroke: 2px var(--line);
+  paint-order: stroke fill;
   pointer-events: none;
   user-select: none;
 }
@@ -816,12 +845,12 @@ html[lang="zh-CN"] .sec-title { font-family: var(--f-display-zh); }
 .xp-company {
   font-family: var(--f-display);
   font-weight: 900;
+  font-style: italic;
   font-size: clamp(40px, 5.4vw, 80px);
   line-height: 1.05;
   letter-spacing: -0.02em;
   white-space: nowrap;
 }
-html[lang="zh-CN"] .xp-company { font-family: var(--f-display-zh); }
 .xp-dept { color: var(--fg-2); font-weight: 600; }
 .xp-rolename { font-size: clamp(18px, 1.6vw, 22px); font-weight: 700; line-height: 1.4; }
 .xp-meta .chips { margin-top: var(--s-3); }
@@ -905,7 +934,8 @@ html[lang="zh-CN"] .xp-company { font-family: var(--f-display-zh); }
   padding-right: 0.5em;
   font-family: var(--f-display);
   font-weight: 800;
-  font-size: clamp(32px, 4.6vw, 68px);
+  font-style: italic;
+  font-size: clamp(30px, 4.2vw, 62px);
   line-height: 1.15;
   letter-spacing: -0.01em;
   color: var(--fg);
@@ -921,7 +951,7 @@ html[lang="zh-CN"] .xp-company { font-family: var(--f-display-zh); }
   background: var(--signal);
 }
 /* 偶数行用描边字，形成节奏 */
-.sk-row:nth-child(even) .sk-item { color: transparent; -webkit-text-stroke: 1.5px var(--fg-2); }
+.sk-row:nth-child(even) .sk-item { color: var(--bg); -webkit-text-stroke: 3px var(--fg-2); paint-order: stroke fill; }
 @media (hover: hover) {
   .sk-item:hover { color: var(--signal); }
   .sk-row:nth-child(even) .sk-item:hover { color: var(--signal); -webkit-text-stroke-color: var(--signal); }
@@ -963,8 +993,7 @@ html[lang="zh-CN"] .xp-company { font-family: var(--f-display-zh); }
 .is-tilting .spot { opacity: 1; }
 .hl-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s-3); }
 .hl-date { font-family: var(--f-mono); font-size: var(--t-small); color: var(--fg-2); }
-.hl-title { font-family: var(--f-display); font-weight: 800; font-size: clamp(24px, 2.6vw, 34px); line-height: 1.25; }
-html[lang="zh-CN"] .hl-title { font-family: var(--f-display-zh); }
+.hl-title { font-family: var(--f-body); font-weight: 800; font-size: clamp(24px, 2.6vw, 34px); line-height: 1.25; }
 .hl-desc { color: var(--fg-2); line-height: 1.75; }
 .hl-link {
   display: flex;
@@ -991,8 +1020,7 @@ html[lang="zh-CN"] .hl-title { font-family: var(--f-display-zh); }
   border-top: 1px solid var(--line);
 }
 .edu-date { font-family: var(--f-mono); font-size: var(--t-small); color: var(--fg-2); }
-.edu-school { font-family: var(--f-display); font-weight: 800; font-size: clamp(24px, 3.4vw, 48px); line-height: 1.2; }
-html[lang="zh-CN"] .edu-school { font-family: var(--f-display-zh); }
+.edu-school { font-family: var(--f-body); font-weight: 800; font-size: clamp(24px, 3.4vw, 48px); line-height: 1.2; }
 .edu-degree { color: var(--fg-2); font-size: var(--t-lead); }
 .edu-in { display: grid; grid-template-columns: inherit; gap: inherit; transition: transform var(--d-2) var(--e-out); }
 @media (min-width: 900px) {
@@ -1004,17 +1032,17 @@ html[lang="zh-CN"] .edu-school { font-family: var(--f-display-zh); }
 .contact { min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; justify-content: center; }
 .kin {
   margin-bottom: var(--s-7);
-  padding-top: 0.45em; /* 给字母向上拉伸留出空间 */
+  padding-top: 0.3em; /* 给字母向上浮动留出空间 */
   font-family: var(--f-display);
   font-weight: 900;
+  font-style: italic;
   font-size: clamp(56px, 10vw, 152px);
-  line-height: 0.9;
-  letter-spacing: -0.03em;
-  text-transform: uppercase;
+  line-height: 1;
+  letter-spacing: -0.02em;
   white-space: nowrap;
   color: var(--fg);
 }
-html[lang="zh-CN"] .kin { font-family: var(--f-display-zh); letter-spacing: 0; }
+html[lang="zh-CN"] .kin { font-family: var(--f-display-zh); font-weight: 400; letter-spacing: 0.02em; }
 .kin-in { display: inline-block; }
 .kin-l { display: inline-block; transform-origin: 50% 100%; will-change: transform; }
 .kin-sp { display: inline-block; width: 0.28em; }
@@ -1022,9 +1050,9 @@ html[lang="zh-CN"] .kin { font-family: var(--f-display-zh); letter-spacing: 0; }
 .contact-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s-6); align-items: end; }
 .contact-mail-block { --gap: 8px; }
 .contact-mail {
-  font-family: var(--f-display);
-  font-weight: 700;
-  font-size: clamp(24px, 4.6vw, 64px);
+  font-family: var(--f-mono); /* 邮箱是一串字符，用等宽字最清楚，也呼应终端的气质 */
+  font-weight: 500;
+  font-size: clamp(18px, 3vw, 40px);
   line-height: 1.15;
   text-decoration: none;
   overflow-wrap: anywhere;
@@ -1203,8 +1231,7 @@ dialog { color: var(--fg); }
 }
 .sheet-head .stat { --gap: 4px; }
 .sheet-head .lbl { color: var(--accent); }
-.sheet-title { font-family: var(--f-display); font-weight: 900; font-size: clamp(28px, 4vw, 40px); line-height: 1.15; }
-html[lang="zh-CN"] .sheet-title { font-family: var(--f-display-zh); }
+.sheet-title { font-family: var(--f-display); font-weight: 900; font-style: italic; font-size: clamp(28px, 4vw, 40px); line-height: 1.15; }
 .sheet-role { color: var(--fg-2); font-weight: 600; }
 .sheet-content { display: grid; gap: var(--s-6); padding: var(--s-6) clamp(20px, 4vw, 40px) var(--s-8); }
 

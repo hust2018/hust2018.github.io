@@ -25,7 +25,7 @@ export const RESUME: Resume = {
       en: "Focused on AI agents and multi-agent systems — taking them from zero to production, grounded in the high-concurrency, distributed-systems foundation built during security R&D at ByteDance. Obsessed with making complex systems simple.",
     },
     location: { zh: "深圳，中国", en: "Shenzhen, China" },
-    status: { zh: "刚入职 Open Design", en: "Just joined Open Design" },
+    status: { zh: "在职，不考虑新机会", en: "Employed · Not open to new opportunities" },
     yearsExp: "4",
     // 头像下方的座右铭（原来写死在组件里，现在收进数据）。
     motto: "尽管提需求，我来想办法实现",

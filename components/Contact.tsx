@@ -15,10 +15,10 @@ type LetterGeo = {
   letters: HTMLElement[];
   centers: number[]; // 每个字母中心的横坐标
   widths: number[];
-  scale: number[]; // 每个字母当前的纵向拉伸倍数
+  scale: number[]; // 每个字母当前的「强度」：1 = 静止，越大浮得越高
 };
 
-// 动态大字：鼠标靠近哪个字母，哪个字母就被纵向拉高；没有鼠标时轻轻起伏。
+// 动态大字：鼠标靠近哪个字，哪个字就向上浮起并轻轻摆动；没有鼠标时缓缓起伏。
 function KineticTitle({ text }: { text: string }) {
   const ref = useFitText<HTMLParagraphElement>([text]);
   const geo = useRef<LetterGeo>({ top: 0, height: 1, letters: [], centers: [], widths: [], scale: [] });
@@ -48,7 +48,7 @@ function KineticTitle({ text }: { text: string }) {
     g.letters.forEach((letter, i) => {
       let target: number;
       if (near) {
-        // 离鼠标越近拉得越高；平方一下，让「近处明显、远处几乎不动」。
+        // 离鼠标越近强度越大；平方一下，让「近处明显、远处几乎不动」。
         const radius = Math.max(160, g.widths[i] * 2.2);
         const closeness = Math.max(0, 1 - Math.abs(s.pointerX - g.centers[i]) / radius);
         target = 1 + 0.42 * closeness * closeness;
@@ -56,7 +56,11 @@ function KineticTitle({ text }: { text: string }) {
         target = 1 + 0.05 * (Math.sin(s.now / 520 + i * 0.7) + 1);
       }
       g.scale[i] += (target - g.scale[i]) * 0.16;
-      letter.style.transform = `scale3d(1,${g.scale[i].toFixed(3)},1)`;
+      // 书法字不适合被拉长变形，所以这里不做缩放，而是「上浮 + 轻微摆动」：
+      // 强度越大浮得越高；相邻的字往相反方向偏一点，像被风吹动。
+      const lift = (g.scale[i] - 1) * 70;
+      const tilt = (i % 2 ? 1 : -1) * (g.scale[i] - 1) * 14;
+      letter.style.transform = `translate3d(0,${(-lift).toFixed(1)}px,0) rotate(${tilt.toFixed(2)}deg)`;
     });
   });
 

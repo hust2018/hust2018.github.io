@@ -3,6 +3,7 @@ import {
   advanceMarquee,
   clamp,
   fitFontSize,
+  fitMode,
   formatDate,
   lerp,
   litCount,
@@ -161,6 +162,19 @@ describe("fitFontSize", () => {
   });
   it("never goes below the minimum", () => {
     expect(fitFontSize({ fontSize: 100, boxWidth: 10, contentWidth: 800 })).toBe(24);
+  });
+});
+
+describe("fitMode", () => {
+  it("does nothing when the text fits or the box has no width", () => {
+    expect(fitMode({ boxWidth: 500, contentWidth: 400 })).toBe("fit");
+    expect(fitMode({ boxWidth: 0, contentWidth: 400 })).toBe("fit");
+  });
+  it("shrinks when the text is only somewhat too wide", () => {
+    expect(fitMode({ boxWidth: 400, contentWidth: 600 })).toBe("shrink");
+  });
+  it("wraps when the text would have to shrink to about half", () => {
+    expect(fitMode({ boxWidth: 400, contentWidth: 900 })).toBe("wrap");
   });
 });
 

@@ -154,6 +154,17 @@ export function fitFontSize(args: {
   return Math.max(min, Math.floor(((fontSize * boxWidth) / contentWidth) * 0.985));
 }
 
+// 一行大字放不下时该怎么办：
+//   "fit"    本来就放得下，什么都不用做；
+//   "shrink" 稍微超出一些，按比例缩小字号（见上面的 fitFontSize）；
+//   "wrap"   要缩到原来的一半左右才放得下——说明这行字实在太长（比如很长的英文公司名），
+//            与其缩成一行小字，不如改用小一号的字并允许换行。
+export function fitMode(args: { boxWidth: number; contentWidth: number }): "fit" | "shrink" | "wrap" {
+  const { boxWidth, contentWidth } = args;
+  if (boxWidth <= 0 || contentWidth <= boxWidth) return "fit";
+  return boxWidth / contentWidth < 0.55 ? "wrap" : "shrink";
+}
+
 // ---------- 乱码解码 ----------
 
 const GLYPHS = "!<>-_\\/[]{}=+*^?#01";

@@ -15,7 +15,7 @@ import { useEffect, useRef, useState } from "react";
 // import type 只在编译期用，打包后会被删掉，不产生运行时代码。
 import type { CSSProperties, DependencyList, ReactNode, RefObject } from "react";
 import { SECTIONS } from "@/lib/data";
-import { fitFontSize, pad2 } from "@/lib/fx";
+import { fitFontSize, fitMode, pad2 } from "@/lib/fx";
 import { cancelScramble, scramble } from "@/lib/scramble";
 import { calculateTilt } from "@/lib/tilt";
 import { getFrameState, onFrame, onLayout, requestLayout } from "@/lib/ticker";
@@ -396,16 +396,29 @@ export function useFitText<T extends HTMLElement>(deps: DependencyList): RefObje
     const inner = el?.querySelector<HTMLElement>("[data-fit-in]");
     if (!el || !inner) return;
     const before = el.style.fontSize;
-    el.style.fontSize = ""; // 先恢复成 CSS 里写的字号，再量
-    const next = fitFontSize({
-      fontSize: parseFloat(getComputedStyle(el).fontSize) || 16,
-      boxWidth: el.clientWidth,
-      contentWidth: inner.offsetWidth,
-    });
-    const value = next === null ? "" : `${next}px`;
+    const wasWrapped = el.hasAttribute("data-fit-wrap");
+    // 先恢复成 CSS 里写的「单行大字」，再量它到底有多宽
+    el.style.fontSize = "";
+    el.removeAttribute("data-fit-wrap");
+    const boxWidth = el.clientWidth;
+    const contentWidth = inner.offsetWidth;
+    const mode = fitMode({ boxWidth, contentWidth });
+
+    let value = "";
+    if (mode === "wrap") {
+      // 太长了：交给 CSS（[data-fit-wrap]）改成小一号并允许换行
+      el.setAttribute("data-fit-wrap", "");
+    } else if (mode === "shrink") {
+      const next = fitFontSize({
+        fontSize: parseFloat(getComputedStyle(el).fontSize) || 16,
+        boxWidth,
+        contentWidth,
+      });
+      value = next === null ? "" : `${next}px`;
+    }
     el.style.fontSize = value;
-    // 字号变了，页面高度也可能跟着变：请其他特效在下一帧重新测量。
-    if (value !== before) requestLayout();
+    // 字号或换行方式变了，页面高度也可能跟着变：请其他特效在下一帧重新测量。
+    if (value !== before || wasWrapped !== (mode === "wrap")) requestLayout();
   }, deps);
   return ref;
 }

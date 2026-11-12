@@ -37,9 +37,11 @@ function fontsReady(ms: number): Promise<void> {
       done();
       return;
     }
+    // 这里的字体名和字重要和 globals.css 里 .hero-name 实际用的一致：
+    // 中文名字是马善政毛笔楷书（只有 400 这一个字重），英文名字是 Bodoni Moda 的 700 斜体。
     Promise.all([
-      document.fonts.load('900 64px "Noto Sans SC"', "李姜磊"),
-      document.fonts.load('900 64px "Archivo"', "JIANGLEI LI"),
+      document.fonts.load('400 64px "Ma Shan Zheng"', "李姜磊"),
+      document.fonts.load('italic 700 64px "Bodoni Moda"', "Jianglei Li"),
       document.fonts.ready,
     ]).then(done, done);
   });
@@ -59,8 +61,10 @@ function measureNameLines(): TextLine[] {
     if (style.textTransform === "uppercase") text = text.toUpperCase();
     const rect = line.getBoundingClientRect();
     const lineStyle = getComputedStyle(line);
+    // 遮罩（.line）四周有留白，文字真正开始的位置要把这些留白扣掉。
     const padTop = parseFloat(lineStyle.paddingTop) || 0;
     const padBottom = parseFloat(lineStyle.paddingBottom) || 0;
+    const padLeft = parseFloat(lineStyle.paddingLeft) || 0;
     // 字体的「上伸 / 下伸」高度：用来把文字基线摆到和页面上一样的位置。
     let ascent = fontSize * 0.88;
     let descent = fontSize * 0.12;
@@ -76,7 +80,7 @@ function measureNameLines(): TextLine[] {
     const boxHeight = rect.height - padTop - padBottom;
     return {
       text,
-      x: rect.left,
+      x: rect.left + padLeft,
       y: boxTop + (boxHeight - (ascent + descent)) / 2 + ascent,
       font,
       letterSpacing: style.letterSpacing === "normal" ? "0px" : style.letterSpacing,

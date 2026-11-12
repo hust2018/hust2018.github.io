@@ -45,12 +45,16 @@ export default function RootLayout({
         {/* preconnect：提前和字体服务器建立连接，让后面真正下载字体时更快 */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        {/* 引入 Google Fonts：
-            · Archivo —— 英文大标题。它是「可变字体」：一个文件里包含连续变化的字宽（wdth）和字重（wght）；
-            · JetBrains Mono —— 等宽小字（标签、日期、终端）；
-            · Noto Sans SC —— 中文，900 这档特粗用于名字和大标题。 */}
+        {/* 引入 Google Fonts，按用途分三组（对应 globals.css 里的 --f-display / --f-body / --f-mono）：
+            · 展示字：Ma Shan Zheng 马善政毛笔楷书（中文）+ Bodoni Moda 衬线斜体（英文），用于名字、区块标题、公司名；
+            · 正文：Archivo（英文）+ Noto Sans SC 思源黑体（中文）；
+            · 等宽：Martian Mono，用于标签、日期、邮箱和终端。
+            写法说明：「wght@400..800」表示这是可变字体，取 400 到 800 之间连续的字重；
+            Bodoni Moda 的「ital,opsz,wght@1,6..96,700」依次是：只要斜体（1）、
+            光学尺寸取 6 到 96（字越大笔画对比越强，浏览器按字号自动选）、字重固定 700；
+            Martian Mono 的「wdth,wght@87.5,400..700」是把字宽固定在 87.5%（稍窄一点），字重取 400 到 700。 */}
         <link
-          href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700;900&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Archivo:wght@400..800&family=Bodoni+Moda:ital,opsz,wght@1,6..96,700&family=Ma+Shan+Zheng&family=Martian+Mono:wdth,wght@87.5,400..700&family=Noto+Sans+SC:wght@400;500;700&display=swap"
           rel="stylesheet"
         />
         {/* 开场遮罩默认盖住整个页面，由脚本负责撤掉。
