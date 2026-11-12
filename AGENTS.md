@@ -85,3 +85,5 @@ Persistence keys: `localStorage` → `resume-lang`; `sessionStorage` → `resume
 ## Assets
 
 Images go in `public/` (served from root, e.g. `public/portrait.jpg` → `/portrait.jpg`). The hero portrait is `public/portrait.jpg` (900×1200) and the WeChat QR is `public/wechat-qr.jpg` (587×605); both are rendered with their real pixel dimensions as `width`/`height` so the layout never shifts — update those numbers if you replace an image. The PDF/encrypted document renderer does *not* embed any image — it's text-only.
+
+**Site icons** follow the Next.js file conventions, so no `<link>` tags are written by hand: `app/favicon.ico` (16/32/48), `app/icon.png` (512, transparent corners) and `app/apple-icon.png` (180, opaque). All three are the top-left "LJL" mark — Bodoni Moda bold italic, dark on the off-white rounded square. They were rendered once from the web font and are plain image files; if the mark changes, re-render them (an SVG cannot be used here because a favicon cannot load web fonts).
