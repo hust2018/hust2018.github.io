@@ -29,12 +29,18 @@ import { SITE_URL } from "../lib/site.ts";
 
 // ── 配置 ────────────────────────────────────────────────────────────────────
 const REPO = "hust2018/hust2018.github.io"; // GitHub 仓库
-const REMOTE = `https://github.com/${REPO}.git`;
 const SITE = SITE_URL; // 线上站点（用于最后验证）
 const ROOT = process.cwd();
 const OUT_DIR = path.join(ROOT, "out");
 const RESUME_MD = path.join(ROOT, "resume.md");
 const RESUME_PDF = path.join(ROOT, "public", "resume.pdf");
+// 优先沿用本地 origin 的地址（比如 SSH），避免强行走 HTTPS 时卡在输入账号密码
+let REMOTE = `https://github.com/${REPO}.git`;
+try {
+  REMOTE = execSync("git remote get-url origin", { encoding: "utf8" }).trim() || REMOTE;
+} catch {
+  // 读不到 origin 时退回默认 HTTPS 地址
+}
 
 // ── 命令行参数 ──────────────────────────────────────────────────────────────
 const argv = process.argv.slice(2);
