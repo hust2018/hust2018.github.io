@@ -37,13 +37,16 @@ function fontsReady(ms: number): Promise<void> {
       done();
       return;
     }
-    // 这里的字体名和字重要和 globals.css 里 .hero-name 实际用的一致：
-    // 中文名字是马善政毛笔楷书（只有 400 这一个字重），英文名字是 Bodoni Moda 的 700 斜体。
-    Promise.all([
-      document.fonts.load('400 64px "Ma Shan Zheng"', "李姜磊"),
-      document.fonts.load('italic 700 64px "Bodoni Moda"', "Jianglei Li"),
-      document.fonts.ready,
-    ]).then(done, done);
+    // 直接从页面上 .hero-name 的计算样式里读字体名、字重和文字，不写死字体名。
+    // 因为 next/font/google 会在构建时给字体生成带哈希的真实名称，这样写中英文和自托管字体都能准确命中。
+    const tasks: Promise<unknown>[] = [document.fonts.ready];
+    const heading = document.querySelector<HTMLElement>(".hero-name");
+    if (heading) {
+      const style = getComputedStyle(heading);
+      const text = heading.textContent?.trim() || "李姜磊";
+      tasks.push(document.fonts.load(`${style.fontStyle} ${style.fontWeight} 64px ${style.fontFamily}`, text));
+    }
+    Promise.all(tasks).then(done, done);
   });
 }
 

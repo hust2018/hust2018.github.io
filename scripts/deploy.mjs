@@ -1,44 +1,44 @@
 #!/usr/bin/env node
 /**
- * 一键部署脚本：pnpm deploy
+ * 一键部署脚本：pnpm publish-site
  * ---------------------------------------------------------------------------
- * 把「写完新简报 → 发布到线上」这一整套流程自动化。之前每次都要手动敲的步骤：
+ * 把「改完简历/代码 → 发布到线上」的流程串起来，避免源码、PDF、线上三边不同步：
  *
- *   1. 校验   检查 content/posts/ 下每篇文章的 frontmatter 是否完整（缺字段会让构建失败）
- *   2. 测试   pnpm test —— 单元测试全过才继续
- *   3. 构建   pnpm build —— 生成静态站点到 out/
- *   4. 提交   把新增/修改的文章提交到 main 分支并推送（源码备份）
- *   5. 部署   把 out/ 的构建产物强推到 gh-pages 分支（GitHub Pages 从这里取内容）
- *   6. 触发   调 GitHub API 触发 Pages 构建（推 gh-pages 不会自动触发，必须手动 POST）
- *   7. 验证   等构建完成，抓线上页面确认真的更新了
+ *   1. 同步检查  确认 resume.md 和 public/resume.pdf 与 lib/data.ts 一致（不一致就先跑 pnpm pdf）
+ *   2. 仓库检查  正式发布前确认工作区干净（先自己 commit，避免 main 悄悄落后于线上站点）
+ *   3. 单元测试  pnpm test —— 单元测试全过才继续
+ *   4. 构建站点  pnpm build —— 生成静态站点到 out/，并检查 GA 统计代码是否在产物里
+ *   5. 推送源码  把 main 分支领先的提交推到 origin/main
+ *   6. 部署页面  把 out/ 强推到 gh-pages 分支（GitHub Pages 从这里取内容）
+ *   7. 触发构建  调 GitHub API 触发 Pages 构建（推 gh-pages 不会自动触发，必须手动 POST）
+ *   8. 线上验证  等构建完成，抓线上首页确认真的更新了
  *
  * 设计原则：**任何一步失败就立刻停止**（fail fast）。宁可不发布，也不要把
- * 构建失败的半成品或没通过测试的内容推到公开线上。
+ * 没通过测试、或没同步 PDF/源码的半成品推到公开线上。
  *
  * 用法：
- *   pnpm deploy                    # 完整流程
- *   pnpm deploy --dry-run          # 演练：只跑校验/测试/构建，不推送任何东西
- *   pnpm deploy -m "自定义提交信息"  # 自定义 commit message
+ *   pnpm publish-site            # 完整发布流程
+ *   pnpm publish-site --dry-run  # 演练：只跑同步检查 / 测试 / 构建，不推送任何东西
  */
 
 import { execSync, execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
+import { buildResumeMarkdown } from "./resume-html.mjs";
+import { SITE_URL } from "../lib/site.ts";
 
 // ── 配置 ────────────────────────────────────────────────────────────────────
-const REPO = "hust2018/hust2018.github.io";          // GitHub 仓库
+const REPO = "hust2018/hust2018.github.io"; // GitHub 仓库
 const REMOTE = `https://github.com/${REPO}.git`;
-const SITE = "https://www.lijianglei.com";            // 线上站点（用于最后验证）
-const POSTS_DIR = path.join(process.cwd(), "content", "posts");
-const OUT_DIR = path.join(process.cwd(), "out");
-// frontmatter 必填字段：与 lib/posts.ts 的校验保持一致，缺任何一个都会让 build 抛错
-const REQUIRED_FIELDS = ["title", "description", "date", "lang"];
+const SITE = SITE_URL; // 线上站点（用于最后验证）
+const ROOT = process.cwd();
+const OUT_DIR = path.join(ROOT, "out");
+const RESUME_MD = path.join(ROOT, "resume.md");
+const RESUME_PDF = path.join(ROOT, "public", "resume.pdf");
 
 // ── 命令行参数 ──────────────────────────────────────────────────────────────
 const argv = process.argv.slice(2);
 const DRY_RUN = argv.includes("--dry-run");
-const msgIdx = Math.max(argv.indexOf("-m"), argv.indexOf("--message"));
-const CUSTOM_MSG = msgIdx >= 0 ? argv[msgIdx + 1] : null;
 
 // ── 小工具 ──────────────────────────────────────────────────────────────────
 const c = {
@@ -64,47 +64,35 @@ const run = (cmd, { silent = false, cwd } = {}) =>
 const capture = (cmd, cwd) => execSync(cmd, { encoding: "utf8", cwd }).trim();
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-// ═══ 1. 校验 frontmatter ════════════════════════════════════════════════════
-// 为什么放在最前面：lib/posts.ts 会对每篇文章做必填字段校验，缺字段直接 throw，
-// 导致 build 失败。与其等构建跑到一半报错，不如先在这里一次性列出所有问题文件。
-step("校验文章 frontmatter");
-const mdFiles = fs.existsSync(POSTS_DIR)
-  ? fs.readdirSync(POSTS_DIR).filter((f) => f.endsWith(".md") && !f.startsWith("_"))
-  : [];
-const badFiles = [];
-for (const f of mdFiles) {
-  const text = fs.readFileSync(path.join(POSTS_DIR, f), "utf8");
-  if (!text.startsWith("---")) {
-    badFiles.push(`${f} —— 没有 YAML frontmatter（文件必须以 --- 开头）`);
-    continue;
-  }
-  // 取出两个 --- 之间的 frontmatter 区块
-  const end = text.indexOf("\n---", 3);
-  const fm = end === -1 ? "" : text.slice(3, end);
-  const missing = REQUIRED_FIELDS.filter((k) => !new RegExp(`^${k}:`, "m").test(fm));
-  if (missing.length) badFiles.push(`${f} —— 缺少字段: ${missing.join(", ")}`);
+// ═══ 1. 校验 resume.md / public/resume.pdf 是否与 lib/data.ts 同步 ══════════
+// 原因：网页直接读 lib/data.ts，但下载按钮用的是预先生成的 public/resume.pdf。
+// 改了简历数据却忘了跑 pnpm pdf，会导致网页和下载下来的 PDF 内容对不上。
+step("检查简历数据与 PDF 同步状态");
+const expectedMd = buildResumeMarkdown("zh");
+const currentMd = fs.existsSync(RESUME_MD) ? fs.readFileSync(RESUME_MD, "utf8") : "";
+if (currentMd !== expectedMd) {
+  die("resume.md 与 lib/data.ts 不一致，请先运行 pnpm pdf 重新生成简历文档和 PDF");
 }
-if (badFiles.length) {
-  badFiles.forEach((b) => console.error(`    ${c.red("✗")} ${b}`));
-  die(`${badFiles.length} 篇文章 frontmatter 不合规，修好再发布`);
+if (!fs.existsSync(RESUME_PDF)) {
+  die("public/resume.pdf 不存在，请先运行 pnpm pdf 生成");
 }
-ok(`${mdFiles.length} 篇文章全部合规`);
+ok("resume.md 与 lib/data.ts 一致，public/resume.pdf 就绪");
 
-// ═══ 2. 查看待发布内容 ══════════════════════════════════════════════════════
-step("检查待发布的改动");
+// ═══ 2. 检查 git 工作区是否干净 ═════════════════════════════════════════════
+// 原因：以前脚本会把未提交的改动直接构建推到 gh-pages，导致 main 悄悄落后于线上。
+// 现在要求正式发布前工作区必须干净；演练模式（--dry-run）只提醒不阻断。
+step("检查 git 工作区状态");
 const status = capture("git status --porcelain");
-const changedPosts = status
-  .split("\n")
-  .filter(Boolean)
-  .map((l) => l.slice(3).replace(/^"|"$/g, ""))
-  .filter((p) => p.startsWith("content/posts/") && p.endsWith(".md"));
-
-if (changedPosts.length === 0) {
-  warn("没有新增或修改的文章");
-  info("（仍会重新构建部署，用于发布代码/样式类改动）");
+if (status.trim() !== "") {
+  const lines = status.split("\n").filter(Boolean);
+  lines.forEach((l) => info(`  ${l}`));
+  if (DRY_RUN) {
+    warn(`发现 ${lines.length} 处未提交改动（演练模式继续执行，正式发布前请先 git commit）`);
+  } else {
+    die(`工作区有 ${lines.length} 处未提交改动，请先 git commit 后再发布，避免 main 落后于线上`);
+  }
 } else {
-  ok(`发现 ${changedPosts.length} 篇待发布文章：`);
-  changedPosts.forEach((p) => info(`  · ${path.basename(p)}`));
+  ok("工作区干净");
 }
 
 // ═══ 3. 单元测试 ════════════════════════════════════════════════════════════
@@ -117,7 +105,7 @@ try {
   die("单元测试未通过");
 }
 
-// ═══ 4. 构建 ════════════════════════════════════════════════════════════════
+// ═══ 4. 构建静态站点 ════════════════════════════════════════════════════════
 step("构建静态站点");
 try {
   run("pnpm build", { silent: true });
@@ -133,39 +121,18 @@ indexHtml.includes("G-E3PKHCXYBD")
   : warn("构建成功，但产物里没找到 GA 代码，请检查 app/layout.tsx");
 
 if (DRY_RUN) {
-  console.log(`\n${c.yellow("● 演练模式（--dry-run）")}：校验/测试/构建均已通过，未推送任何内容。\n`);
+  console.log(`\n${c.yellow("● 演练模式（--dry-run）")}：同步检查 / 测试 / 构建均已通过，未推送任何内容。\n`);
   process.exit(0);
 }
 
-// ═══ 5. 提交并推送 main（源码）══════════════════════════════════════════════
-step("提交源码到 main 分支");
-if (status.trim() === "") {
-  info("工作区干净，无需提交");
-} else {
-  // 只提交文章；其它零散改动（如 AGENTS.md）保持不动，避免误提交
-  if (changedPosts.length) {
-    execFileSync("git", ["add", ...changedPosts], { stdio: "inherit" });
-    const names = changedPosts.map((p) => path.basename(p, ".md").replace("daily-brief-", ""));
-    const msg =
-      CUSTOM_MSG ||
-      `content: add daily briefs ${names.length > 1 ? `${names[0]} through ${names[names.length - 1]}` : names[0]}`;
-    execFileSync(
-      "git",
-      ["commit", "-m", `${msg}\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>`],
-      { stdio: "inherit" },
-    );
-    ok("已提交");
-  } else {
-    info("没有文章改动需要提交（其它未跟踪文件保持原样）");
-  }
-}
-// 本地有领先提交才推送
+// ═══ 5. 推送 main 分支源码 ══════════════════════════════════════════════════
+step("推送源码到 main 分支");
 const ahead = capture("git rev-list --count origin/main..HEAD");
 if (Number(ahead) > 0) {
   run("git push origin main");
   ok(`已推送 ${ahead} 个提交到 main`);
 } else {
-  info("main 无新提交可推");
+  info("main 已与远端同步，无新提交可推");
 }
 
 // ═══ 6. 部署构建产物到 gh-pages ════════════════════════════════════════════
@@ -208,7 +175,10 @@ for (let i = 1; i <= 12; i++) {
     /* 偶发网络错误：忽略，下一轮继续 */
   }
   info(`第 ${i} 次检查: ${s || "(查询失败)"}`);
-  if (s === "built") { built = true; break; }
+  if (s === "built") {
+    built = true;
+    break;
+  }
   if (s === "errored") die("GitHub Pages 构建报错，去仓库 Settings → Pages 查看详情");
 }
 if (!built) {
@@ -217,20 +187,14 @@ if (!built) {
 }
 ok("Pages 构建完成");
 
-step("验证线上内容");
-// 抽查最新一篇文章：从本次改动里取日期最大的那篇
-const latest = changedPosts.map((p) => path.basename(p, ".md")).sort().pop();
-if (latest) {
-  try {
-    const html = capture(`curl -sL "${SITE}/blog/${latest}/?_=${Date.now()}"`);
-    html.includes("每日商业与科技简报")
-      ? ok(`${SITE}/blog/${latest}/ 已上线`)
-      : warn("线上页面暂未看到内容（可能是 CDN 缓存，稍后再看）");
-  } catch {
-    warn("验证请求失败，请手动打开站点确认");
-  }
-} else {
-  ok(`站点已更新：${SITE}`);
+step("验证线上首页");
+try {
+  const html = capture(`curl -sL "${SITE}/?_=${Date.now()}"`);
+  html.includes("李姜磊")
+    ? ok(`${SITE}/ 访问正常`)
+    : warn("线上页面暂未看到预期内容（可能是 CDN 缓存，稍后再看）");
+} catch {
+  warn("验证请求失败，请手动打开站点确认");
 }
 
 console.log(`\n${c.green(c.bold("🎉 部署完成"))}  ${SITE}\n`);

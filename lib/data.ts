@@ -100,8 +100,8 @@ export const RESUME: Resume = {
     {
       era: "agent",
       role: { zh: "AI Agent 开发工程师", en: "AI Agent Engineer" },
-      company: { zh: "tapnow", en: "tapnow" },
-      date: "2026.5 — 2026.10",
+      company: { zh: "TapNow", en: "TapNow" },
+      date: "2026.05 — 2026.10",
       bullets: {
         zh: [
           "**核心模型服务与架构重构**：端到端负责多模态模型平台，打通 SDK、供应商适配、路由、任务编排与计费，统一支撑画布和 Agent；主导 Go 架构重构，拆分网关、同步／异步执行与调度服务，通过配置化治理、所有权心跳和终态保护，提升模型扩展与长任务可靠性。",
@@ -137,7 +137,7 @@ export const RESUME: Resume = {
       era: "security",
       role: { zh: "安全研发工程师", en: "Security R&D Engineer" },
       company: { zh: "字节跳动 · 安全与风控", en: "ByteDance · Security & Risk Control" },
-      date: "2022.6 — 2025.7",
+      date: "2022.06 — 2025.07",
       bullets: {
         zh: [
           "研发容器微隔离 **HFW v3**：控制面迁移 Hertz 架构，**规则响应提升 400%**，支持热更新，稳定性大幅增强。",
@@ -166,7 +166,7 @@ export const RESUME: Resume = {
   // highlights：「亮点 / 活动」——黑客马拉松、开源研读等（对应 PDF 的「活动经历」）。
   highlights: [
     {
-      date: "2025.8 — 2025.9",
+      date: "2025.08 — 2025.09",
       title: { zh: "GOSIM Hangzhou 2025 · Code Alert 黑客马拉松", en: "GOSIM Hangzhou 2025 · Code Alert Hackathon" },
       badge: { zh: "第五名", en: "5th place" },
       desc: {
@@ -180,12 +180,12 @@ export const RESUME: Resume = {
   // education：教育经历数组（最近的放最前）。extra 字段可选，这里没填就省略。
   education: [
     {
-      date: "2019.9 — 2022.6",
+      date: "2019.09 — 2022.06",
       school: { zh: "华中科技大学", en: "Huazhong Univ. of Science & Technology" },
       degree: { zh: "网络空间安全 · 硕士", en: "M.Eng., Cyberspace Security" },
     },
     {
-      date: "2015.9 — 2019.6",
+      date: "2015.09 — 2019.06",
       school: { zh: "华中科技大学", en: "Huazhong Univ. of Science & Technology" },
       degree: { zh: "信息安全 · 学士", en: "B.Eng., Information Security" },
     },

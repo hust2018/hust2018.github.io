@@ -105,6 +105,7 @@ export function Hero({ lang, live }: { lang: Lang; live: boolean }) {
                   width={900}
                   height={1200}
                   alt={pickLang(STRINGS.portraitAlt, lang)}
+                  fetchPriority="high"
                   decoding="async"
                 />
                 <span className="portrait-cover" aria-hidden="true" />

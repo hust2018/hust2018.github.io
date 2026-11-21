@@ -66,10 +66,10 @@ dialog:not([open]) { display: none !important; }
      --f-display-zh 反过来，给纯中文的大字用（名字、区块标题），这样行高按中文字体来算。
      毛笔字只有一个字重、也没有斜体，所以全站关掉了「浏览器自动加粗 / 自动倾斜」
      （见 body 的 font-synthesis）；展示字规则里写的 italic 因此只作用在英文和数字上。 */
-  --f-display: "Bodoni Moda", "Ma Shan Zheng", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", serif;
-  --f-display-zh: "Ma Shan Zheng", "Bodoni Moda", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", serif;
-  --f-body: "Archivo", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
-  --f-mono: "Martian Mono", ui-monospace, "SF Mono", Menlo, Consolas, "Noto Sans SC", monospace;
+  --f-display: var(--font-bodoni), var(--font-ma-shan-zheng), var(--font-noto-sans-sc), "PingFang SC", "Microsoft YaHei", serif;
+  --f-display-zh: var(--font-ma-shan-zheng), var(--font-bodoni), var(--font-noto-sans-sc), "PingFang SC", "Microsoft YaHei", serif;
+  --f-body: var(--font-archivo), var(--font-noto-sans-sc), "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --f-mono: var(--font-martian-mono), ui-monospace, "SF Mono", Menlo, Consolas, var(--font-noto-sans-sc), monospace;
 
   /* 字号 */
   --t-label: 12px;
